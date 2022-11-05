@@ -3,7 +3,7 @@ sphinx-quickstart on Sat Nov  5 18:11:12 2022.
 You can adapt this file completely to your liking, but it should at least
 contain the root `toctree` directive.
 
-Welcome to <html_title>'s documentation!
+Welcome to CyberArena's documentation!
 ======================================
 
 .. toctree::
