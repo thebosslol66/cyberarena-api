@@ -1,4 +1,4 @@
-Principles of CyberArena
+Principles of <html_title>
 ========================
 
 Paragraphe Principle
