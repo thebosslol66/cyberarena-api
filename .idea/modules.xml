@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/ProjectL3.iml" filepath="$PROJECT_DIR$/.idea/ProjectL3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/CyberArena-API.iml" filepath="$PROJECT_DIR$/.idea/CyberArena-API.iml" />
     </modules>
   </component>
 </project>
