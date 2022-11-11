@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'CyberArena-API'
+project = 'CyberArena'
 copyright = '2022, Yasser OMARI, Alphée GROSDIDIER, Fantin GAUTHIER'
 author = 'Yasser OMARI, Alphée GROSDIDIER, Fantin GAUTHIER'
 release = 'pre-alpha'
@@ -28,6 +28,6 @@ exclude_patterns = [
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
-html_title = 'CyberArena-API'
+html_title = 'CyberArena'
 html_logo = None
 html_favicon = None
