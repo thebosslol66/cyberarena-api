@@ -1,0 +1,58 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile
+    image: cyberarena:${CYBERARENA_VERSION:-latest}
+    restart: always
+    env_file:
+    - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      CYBERARENA_HOST: 0.0.0.0
+      CYBERARENA_DB_HOST: cyberarena-db
+      CYBERARENA_DB_PORT: 3306
+      CYBERARENA_DB_USER: cyberarena
+      CYBERARENA_DB_PASS: cyberarena
+      CYBERARENA_DB_BASE: cyberarena
+
+  db:
+    image: bitnami/mysql:8.0.30
+    hostname: cyberarena-db
+    restart: always
+    environment:
+      MYSQL_ROOT_USER: "cyberarena"
+      MYSQL_ROOT_PASSWORD: "cyberarena"
+      MYSQL_DATABASE: "cyberarena"
+      MYSQL_AUTHENTICATION_PLUGIN: "mysql_native_password"
+    healthcheck:
+      test: mysqladmin ping -h localhost
+      interval: 10s
+      timeout: 5s
+      retries: 40
+    volumes:
+    - cyberarena-db-data:/bitnami/mysql/data
+
+  migrator:
+    image: cyberarena:${CYBERARENA_VERSION:-latest}
+    restart: "no"
+    command: alembic upgrade head
+    environment:
+      CYBERARENA_DB_HOST: cyberarena-db
+      CYBERARENA_DB_PORT: 3306
+      CYBERARENA_DB_USER: cyberarena
+      CYBERARENA_DB_PASS: cyberarena
+      CYBERARENA_DB_BASE: cyberarena
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+
+volumes:
+  cyberarena-db-data:
+    name: cyberarena-db-data
