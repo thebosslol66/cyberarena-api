@@ -33,7 +33,9 @@ async def is_username_correct(user_model: VerifyUserModel) -> Optional[str]:
     if len(user_model.username) < 4:
         return "Username is too short"
     if not any(char.isalnum() for char in user_model.username):
-        return "Username must contain at least one alphanumeric character"
+        return "Username must contain only alphanumeric character"
+    if not any(not char.isspace() for char in user_model.username):
+        return "Username must not contain spaces"
     return None
 
 
@@ -56,6 +58,8 @@ async def is_password_correct(user_model: VerifyUserModel) -> Optional[str]:
         " least one alphanumeric character",
     }
 
+    if len(user_model.password) < 8:
+        return "Password is too short"
     for verification_function, response in verification_responses.items():
         if not any(verification_function(char) for char in user_model.password):
             return response

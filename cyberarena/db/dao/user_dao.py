@@ -27,8 +27,10 @@ class UserDAO:
         :param email: email of a user.
         :param password: password of a user.
         """
+        user = UserModel(username=username, email=email)
+        user.set_password(password)
         self.session.add(
-            UserModel(username=username, email=email, password=password),
+            user,
         )
 
     async def get_user_by_username(self, username: str) -> Optional[UserModel]:
