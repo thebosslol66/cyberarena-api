@@ -6,7 +6,7 @@ services:
       # Exposes application port.
     - "8000:8000"
     volumes:
-      # Adds current directory as volume.
+      # Adds current directory as volume
     - .:/app/src/
     environment:
       # Enables autoreload.
