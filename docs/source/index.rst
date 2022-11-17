@@ -12,5 +12,8 @@ Welcome to <html_title>'s documentation!
    :name: mastertoc
 
    overview/principle
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 5e01f9b15f52c1feeb32962b20c65742a3525488
