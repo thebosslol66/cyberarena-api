@@ -34,6 +34,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("email"),
         sa.UniqueConstraint("username"),
+        sa.Column("refresh_token_value", sa.String(length=128), nullable=True),
     )
     # ### end Alembic commands ###
 
