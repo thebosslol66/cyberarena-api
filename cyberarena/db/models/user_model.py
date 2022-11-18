@@ -23,6 +23,7 @@ class UserModel(Base):
         unique=True,
         nullable=False,
     )
+    refresh_token_value = Column(String(length=128), nullable=True)  # noqa: WPS432
     is_active = Column(Boolean(), nullable=False, default=False)  # noqa: WPS432
     is_superuser = Column(Boolean(), nullable=False, default=False)  # noqa: WPS432
 

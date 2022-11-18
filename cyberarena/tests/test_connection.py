@@ -49,6 +49,7 @@ async def test_new_sign_up(
     assert instance1.username == test_name
     assert instance1.email == email
     assert instance1.is_correct_password(password)
+    assert instance1.refresh_token_value is None
     assert instance1.is_superuser is False
     assert instance1.is_active is False
 
