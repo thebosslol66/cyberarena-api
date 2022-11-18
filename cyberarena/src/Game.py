@@ -1,3 +1,5 @@
+
+
 class Game :
     def __init__(self, id, player1, player2, terrain) :
         self.player1 = player1
@@ -5,7 +7,7 @@ class Game :
         self.board = board
         self.turn = 0
         self.winner = None
-
+        self.id = id
 
     def play(self) :
         while self.winner is None :
