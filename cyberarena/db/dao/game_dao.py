@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from fastapi import Depends
 from sqlalchemy import select
@@ -7,13 +7,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from cyberarena.db.dependencies import get_db_session
 from cyberarena.db.models.game_model import GameModel
 
-class GameDAO :
+
+class GameDAO:
     """Class for accessing game table"""
 
-    def __init__(self, session : AsyncSession = Depends(get_db_session)) :
+    def __init__(self, session: AsyncSession = Depends(get_db_session)):
         self.session = session
 
-    async def create_game(self, player1 : int, player2 : int, terrain : str) -> None :
+    async def create_game(self, player1: int, player2: int, terrain: str) -> None:
         """
         Add single game to session.
 
@@ -25,7 +26,7 @@ class GameDAO :
         game = GameModel(player1=player1, player2=player2, terrain=terrain)
         self.session.add(game)
 
-    async def get_game_by_id(self, id : int) -> Optional[GameModel] :
+    async def get_game_by_id(self, id: int) -> Optional[GameModel]:
         """
         Get specific game model.
 
@@ -34,26 +35,28 @@ class GameDAO :
         """
         query = select(GameModel).where(GameModel.id == id)
         rows = await self.session.execute(query)
-        try :
+        try:
             return rows.scalars().one()
-        except Exception :
+        except Exception:
             return None
 
-    async def get_game_by_player(self, player : int) -> Optional[GameModel] :
+    async def get_game_by_player(self, player: int) -> Optional[GameModel]:
         """
         Get specific game model.
 
         :param player: id of player instance.
         :return: game model.
         """
-        query = select(GameModel).where(GameModel.player1 == player or GameModel.player2 == player)
+        query = select(GameModel).where(
+            GameModel.player1 == player or GameModel.player2 == player
+        )
         rows = await self.session.execute(query)
-        try :
+        try:
             return rows.scalars().fetchall()
-        except Exception :
+        except Exception:
             return None
 
-    async def get_game_by_terrain(self, terrain : str) -> Optional[GameModel] :
+    async def get_game_by_terrain(self, terrain: str) -> Optional[GameModel]:
         """
         Get specific game model.
 
@@ -64,8 +67,7 @@ class GameDAO :
         rows = await self.session.execute(query)
         return rows.scalars().fetchall()
 
-
-    async def get_game_by_winner(self, winner : int) -> Optional[GameModel] :
+    async def get_game_by_winner(self, winner: int) -> Optional[GameModel]:
         """
         Get specific game model.
 
@@ -75,6 +77,3 @@ class GameDAO :
         query = select(GameModel).where(GameModel.winner == winner)
         rows = await self.session.execute(query)
         return rows.scalars().fetchall()
-
-
-
