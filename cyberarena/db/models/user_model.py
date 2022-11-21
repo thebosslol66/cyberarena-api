@@ -11,7 +11,7 @@ class UserModel(Base):
 
     __tablename__ = "user_model"
 
-    id = Column(Integer(), primary_key=True, autoincrement=True)
+    id = Column(Integer(), primary_key=True, autoincrement=True, nullable=False)
     username = Column(
         String(length=200),  # noqa: WPS432
         unique=True,

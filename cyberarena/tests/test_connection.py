@@ -1,14 +1,19 @@
-# flake8: noqa
-
+import datetime
 import uuid
 
 import pytest
+from _pytest.monkeypatch import MonkeyPatch
 from fastapi import FastAPI
 from httpx import AsyncClient
+from jose import jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from cyberarena.db.dao.user_dao import UserDAO
+from cyberarena.db.models.user_model import UserModel
+from cyberarena.settings import settings
+from cyberarena.web.api.connection import utils
+from cyberarena.web.api.connection.utils import create_refresh_token
 
 ######################################################################
 #                       TESTS USER SIGNUP                            #
@@ -526,7 +531,7 @@ async def create_dummy_user(
 
 
 @pytest.mark.anyio
-async def test_sign_in(
+async def test_sign_in_username_correct(
     fastapi_app: FastAPI,
     client: AsyncClient,
     dbsession: AsyncSession,
@@ -537,17 +542,540 @@ async def test_sign_in(
     :param client: client for the app.
     :param fastapi_app: current FastAPI application.
     """
-    url = fastapi_app.url_path_for("sign_in")
-    username = ("test",)
-    password = ("aAZ?o2aaaaa",)
-    email = ("test@test.com",)
+    url = fastapi_app.url_path_for("login_for_access_token")
+    username = "test"
+    password = "aAZ?o2aaaaa"
+    email = "test@test.com"
 
     await create_dummy_user(dbsession)
+    user_dao = UserDAO(dbsession)
+    user = await user_dao.get_user_by_username(username)
+    if user is None:
+        raise ValueError("User is None")
+    await user_dao.update_active(-1 if user.id is None else user.id, True)
+
+    response = await client.post(
+        url,
+        data={
+            "username": username,
+            "password": password,
+        },
+        headers={
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    at = response.json()["access_token"]
+    assert at != ""
+    rt = response.json()["refresh_token"]
+    assert rt != ""
+    assert response.json()["token_type"] == "Bearer"
+    decoded_access_token = jwt.decode(
+        at,
+        settings.secret_key,
+        algorithms=[settings.algorithm],
+    )
+    decoded_refresh_token = jwt.decode(
+        rt,
+        settings.secret_key,
+        algorithms=[settings.algorithm],
+    )
+    user_from_db: UserModel = await user_dao.get_user_by_username(username)
+    assert decoded_access_token["sub"] == str(
+        user_from_db.id,
+    )
+    assert (
+        decoded_access_token["exp"] - decoded_access_token["iat"]
+        == settings.access_token_expire_minutes * 60
+    )
+    # TODO: check scopes
+
+    user_from_db: UserModel = await user_dao.get_user_by_username(username)
+    assert decoded_refresh_token["sub"] == str(
+        user_from_db.id,
+    )
+    assert (
+        decoded_refresh_token["exp"] - decoded_refresh_token["iat"]
+        == settings.refresh_token_expire_minutes * 60
+    )
+    assert decoded_refresh_token["val"] == user.refresh_token_value
+
+
+@pytest.mark.anyio
+async def test_sign_in_email_correct(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+) -> None:
+    """
+    Checks the register endpoint.
+
+    :param client: client for the app.
+    :param fastapi_app: current FastAPI application.
+    """
+    url = fastapi_app.url_path_for("login_for_access_token")
+    username = "test"
+    password = "aAZ?o2aaaaa"
+    email = "test@test.com"
+
+    await create_dummy_user(dbsession)
+    user_dao = UserDAO(dbsession)
+    user = await user_dao.get_user_by_username(username)
+    if user is None:
+        raise ValueError("User is None")
+    await user_dao.update_active(-1 if user.id is None else user.id, True)
+
+    response = await client.post(
+        url,
+        data={
+            "username": email,
+            "password": password,
+        },
+        headers={
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    at = response.json()["access_token"]
+    assert at != ""
+    rt = response.json()["refresh_token"]
+    assert rt != ""
+    assert response.json()["token_type"] == "Bearer"
+    decoded_access_token = jwt.decode(
+        at,
+        settings.secret_key,
+        algorithms=[settings.algorithm],
+    )
+    decoded_refresh_token = jwt.decode(
+        rt,
+        settings.secret_key,
+        algorithms=[settings.algorithm],
+    )
+    assert decoded_access_token["sub"] == str(
+        (
+            await user_dao.get_user_by_username(
+                username,
+            )
+        ).id,
+    )
+    assert (
+        decoded_access_token["exp"] - decoded_access_token["iat"]
+        == settings.access_token_expire_minutes * 60
+    )
+    # TODO: check scopes
+
+    user_from_db: UserModel = await user_dao.get_user_by_username(
+        username,
+    )
+
+    assert decoded_refresh_token["sub"] == str(
+        user_from_db.id,
+    )
+    assert (
+        decoded_refresh_token["exp"] - decoded_refresh_token["iat"]
+        == settings.refresh_token_expire_minutes * 60
+    )
+    assert decoded_refresh_token["val"] == user.refresh_token_value
+
+
+@pytest.mark.anyio
+async def test_sign_in_invalid_password(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+) -> None:
+    """
+    Checks the register endpoint.
+
+    :param client: client for the app.
+    :param fastapi_app: current FastAPI application.
+    """
+    url = fastapi_app.url_path_for("login_for_access_token")
+    username = "test"
+    password = "aAZ?o2aaaaa"
+    email = "test@test.com"
+
+    await create_dummy_user(dbsession)
+    user_dao = UserDAO(dbsession)
+    user = await user_dao.get_user_by_username(username)
+    if user is None:
+        raise ValueError("User is None")
+    await user_dao.update_active(-1 if user.id is None else user.id, True)
+
+    response = await client.post(
+        url,
+        data={
+            "username": username,
+            "password": password + "a",
+        },
+        headers={
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.anyio
+async def test_sign_in_inactive_user(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+) -> None:
+    """
+    Checks the register endpoint.
+
+    :param client: client for the app.
+    :param fastapi_app: current FastAPI application.
+    """
+    url = fastapi_app.url_path_for("login_for_access_token")
+    username = "test"
+    password = "aAZ?o2aaaaa"
+    email = "test@test.com"
+
+    await create_dummy_user(dbsession)
+    user_dao = UserDAO(dbsession)
+    user = await user_dao.get_user_by_username(username)
+    if user is None:
+        raise ValueError("User is None")
+    await user_dao.update_active(-1 if user.id is None else user.id, False)
+
+    response = await client.post(
+        url,
+        data={
+            "username": username,
+            "password": password,
+        },
+        headers={
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.anyio
+async def test_sign_in_invalid_username(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+) -> None:
+    """
+    Checks the register endpoint.
+
+    :param client: client for the app.
+    :param fastapi_app: current FastAPI application.
+    """
+    url = fastapi_app.url_path_for("login_for_access_token")
+    username = "test"
+    password = "aAZ?o2aaaaa"
+    email = "test@test.com"
+
+    await create_dummy_user(dbsession)
+    user_dao = UserDAO(dbsession)
+    user = await user_dao.get_user_by_username(username)
+    if user is None:
+        raise ValueError("User is None")
+    await user_dao.update_active(-1 if user.id is None else user.id, True)
+
+    response = await client.post(
+        url,
+        data={
+            "username": username + "a",
+            "password": password,
+        },
+        headers={
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.anyio
+async def test_sign_in_invalid_email(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+) -> None:
+    """
+    Checks the register endpoint.
+
+    :param client: client for the app.
+    :param fastapi_app: current FastAPI application.
+    """
+    url = fastapi_app.url_path_for("login_for_access_token")
+    username = "test"
+    password = "aAZ?o2aaaaa"
+    email = "test@test.com"
+
+    await create_dummy_user(dbsession)
+    user_dao = UserDAO(dbsession)
+    user = await user_dao.get_user_by_username(username)
+    if user is None:
+        raise ValueError("User is None")
+    await user_dao.update_active(-1 if user.id is None else user.id, True)
+
+    response = await client.post(
+        url,
+        data={
+            "username": "a" + email,
+            "password": password,
+        },
+        headers={
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+######################################################################
+#                     TEST USER REFRESH TOKEN                        #
+######################################################################
+
+
+@pytest.mark.anyio
+async def test_refresh_token(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+) -> None:
+    """
+    Checks the register endpoint.
+
+    :param client: client for the app.
+    :param fastapi_app: current FastAPI application.
+    """
+    url = fastapi_app.url_path_for("refresh_token_endpoint")
+    username = "test"
+    password = "aAZ?o2aaaaa"
+    email = "test@test.com"
+
+    await create_dummy_user(dbsession)
+    user_dao = UserDAO(dbsession)
+    user = await user_dao.get_user_by_username(username)
+    if user is None:
+        raise ValueError("User is None")
+    await user_dao.update_active(user.id, True)
+
+    refresh_token = await create_refresh_token(user, user_dao)
 
     response = await client.post(
         url,
         json={
-            "username": username,
-            "password": password,
+            "refresh_token": refresh_token,
         },
     )
+
+    assert response.status_code == status.HTTP_200_OK
+    at = response.json()["access_token"]
+    assert at != ""
+    rt = response.json()["refresh_token"]
+    assert rt != ""
+    assert response.json()["token_type"] == "Bearer"
+    decoded_access_token = jwt.decode(
+        at,
+        settings.secret_key,
+        algorithms=[settings.algorithm],
+    )
+    decoded_refresh_token = jwt.decode(
+        rt,
+        settings.secret_key,
+        algorithms=[settings.algorithm],
+    )
+    assert decoded_access_token["sub"] == str(
+        (
+            await user_dao.get_user_by_username(
+                username,
+            )
+        ).id,
+    )
+    assert (
+        decoded_access_token["exp"] - decoded_access_token["iat"]
+        == settings.access_token_expire_minutes * 60
+    )
+    # TODO: check scopes
+
+    user_from_db: UserModel = await user_dao.get_user_by_username(
+        username,
+    )
+    assert decoded_refresh_token["sub"] == str(
+        user_from_db.id,
+    )
+    assert (
+        decoded_refresh_token["exp"] - decoded_refresh_token["iat"]
+        == settings.refresh_token_expire_minutes * 60
+    )
+    assert decoded_refresh_token["val"] == user.refresh_token_value
+
+
+@pytest.mark.anyio
+async def test_refresh_token_invalid_token(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+) -> None:
+    """
+    Checks the register endpoint.
+
+    :param client: client for the app.
+    :param fastapi_app: current FastAPI application.
+    """
+    url = fastapi_app.url_path_for("refresh_token_endpoint")
+    username = "test"
+    password = "aAZ?o2aaaaa"
+    email = "test@test.com"
+
+    await create_dummy_user(dbsession)
+    user_dao = UserDAO(dbsession)
+    user = await user_dao.get_user_by_username(username)
+    if user is None:
+        raise ValueError("User is None")
+    await user_dao.update_active(-1 if user.id is None else user.id, True)
+
+    refresh_token = await create_refresh_token(user, user_dao)
+
+    response = await client.post(
+        url,
+        json={
+            "refresh_token": refresh_token + "a",
+        },
+    )
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.anyio
+async def test_refresh_token_expired_token(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """
+    Checks the register endpoint.
+
+    :param client: client for the app.
+    :param fastapi_app: current FastAPI application.
+    """
+    url = fastapi_app.url_path_for("refresh_token_endpoint")
+    username = "test"
+    password = "aAZ?o2aaaaa"
+    email = "test@test.com"
+
+    await create_dummy_user(dbsession)
+    user_dao = UserDAO(dbsession)
+    user = await user_dao.get_user_by_username(username)
+    if user is None:
+        raise ValueError("User is None")
+    await user_dao.update_active(-1 if user.id is None else user.id, True)
+
+    refresh_token = await create_refresh_token(user, user_dao)
+
+    expire_time = datetime.datetime.utcnow() + datetime.timedelta(
+        minutes=settings.refresh_token_expire_minutes + 1,
+    )
+
+    monkeypatch.setattr(utils, "now", lambda: expire_time)
+
+    response = await client.post(
+        url,
+        json={
+            "refresh_token": refresh_token,
+        },
+    )
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.anyio
+async def test_refresh_token_user_not_have_token(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+) -> None:
+    """
+    Checks the register endpoint.
+
+    :param client: client for the app.
+    :param fastapi_app: current FastAPI application.
+    """
+    url = fastapi_app.url_path_for("refresh_token_endpoint")
+    username = "test"
+    password = "aAZ?o2aaaaa"
+    email = "test@test.com"
+
+    await create_dummy_user(dbsession)
+    user_dao = UserDAO(dbsession)
+    user = await user_dao.get_user_by_username(username)
+    if user is None:
+        raise ValueError("User is None")
+    await user_dao.update_active(-1 if user.id is None else user.id, True)
+
+    response = await client.post(
+        url,
+        json={
+            "refresh_token": "a",
+        },
+    )
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.anyio
+async def test_refresh_token_stolen(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+) -> None:
+    """
+    Checks the register endpoint.
+
+    :param client: client for the app.
+    :param fastapi_app: current FastAPI application.
+    """
+    url = fastapi_app.url_path_for("refresh_token_endpoint")
+    username = "test"
+    password = "aAZ?o2aaaaa"
+    email = "test@test.com"
+
+    await create_dummy_user(dbsession)
+    user_dao = UserDAO(dbsession)
+    user = await user_dao.get_user_by_username(username)
+    if user is None:
+        raise ValueError("User is None")
+    await user_dao.update_active(-1 if user.id is None else user.id, True)
+
+    refresh_token = await create_refresh_token(user, user_dao)
+
+    response = await client.post(
+        url,
+        json={
+            "refresh_token": refresh_token,
+        },
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    new_rt = response.json()["refresh_token"]
+
+    response = await client.post(
+        url,
+        json={
+            "refresh_token": refresh_token,
+        },
+    )
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert user.refresh_token_value is None
+
+    response = await client.post(
+        url,
+        json={
+            "refresh_token": new_rt,
+        },
+    )
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
