@@ -315,7 +315,7 @@ async def get_current_user(  # noqa: C901
     return user
 
 
-class PayloadValueForTranmissionRT(object):
+class _PayloadValueForTranmissionRT(object):
     """
     Payload value for transmission.
 
@@ -339,10 +339,10 @@ class PayloadValueForTranmissionRT(object):
     refresh_token_value: str
 
 
-async def verify_payload_rt(
+async def _verify_payload_rt(
     payload: Any,
     credentials_exception: HTTPException,
-) -> PayloadValueForTranmissionRT:
+) -> _PayloadValueForTranmissionRT:
     """
     Verify payload.
 
@@ -360,7 +360,7 @@ async def verify_payload_rt(
     refresh_token = payload.get("val")
     if refresh_token is None:
         raise credentials_exception
-    return PayloadValueForTranmissionRT(user_id, refresh_token)
+    return _PayloadValueForTranmissionRT(user_id, refresh_token)
 
 
 async def get_curent_user_with_refresh_token(
@@ -381,7 +381,7 @@ async def get_curent_user_with_refresh_token(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        result: PayloadValueForTranmissionRT = await verify_payload_rt(
+        result: _PayloadValueForTranmissionRT = await _verify_payload_rt(
             jwt.decode(
                 token,
                 settings.secret_key,

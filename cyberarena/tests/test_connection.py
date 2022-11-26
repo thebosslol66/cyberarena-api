@@ -1,3 +1,4 @@
+# flake8: noqa
 import datetime
 import uuid
 
@@ -13,7 +14,6 @@ from cyberarena.db.dao.user_dao import UserDAO
 from cyberarena.db.models.user_model import UserModel
 from cyberarena.settings import settings
 from cyberarena.web.api.connection import utils
-from cyberarena.web.api.connection.utils import create_refresh_token
 
 ######################################################################
 #                       TESTS USER SIGNUP                            #
@@ -861,7 +861,7 @@ async def test_refresh_token(
         raise ValueError("User is None")
     await user_dao.update_active(user.id, True)
 
-    refresh_token = await create_refresh_token(user, user_dao)
+    refresh_token = await utils.create_refresh_token(user, user_dao)
 
     response = await client.post(
         url,
@@ -936,7 +936,7 @@ async def test_refresh_token_invalid_token(
         raise ValueError("User is None")
     await user_dao.update_active(-1 if user.id is None else user.id, True)
 
-    refresh_token = await create_refresh_token(user, user_dao)
+    refresh_token = await utils.create_refresh_token(user, user_dao)
 
     response = await client.post(
         url,
@@ -973,7 +973,7 @@ async def test_refresh_token_expired_token(
         raise ValueError("User is None")
     await user_dao.update_active(-1 if user.id is None else user.id, True)
 
-    refresh_token = await create_refresh_token(user, user_dao)
+    refresh_token = await utils.create_refresh_token(user, user_dao)
 
     expire_time = datetime.datetime.utcnow() + datetime.timedelta(
         minutes=settings.refresh_token_expire_minutes + 1,
@@ -1049,7 +1049,7 @@ async def test_refresh_token_stolen(
         raise ValueError("User is None")
     await user_dao.update_active(-1 if user.id is None else user.id, True)
 
-    refresh_token = await create_refresh_token(user, user_dao)
+    refresh_token = await utils.create_refresh_token(user, user_dao)
 
     response = await client.post(
         url,
