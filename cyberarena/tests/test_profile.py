@@ -1,18 +1,16 @@
 # flake8: noqa
+from typing import Callable
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from cyberarena.db.dao.user_dao import UserDAO
-from cyberarena.web.api.connection import utils
-
-######################################################################
-#                     TESTS CHANGE PASSWORD                          #
-######################################################################
+from cyberarena.db.models.user_model import UserModel
+from cyberarena.web.api.connection.utils import get_current_user
 
 
 async def create_dummy_user(
@@ -37,6 +35,72 @@ async def create_dummy_user(
     )
 
 
+######################################################################
+#                     TESTS USER INFORMATIONS                        #
+######################################################################
+
+
+def override_get_current_user(username: str) -> Callable[[], UserModel]:
+    """
+    Override get_current_user.
+
+    :param username: username.
+    :param user_dao: user dao.
+    """
+
+    async def func(
+        user_dao: UserDAO = Depends(),
+    ) -> UserModel:
+        """
+        Get current user.
+
+        :param user_dao: user dao.
+        :return: current user.
+        """
+        return await user_dao.get_user_by_username(username)
+
+    return func
+
+
+async def test_get_current_user_profile(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    monkeypatch: MonkeyPatch,
+    dbsession: AsyncSession,
+) -> None:
+    """
+    Test get current user profile.
+
+    :param app: fastapi app.
+    :param client: httpx client.
+    :param monkeypatch: monkeypatch.
+    :param dbsession: database session.
+    """
+    username = "test"
+    await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
+
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
+    )
+
+    response = await client.get(
+        fastapi_app.url_path_for("get_current_user_profile"),
+    )
+    print(response.json())
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {
+        "username": "test",
+        "email": "test@test.com",
+        "active": True,
+    }
+
+
+######################################################################
+#                     TESTS CHANGE PASSWORD                          #
+######################################################################
+
+
 @pytest.mark.anyio
 async def test_change_password(
     fastapi_app: FastAPI,
@@ -51,11 +115,10 @@ async def test_change_password(
     new_password = "aAZ?o2aaaaa"
 
     await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
 
-    monkeypatch.setattr(
-        utils,
-        "get_current_user",
-        lambda: dao.get_user_by_username(username),
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
     )
 
     url = fastapi_app.url_path_for("change_password")
@@ -67,10 +130,9 @@ async def test_change_password(
         },
     )
     assert response.status_code == status.HTTP_200_OK
-    dao = UserDAO(dbsession)
     user = await dao.get_user_by_username(username)
-    assert user.password != password
-    assert user.password == new_password
+    assert not user.is_correct_password(password)
+    assert user.is_correct_password(new_password)
 
 
 @pytest.mark.anyio
@@ -84,6 +146,7 @@ async def test_change_password_protected_route(
     new_password = "aAZ?o2aaaaa"
 
     await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
 
     url = fastapi_app.url_path_for("change_password")
     response = await client.put(
@@ -94,9 +157,8 @@ async def test_change_password_protected_route(
         },
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    dao = UserDAO(dbsession)
     user = await dao.get_user_by_username(username)
-    assert user.password == password
+    assert user.is_correct_password(password)
 
 
 @pytest.mark.anyio
@@ -115,10 +177,10 @@ async def test_change_password_wrong_old_password(
 
     await create_dummy_user(dbsession)
 
-    monkeypatch.setattr(
-        utils,
-        "get_current_user",
-        lambda: dao.get_user_by_username(username),
+    dao = UserDAO(dbsession)
+
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
     )
 
     url = fastapi_app.url_path_for("change_password")
@@ -130,9 +192,8 @@ async def test_change_password_wrong_old_password(
         },
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    dao = UserDAO(dbsession)
     user = await dao.get_user_by_username(username)
-    assert user.password == password
+    assert user.is_correct_password(password)
 
 
 @pytest.mark.anyio
@@ -147,11 +208,10 @@ async def test_change_password_same_password(
     password = "aAZ?o2aaaaa"
 
     await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
 
-    monkeypatch.setattr(
-        utils,
-        "get_current_user",
-        lambda: dao.get_user_by_username(username),
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
     )
 
     url = fastapi_app.url_path_for("change_password")
@@ -163,9 +223,8 @@ async def test_change_password_same_password(
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    dao = UserDAO(dbsession)
     user = await dao.get_user_by_username(username)
-    assert user.password == password
+    assert user.is_correct_password(password)
 
 
 @pytest.mark.anyio
@@ -182,11 +241,10 @@ async def test_change_password_wrong_new_password(
     new_passwords = ["a?o2aaaaa", "A?O2AAAAA", "aAZ?oaaaaa", "aAZo2aaaaa", "aAZ?o2a"]
 
     await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
 
-    monkeypatch.setattr(
-        utils,
-        "get_current_user",
-        lambda: dao.get_user_by_username(username),
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
     )
 
     url = fastapi_app.url_path_for("change_password")
@@ -199,9 +257,8 @@ async def test_change_password_wrong_new_password(
             },
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        dao = UserDAO(dbsession)
         user = await dao.get_user_by_username(username)
-        assert user.password == password
+        assert user.is_correct_password(password)
 
 
 ######################################################################
@@ -224,11 +281,10 @@ async def test_change_email(
     old_email = "test@test.com"
 
     await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
 
-    monkeypatch.setattr(
-        utils,
-        "get_current_user",
-        lambda: dao.get_user_by_username(username),
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
     )
 
     url = fastapi_app.url_path_for("change_email")
@@ -240,7 +296,6 @@ async def test_change_email(
         },
     )
     assert response.status_code == status.HTTP_200_OK
-    dao = UserDAO(dbsession)
     user = await dao.get_user_by_username(username)
     assert user.email != old_email
     assert user.email == new_email
@@ -261,6 +316,7 @@ async def test_change_email_protected_route(
     old_email = "test@test.com"
 
     await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
 
     url = fastapi_app.url_path_for("change_email")
     response = await client.put(
@@ -272,7 +328,6 @@ async def test_change_email_protected_route(
     )
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    dao = UserDAO(dbsession)
     user = await dao.get_user_by_username(username)
     assert user.email == old_email
 
@@ -293,11 +348,10 @@ async def test_change_email_wrong_password(
     new_email = "test2@test.com"
 
     await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
 
-    monkeypatch.setattr(
-        utils,
-        "get_current_user",
-        lambda: dao.get_user_by_username(username),
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
     )
 
     url = fastapi_app.url_path_for("change_email")
@@ -309,7 +363,6 @@ async def test_change_email_wrong_password(
         },
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    dao = UserDAO(dbsession)
     user = await dao.get_user_by_username(username)
     assert user.email != new_email
     assert user.email == old_email
@@ -328,11 +381,10 @@ async def test_change_email_same_email(
     old_email = "test@test.com"
 
     await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
 
-    monkeypatch.setattr(
-        utils,
-        "get_current_user",
-        lambda: dao.get_user_by_username(username),
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
     )
 
     url = fastapi_app.url_path_for("change_email")
@@ -345,7 +397,6 @@ async def test_change_email_same_email(
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    dao = UserDAO(dbsession)
     user = await dao.get_user_by_username(username)
     assert user.email == old_email
 
@@ -370,11 +421,10 @@ async def test_change_email_wrong_email(
     ]
 
     await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
 
-    monkeypatch.setattr(
-        utils,
-        "get_current_user",
-        lambda: dao.get_user_by_username(username),
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
     )
 
     url = fastapi_app.url_path_for("change_email")
@@ -387,7 +437,6 @@ async def test_change_email_wrong_email(
             },
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        dao = UserDAO(dbsession)
         user = await dao.get_user_by_username(username)
         assert user.email != wrong_email
 
@@ -406,11 +455,10 @@ async def test_change_email_other_account_have_same_email(
 
     await create_dummy_user(dbsession)
     await create_dummy_user(dbsession, username="test2", email=new_email)
+    dao = UserDAO(dbsession)
 
-    monkeypatch.setattr(
-        utils,
-        "get_current_user",
-        lambda: dao.get_user_by_username(username),
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
     )
 
     url = fastapi_app.url_path_for("change_email")
@@ -422,11 +470,139 @@ async def test_change_email_other_account_have_same_email(
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    dao = UserDAO(dbsession)
     user = await dao.get_user_by_username(username)
     assert user.email != new_email
 
 
 ######################################################################
-#                      TESTS CHANGE PASSWORD                         #
+#                      TESTS CHANGE USERNAME                         #
 ######################################################################
+
+
+@pytest.mark.anyio
+async def test_change_username(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Tests change username."""
+
+    username = "test"
+    password = "aAZ?o2aaaaa"
+    new_username = "test2"
+
+    await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
+
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
+    )
+
+    url = fastapi_app.url_path_for("change_username")
+    response = await client.put(
+        url,
+        json={
+            "password": password,
+            "new_username": new_username,
+        },
+    )
+    assert response.status_code == status.HTTP_200_OK
+    user = await dao.get_user_by_username(new_username)
+    assert user.username == new_username
+
+
+@pytest.mark.anyio
+async def test_change_username_wrong_password(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Tests change username with wrong password."""
+    username = "test"
+    password = "aAZ?o2aaaaa"
+    new_username = "test2"
+
+    await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
+
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
+    )
+
+    url = fastapi_app.url_path_for("change_username")
+    response = await client.put(
+        url,
+        json={
+            "password": "wrong_password",
+            "new_username": new_username,
+        },
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    user = await dao.get_user_by_username(username)
+    assert user.username == username
+
+
+@pytest.mark.anyio
+async def test_change_username_same_username(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Tests change username with same username."""
+    username = "test"
+    password = "aAZ?o2aaaaa"
+
+    await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
+
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
+    )
+
+    url = fastapi_app.url_path_for("change_username")
+    response = await client.put(
+        url,
+        json={
+            "password": password,
+            "new_username": username,
+        },
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    user = await dao.get_user_by_username(username)
+    assert user.username == username
+
+
+@pytest.mark.anyio
+async def test_change_username_other_account_have_same_username(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Tests change username with other account have same username."""
+    username = "test"
+    password = "aAZ?o2aaaaa"
+    new_username = "test2"
+
+    await create_dummy_user(dbsession)
+    await create_dummy_user(dbsession, username=new_username, email="test2@test.com")
+    dao = UserDAO(dbsession)
+
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
+    )
+
+    url = fastapi_app.url_path_for("change_username")
+    response = await client.put(
+        url,
+        json={
+            "password": password,
+            "new_username": new_username,
+        },
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    user = await dao.get_user_by_username(username)
+    assert user.username == username

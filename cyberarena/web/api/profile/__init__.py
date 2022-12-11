@@ -1,4 +1,4 @@
-"""Connection API model."""
+"""Profile API model."""
 from cyberarena.web.api.profile.views import router
 
 __all__ = ["router"]

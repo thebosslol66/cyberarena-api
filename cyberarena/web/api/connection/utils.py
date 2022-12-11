@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
@@ -262,7 +262,7 @@ async def verify_payload_at(
     user_id: int = payload.get("sub")
     if user_id is None:
         raise credentials_exception
-    token_scopes: str = payload.get("scopes", "")
+    token_scopes: List[str] = payload.get("scopes", "").split()
     return TokenData(scopes=token_scopes, user_id=user_id)
 
 
