@@ -57,6 +57,8 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
     refresh_token_expire_minutes: int = 60 * 24 * 7
 
+    max_avatar_size: int = 1000000
+
     @property
     def db_url(self) -> URL:
         """
