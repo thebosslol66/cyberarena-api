@@ -1,1 +1,1 @@
-"""This module will be complete with futher fonctionalities"""
+"""This module will be complete with futher fonctionalities."""

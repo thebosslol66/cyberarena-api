@@ -1,4 +1,6 @@
 # flake8: noqa
+import os
+import shutil
 from typing import Callable
 
 import pytest
@@ -10,6 +12,7 @@ from starlette import status
 
 from cyberarena.db.dao.user_dao import UserDAO
 from cyberarena.db.models.user_model import UserModel
+from cyberarena.settings import settings
 from cyberarena.web.api.connection.utils import get_current_user
 
 
@@ -62,6 +65,7 @@ def override_get_current_user(username: str) -> Callable[[], UserModel]:
     return func
 
 
+@pytest.mark.anyio
 async def test_get_current_user_profile(
     fastapi_app: FastAPI,
     client: AsyncClient,
@@ -616,17 +620,13 @@ async def test_change_username_other_account_have_same_username(
 @pytest.fixture
 def erease_avatar_file() -> None:
     """Fixture to delete avatar file."""
-    import os
-
-    for file in os.listdir("cyberarena/static/img/avatars"):
-        os.remove(f"cyberarena/static/img/avatars{file}")
+    for file in os.listdir(settings.avatar_path):
+        os.remove(os.path.join(settings.avatar_path, file))
 
 
 def verify_avatar_file(filename: str) -> bool:
     """Verify if avatar file exists."""
-    import os
-
-    return os.path.exists(f"cyberarena/static/img/avatars/{filename}")
+    return os.path.exists(os.path.join(settings.avatar_path, filename))
 
 
 @pytest.mark.anyio
@@ -635,6 +635,7 @@ async def test_change_avatar(
     client: AsyncClient,
     dbsession: AsyncSession,
     monkeypatch: MonkeyPatch,
+    image_diff: Callable,
 ) -> None:
     """Tests change avatar."""
     username = "test"
@@ -661,6 +662,10 @@ async def test_change_avatar(
     assert response.status_code == status.HTTP_200_OK
     user = await dao.get_user_by_username(username)
     assert verify_avatar_file(str(user.id) + ".png")
+    assert image_diff(
+        "cyberarena/tests_data/imgs/test_avatar_good_512x512.png",
+        os.path.join(settings.avatar_path, str(user.id) + ".png"),
+    )
 
 
 @pytest.mark.anyio
@@ -669,6 +674,7 @@ async def test_change_avatar_good_jpg(
     client: AsyncClient,
     dbsession: AsyncSession,
     monkeypatch: MonkeyPatch,
+    image_diff: Callable,
 ) -> None:
     """Tests change avatar with good jpg."""
     username = "test"
@@ -695,6 +701,10 @@ async def test_change_avatar_good_jpg(
     assert response.status_code == status.HTTP_200_OK
     user = await dao.get_user_by_username(username)
     assert verify_avatar_file(str(user.id) + ".png")
+    assert image_diff(
+        "cyberarena/tests_data/imgs/test_avatar_good_512x512.jpg",
+        os.path.join(settings.avatar_path, str(user.id) + ".png"),
+    )
 
 
 @pytest.mark.anyio
@@ -803,6 +813,7 @@ async def test_change_avatar_lower_size(
     client: AsyncClient,
     dbsession: AsyncSession,
     monkeypatch: MonkeyPatch,
+    image_diff: Callable,
 ) -> None:
     """Tests change avatar with an image < 512x512."""
     username = "test"
@@ -829,6 +840,49 @@ async def test_change_avatar_lower_size(
     assert response.status_code == status.HTTP_200_OK
     user = await dao.get_user_by_username(username)
     assert verify_avatar_file(str(user.id) + ".png")
+    assert image_diff(
+        "cyberarena/tests_data/imgs/test_avatar_good_453x292.png",
+        os.path.join(settings.avatar_path, str(user.id) + ".png"),
+    )
+
+
+@pytest.mark.anyio
+async def test_change_avatar_with_RGBA_field(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    monkeypatch: MonkeyPatch,
+    image_diff: Callable,
+) -> None:
+    """Tests change avatar with an image with RGBA field."""
+    username = "test"
+
+    await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
+
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
+    )
+
+    url = fastapi_app.url_path_for("change_avatar")
+
+    response = await client.put(
+        url,
+        files={
+            "avatar_img": open(
+                "cyberarena/tests_data/imgs/test_avatar_good_RGBA_512x512.png",
+                "rb",
+            ),
+        },
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    user = await dao.get_user_by_username(username)
+    assert verify_avatar_file(str(user.id) + ".png")
+    assert image_diff(
+        "cyberarena/tests_data/imgs/test_avatar_good_RGBA_512x512.png",
+        os.path.join(settings.avatar_path, str(user.id) + ".png"),
+    )
 
 
 @pytest.mark.anyio
@@ -863,3 +917,331 @@ async def test_change_avatar_good_dimentions_but_bigger(
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     user = await dao.get_user_by_username(username)
     assert not verify_avatar_file(str(user.id) + ".png")
+
+
+@pytest.mark.anyio
+async def test_change_avatar_with_already_avatar_set(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    monkeypatch: MonkeyPatch,
+    image_diff: Callable,
+) -> None:
+    """Tests change avatar with an avatar already set."""
+    username = "test"
+
+    await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
+
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
+    )
+
+    user = await dao.get_user_by_username(username)
+
+    # copy a good image to the avatar folder
+    shutil.copy(
+        "cyberarena/tests_data/imgs/test_avatar_good_512x512.png",
+        os.path.join(settings.avatar_path, str(user.id) + ".png"),
+    )
+
+    url = fastapi_app.url_path_for("change_avatar")
+
+    response = await client.put(
+        url,
+        files={
+            "avatar_img": open(
+                "cyberarena/tests_data/imgs/test_avatar_good_512x512.jpg",
+                "rb",
+            ),
+        },
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert verify_avatar_file(str(user.id) + ".png")
+
+    # TODO: fix this test
+    assert not image_diff(
+        "cyberarena/tests_data/imgs/test_avatar_good_512x512.png",
+        os.path.join(settings.avatar_path, str(user.id) + ".png"),
+    )
+
+    assert image_diff(
+        "cyberarena/tests_data/imgs/test_avatar_good_512x512.jpg",
+        os.path.join(settings.avatar_path, str(user.id) + ".png"),
+    )
+
+
+@pytest.mark.anyio
+async def test_change_avatar_replace_with_bad_dont_change_the_old(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    monkeypatch: MonkeyPatch,
+    image_diff: Callable,
+) -> None:
+    """Tests change avatar with an avatar already set."""
+    username = "test"
+
+    await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
+
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
+    )
+
+    user = await dao.get_user_by_username(username)
+
+    # copy a good image to the avatar folder
+    shutil.copy(
+        "cyberarena/tests_data/imgs/test_avatar_good_512x512.png",
+        os.path.join(settings.avatar_path, str(user.id) + ".png"),
+    )
+
+    url = fastapi_app.url_path_for("change_avatar")
+
+    response = await client.put(
+        url,
+        files={
+            "avatar_img": open(
+                "cyberarena/tests_data/imgs/test_avatar_bad_format_512x512.gif",
+                "rb",
+            ),
+        },
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert verify_avatar_file(str(user.id) + ".png")
+    assert image_diff(
+        "cyberarena/tests_data/imgs/test_avatar_good_512x512.png",
+        os.path.join(settings.avatar_path, str(user.id) + ".png"),
+        throw_exception=False,
+    )
+
+    assert not image_diff(
+        "cyberarena/tests_data/imgs/test_avatar_bad_format_512x512.gif",
+        os.path.join(settings.avatar_path, str(user.id) + ".png"),
+        throw_exception=False,
+    )
+
+
+######################################################################
+#                         TESTS ME AVATAR                            #
+######################################################################
+
+
+@pytest.mark.anyio
+async def test_get_me_avatar(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Tests get me avatar."""
+    username = "test"
+
+    await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
+
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
+    )
+
+    user = await dao.get_user_by_username(username)
+
+    # copy a good image to the avatar folder
+    shutil.copy(
+        "cyberarena/tests_data/imgs/test_avatar_good_512x512.png",
+        os.path.join(settings.avatar_path, str(user.id) + ".png"),
+    )
+
+    url = fastapi_app.url_path_for("get_current_user_avatar")
+
+    response = await client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.headers["content-type"] == "image/png"
+    assert (
+        response.content
+        == open(
+            "cyberarena/tests_data/imgs/test_avatar_good_512x512.png",
+            "rb",
+        ).read()
+    )
+
+
+@pytest.mark.anyio
+async def test_get_me_avatar_no_avatar_set(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Tests get me avatar."""
+    username = "test"
+
+    await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
+
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
+    )
+
+    user = await dao.get_user_by_username(username)
+    url = fastapi_app.url_path_for("get_current_user_avatar")
+
+    response = await client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.headers["content-type"] == "image/png"
+    assert (
+        response.content
+        == open(
+            os.path.join(
+                settings.avatar_path,
+                "default",
+                str(
+                    (
+                        user.id
+                        % len(
+                            os.listdir(
+                                os.path.join(settings.avatar_path, "default"),
+                            ),
+                        )
+                    )
+                    + 1,
+                )
+                + ".png",
+            ),
+            "rb",
+        ).read()
+    )
+
+
+@pytest.mark.anyio
+async def test_get_me_avatar_protected(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Tests get me avatar."""
+    username = "test"
+
+    await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
+
+    user = await dao.get_user_by_username(username)
+    url = fastapi_app.url_path_for("get_current_user_avatar")
+
+    response = await client.get(url)
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+######################################################################
+#                      TESTS USERNAME AVATAR                         #
+######################################################################
+
+
+@pytest.mark.anyio
+async def test_get_username_avatar(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Tests get username avatar."""
+    username = "test"
+
+    await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
+
+    user = await dao.get_user_by_username(username)
+
+    # copy a good image to the avatar folder
+    shutil.copy(
+        "cyberarena/tests_data/imgs/test_avatar_good_512x512.png",
+        os.path.join(settings.avatar_path, str(user.id) + ".png"),
+    )
+
+    url = fastapi_app.url_path_for("get_specified_user_avatar", username=username)
+
+    response = await client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.headers["content-type"] == "image/png"
+    assert (
+        response.content
+        == open(
+            "cyberarena/tests_data/imgs/test_avatar_good_512x512.png",
+            "rb",
+        ).read()
+    )
+
+
+@pytest.mark.anyio
+async def test_get_username_avatar_no_avatar_set(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Tests get username avatar."""
+    username = "test"
+
+    await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
+
+    user = await dao.get_user_by_username(username)
+
+    url = fastapi_app.url_path_for("get_specified_user_avatar", username=username)
+
+    response = await client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.headers["content-type"] == "image/png"
+    assert (
+        response.content
+        == open(
+            os.path.join(
+                settings.avatar_path,
+                "default",
+                str(
+                    (
+                        user.id
+                        % len(
+                            os.listdir(
+                                os.path.join(settings.avatar_path, "default"),
+                            ),
+                        )
+                    )
+                    + 1,
+                )
+                + ".png",
+            ),
+            "rb",
+        ).read()
+    )
+
+
+@pytest.mark.anyio
+async def test_get_username_avatar_user_not_exist(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Tests get username avatar."""
+    username = "test"
+
+    await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
+
+    user = await dao.get_user_by_username(username)
+
+    url = fastapi_app.url_path_for("get_specified_user_avatar", username="test2")
+
+    response = await client.get(url)
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND

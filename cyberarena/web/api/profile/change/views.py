@@ -126,8 +126,9 @@ async def save_avatar_img(avatar_img: UploadFile, path: str) -> dict[str, str]:
     :raises HTTPException: if the image failed to be saved.
     """
     try:
+        # Open the img as same as the original image
         img = Image.open(avatar_img.file)
-        img.save(path, "PNG")
+        img.save(path, "PNG", optimize=True)
         return {"msg": "Avatar changed"}
 
     except Exception:

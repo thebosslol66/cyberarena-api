@@ -76,7 +76,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
 name = "attrs"
 version = "22.1.0"
 description = "Classes Without Boilerplate"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.5"
 
@@ -272,6 +272,17 @@ wrapt = ">=1.10,<2"
 dev = ["PyTest", "PyTest (<5)", "PyTest-Cov", "PyTest-Cov (<2.6)", "bump2version (<1)", "configparser (<5)", "importlib-metadata (<3)", "importlib-resources (<4)", "sphinx (<2)", "sphinxcontrib-websupport (<2)", "tox", "zipp (<2)"]
 
 [[package]]
+name = "diffimg"
+version = "0.3.0"
+description = "Get the % difference in images + generate a diff image"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+Pillow = ">=4.3"
+
+[[package]]
 name = "distlib"
 version = "0.3.6"
 description = "Distribution utilities"
@@ -314,7 +325,7 @@ python-versions = "*"
 name = "exceptiongroup"
 version = "1.0.4"
 description = "Backport of PEP 654 (exception groups)"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -663,10 +674,21 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "imgdiff"
+version = "1.7.1"
+description = "Present two images side-by-side for visual comparison"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+Pillow = "*"
+
+[[package]]
 name = "iniconfig"
 version = "1.1.1"
 description = "iniconfig: brain-dead simple config-ini parsing"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -1023,7 +1045,7 @@ test = ["appdirs (==1.4.4)", "pytest (>=7.2)", "pytest-cov (>=4)", "pytest-mock 
 name = "pluggy"
 version = "1.0.0"
 description = "plugin and hook calling mechanisms for python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -1155,7 +1177,7 @@ diagrams = ["jinja2", "railroad-diagrams"]
 name = "pytest"
 version = "7.2.0"
 description = "pytest: simple powerful testing with Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -1196,6 +1218,23 @@ python-versions = "*"
 
 [package.dependencies]
 pytest = ">=2.6.0"
+
+[[package]]
+name = "pytest-image-diff"
+version = "0.0.9"
+description = ""
+category = "main"
+optional = false
+python-versions = ">=3.6, <4"
+
+[package.dependencies]
+diffimg = "*"
+imgdiff = "*"
+pytest = "*"
+typing-extensions = "*"
+
+[package.extras]
+splinter = ["pytest-splinter (>=2.1.0)"]
 
 [[package]]
 name = "python-dotenv"
@@ -1615,7 +1654,7 @@ tokenize-rt = ">=2.1"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "8b4b44f329a09d2895ea091986d1a4a37575386b961c8d10ed38e55a2076119b"
+content-hash = "cb2d4b254b0250cfd11d61dd3bdf9c1d64eaeb825961a194d290d1231ae3b5bf"
 
 [metadata.files]
 aiofiles = [
@@ -1877,6 +1916,9 @@ darglint = [
 deprecated = [
     {file = "Deprecated-1.2.13-py2.py3-none-any.whl", hash = "sha256:64756e3e14c8c5eea9795d93c524551432a0be75629f8f29e67ab8caf076c76d"},
     {file = "Deprecated-1.2.13.tar.gz", hash = "sha256:43ac5335da90c31c24ba028af536a91d41d53f9e6901ddb021bcc572ce44e38d"},
+]
+diffimg = [
+    {file = "diffimg-0.3.0.tar.gz", hash = "sha256:5f9bfc5417430729205b70e68f22bade19fed43d963daa7fb45d9447d0a01a24"},
 ]
 distlib = [
     {file = "distlib-0.3.6-py2.py3-none-any.whl", hash = "sha256:f35c4b692542ca110de7ef0bea44d73981caeb34ca0b9b6b2e6d7790dda8f80e"},
@@ -2144,6 +2186,10 @@ identify = [
 idna = [
     {file = "idna-3.4-py3-none-any.whl", hash = "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"},
     {file = "idna-3.4.tar.gz", hash = "sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"},
+]
+imgdiff = [
+    {file = "imgdiff-1.7.1-py2.py3-none-any.whl", hash = "sha256:b9a875abdc5160e23a2058f204e29954dccfed4b8b2fb941fc82c03c2c753f96"},
+    {file = "imgdiff-1.7.1.tar.gz", hash = "sha256:c8f947c84f8575009911b005ccd7a0e7edd6e53e8b07a623e4bac23df1419c9e"},
 ]
 iniconfig = [
     {file = "iniconfig-1.1.1-py2.py3-none-any.whl", hash = "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3"},
@@ -2554,6 +2600,10 @@ pytest-cov = [
 ]
 pytest-env = [
     {file = "pytest-env-0.6.2.tar.gz", hash = "sha256:7e94956aef7f2764f3c147d216ce066bf6c42948bb9e293169b1b1c880a580c2"},
+]
+pytest-image-diff = [
+    {file = "pytest-image-diff-0.0.9.tar.gz", hash = "sha256:9ad512065d7e937229237aaa155e160ee1ccbcfd3e21a80b8d434c24aefa5dcf"},
+    {file = "pytest_image_diff-0.0.9-py2.py3-none-any.whl", hash = "sha256:823e70afa985b4a1c19ef83875b38096e41e6f36631a1d0d390b9b6c963efd21"},
 ]
 python-dotenv = [
     {file = "python-dotenv-0.21.0.tar.gz", hash = "sha256:b77d08274639e3d34145dfa6c7008e66df0f04b7be7a75fd0d5292c191d79045"},
