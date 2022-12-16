@@ -12,7 +12,7 @@ from cyberarena.web.api.connection.utils import (
 )
 from cyberarena.web.api.profile.change.schema import ChangeUserInformations
 
-router: APIRouter = APIRouter(prefix="/change", tags=["change"])
+router: APIRouter = APIRouter(prefix="/change")
 
 
 @router.put("/password")

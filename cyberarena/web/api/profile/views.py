@@ -33,6 +33,30 @@ async def get_current_user_profile(
     )
 
 
+# TODO: know if the profile is accessible by everyone or only connected user
+# TODO: If the profile is acessible by everyone, select if all is
+#  accessible by everyone or only connected user
+@router.get("/{username}")
+async def get_specified_user_profile(
+    username: str,
+    user_dao: UserDAO = Depends(),
+) -> None:
+    """
+    Return informations about a specific user with his username.
+
+    :param username: username of profile to get.
+    :param user_dao: user_dao.
+    :raises HTTPException: if the user is not found.
+    """
+    user = await user_dao.get_user_by_username(username)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+
+
 @router.get("/me/avatar", response_class=FileResponse)
 async def get_current_user_avatar(
     current_user: UserModel = Depends(get_current_user),
