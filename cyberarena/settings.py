@@ -60,6 +60,8 @@ class Settings(BaseSettings):
     max_avatar_size: int = 1000000
     avatar_path: str = "cyberarena/static/img/avatars/"
 
+    daily_coin_reward: int = 10
+
     @property
     def db_url(self) -> URL:
         """

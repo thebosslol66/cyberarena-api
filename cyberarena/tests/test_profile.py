@@ -134,6 +134,38 @@ async def test_get_specified_user_profile(
     assert response.status_code == status.HTTP_200_OK
 
 
+@pytest.mark.anyio
+async def test_get_specified_user_profile_user_not_exist(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    monkeypatch: MonkeyPatch,
+    dbsession: AsyncSession,
+) -> None:
+    """
+    Test get current user profile.
+
+    :param fastapi_app: fastapi app.
+    :param client: httpx client.
+    :param monkeypatch: monkeypatch.
+    :param dbsession: database session.
+    """
+    username = "test"
+    await create_dummy_user(dbsession)
+    dao = UserDAO(dbsession)
+
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
+    )
+
+    response = await client.get(
+        fastapi_app.url_path_for("get_specified_user_profile", username="test2"),
+    )
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json() == {
+        "detail": "User not found",
+    }
+
+
 ######################################################################
 #                     TESTS CHANGE PASSWORD                          #
 ######################################################################

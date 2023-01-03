@@ -1,23 +1,61 @@
 Interface of game module
-========================
+########################
 
-This interface will be used to represent a game.
-It will implement all mechanisms of the game, included error handler of imposible moves.
-This documentation is used to implement the api endpoints and websocket communication
-with the game mechanism.
+What is needed to be done
+=========================
 
-Methods to implement
---------------------
+This interface will represent a game and implement all of its mechanisms,
+including error handling for impossible moves.
+It will be used to implement API endpoints and websocket
+communication with the game mechanism.
+
+Design Patterns to be used
+==========================
+
+- Singleton:
+    For storing game cards  in memory
+
+- Monteur ou fabrique:
+    For creating cards of games
+
+- Decorateur:
+    For effects applied to cards.
+    For example, a card can be a "card with a shield" or a card poisoned.
 
 
-The following functions must be implemented:
+Methods to Implement
+=====================
+- createGame(gameDAO):
 
-- `createGame(gameDAO)` : Create a new game and register it in the database. it return the game id.
-- `addPlayer(gameId, gameDAO, playerid)` : Add a player to the game. It returns true if the player was added, false otherwise and logg into console
-- `removePlayer(gameId, gameDAO, playerid)` : Remove a player from the game. It returns true if the player was removed, false otherwise and logg into console
-- `startGame(gameId, gameDAO)` : Start the game. It returns true if the game was started, false otherwise and log into console
+  - Creates a new game and registers it in the database.
+  - Returns the game's ID.
 
-- `isGameStarted(gameId, gameDAO)` : Return true if the game is started, false otherwise
-- `isGameFinished(gameId, gameDAO)` : Return true if the game is finished, false otherwise
+- addPlayer(gameId, gameDAO, playerId):
 
-- `getCurrentPlayer(gameId, gameDAO)` : Return the current player id for specified id
+  - Adds a player to the game.
+  - Returns true if the player was added, false otherwise.
+  - Logs any errors to the console.
+
+- removePlayer(gameId, gameDAO, playerId):
+
+  - Removes a player from the game.
+  - Returns true if the player was removed, false otherwise.
+  - Logs any errors to the console.
+
+- startGame(gameId, gameDAO):
+
+  - Starts the game.
+  - Returns true if the game was started, false otherwise.
+  - Logs any errors to the console.
+
+- isGameStarted(gameId, gameDAO):
+
+  - Returns true if the game has started, false otherwise.
+
+- isGameFinished(gameId, gameDAO):
+
+  - Returns true if the game has finished, false otherwise.
+
+- getCurrentPlayer(gameId, gameDAO):
+
+  - Returns the ID of the current player for the specified game.

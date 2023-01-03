@@ -344,7 +344,7 @@ async def _verify_payload_rt(
     credentials_exception: HTTPException,
 ) -> _PayloadValueForTranmissionRT:
     """
-    Verify payload.
+    Verify payload of the refresh token.
 
     :param payload: Payload of token.
     :param credentials_exception: Exception to raise if payload is invalid.

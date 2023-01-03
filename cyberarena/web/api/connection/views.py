@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -98,6 +99,7 @@ async def login_for_access_token(
             status_code=400,  # noqa: WPS432
             detail="Inactive user",
         )
+    user.last_login = datetime.now()
     access_token = await create_access_token(user, "")  # TODO: add scopes from user db
     if settings.environment == "dev":
         access_token = await create_access_token(user, " ".join(form_data.scopes))

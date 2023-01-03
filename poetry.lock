@@ -220,7 +220,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7
 name = "coverage"
 version = "6.5.0"
 description = "Code coverage measurement for Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -275,7 +275,7 @@ dev = ["PyTest", "PyTest (<5)", "PyTest-Cov", "PyTest-Cov (<2.6)", "bump2version
 name = "diffimg"
 version = "0.3.0"
 description = "Get the % difference in images + generate a diff image"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -677,7 +677,7 @@ python-versions = ">=3.5"
 name = "imgdiff"
 version = "1.7.1"
 description = "Present two images side-by-side for visual comparison"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -1197,7 +1197,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.
 name = "pytest-cov"
 version = "4.0.0"
 description = "Pytest plugin for measuring coverage."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -1223,7 +1223,7 @@ pytest = ">=2.6.0"
 name = "pytest-image-diff"
 version = "0.0.9"
 description = ""
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6, <4"
 
@@ -1654,7 +1654,7 @@ tokenize-rt = ">=2.1"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "cb2d4b254b0250cfd11d61dd3bdf9c1d64eaeb825961a194d290d1231ae3b5bf"
+content-hash = "fe1409a40cbe4d36ed88089a9ebc58c9373c377e4536a633b56b89f8d1222fa1"
 
 [metadata.files]
 aiofiles = [
