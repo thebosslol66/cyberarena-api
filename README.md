@@ -28,16 +28,19 @@ You can start the project with docker using this command:
 docker-compose -f deploy/docker-compose.yml --project-directory . up --build
 ```
 
-If you want to develop in docker with autoreload add `-f deploy/docker-compose.dev.yml` to your docker command.
+If you want to develop in docker with autoreload add `-f deploy/docker-compose.dev.yml`
+to your docker command.
 Like this:
 
 ```bash
 docker-compose -f deploy/docker-compose.yml -f deploy/docker-compose.dev.yml --project-directory . up
 ```
 
-This command exposes the web application on port 8000, mounts current directory and enables autoreload.
+This command exposes the web application on port 8000, mounts current directory and
+enables autoreload.
 
-But you have to rebuild image every time you modify `poetry.lock` or `pyproject.toml` with this command:
+But you have to rebuild image every time you modify `poetry.lock` or `pyproject.toml`
+with this command:
 
 ```bash
 docker-compose -f deploy/docker-compose.yml --project-directory . build
@@ -75,17 +78,21 @@ All environment variabels should start with "CYBERARENA_" prefix.
 
 For example if you see in your "cyberarena/settings.py" a variable named like
 `random_parameter`, you should provide the "CYBERARENA_RANDOM_PARAMETER"
-variable to configure the value. This behaviour can be changed by overriding `env_prefix` property
+variable to configure the value. This behaviour can be changed by
+overriding `env_prefix` property
 in `cyberarena.settings.Settings.Config`.
 
 An exmaple of .env file:
+
 ```bash
 CYBERARENA_RELOAD="True"
 CYBERARENA_PORT="8000"
 CYBERARENA_ENVIRONMENT="dev"
 ```
 
-You can read more about BaseSettings class here: https://pydantic-docs.helpmanual.io/usage/settings/
+You can read more about BaseSettings class
+here: https://pydantic-docs.helpmanual.io/usage/settings/
+
 ## Opentelemetry
 
 If you want to start your project with opentelemetry collector
@@ -109,6 +116,7 @@ You can read more about opentelemetry here: https://opentelemetry.io/
 ## Pre-commit
 
 To install pre-commit simply run inside the shell:
+
 ```bash
 pre-commit install
 ```
@@ -117,18 +125,19 @@ pre-commit is very useful to check your code before publishing it.
 It's configured using .pre-commit-config.yaml file.
 
 By default it runs:
+
 * black (formats your code);
 * mypy (validates types);
 * isort (sorts imports in all files);
 * flake8 (spots possibe bugs);
 * yesqa (removes useless `# noqa` comments).
 
-
 You can read more about pre-commit here: https://pre-commit.com/
 
 ## Migrations
 
 If you want to migrate your database, you should run following commands:
+
 ```bash
 # To run all migrations untill the migration with revision_id.
 alembic upgrade "<revision_id>"
@@ -140,6 +149,7 @@ alembic upgrade "head"
 ### Reverting migrations
 
 If you want to revert migrations, you should run:
+
 ```bash
 # revert all migrations up to: revision_id.
 alembic downgrade <revision_id>
@@ -151,6 +161,7 @@ alembic downgrade <revision_id>
 ### Migration generation
 
 To generate migrations you should run:
+
 ```bash
 # For automatic change detection.
 alembic revision --autogenerate
@@ -158,7 +169,6 @@ alembic revision --autogenerate
 # For empty file generation.
 alembic revision
 ```
-
 
 ## Running tests
 
@@ -170,15 +180,17 @@ docker-compose -f deploy/docker-compose.yml --project-directory . down
 ```
 
 For running tests on your local machine.
+
 1. you need to start a database.
 
 I prefer doing it with docker:
+
 ```
 docker run -p "3306:3306" -e "MYSQL_PASSWORD=cyberarena" -e "MYSQL_USER=cyberarena" -e "MYSQL_DATABASE=cyberarena" -e ALLOW_EMPTY_PASSWORD=yes bitnami/mysql:8.0.30
 ```
 
-
 2. Run the pytest.
+
 ```bash
 pytest -vv .
 ```

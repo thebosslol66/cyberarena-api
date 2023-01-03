@@ -56,7 +56,6 @@ async def get_specified_user_profile(
         )
 
 
-
 @router.get("/me/avatar", response_class=FileResponse)
 async def get_current_user_avatar(
     current_user: UserModel = Depends(get_current_user),
