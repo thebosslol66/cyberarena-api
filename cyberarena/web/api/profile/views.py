@@ -40,13 +40,14 @@ async def get_current_user_profile(
 async def get_specified_user_profile(
     username: str,
     user_dao: UserDAO = Depends(),
-) -> None:
+) -> str:
     """
     Return informations about a specific user with his username.
 
     :param username: username of profile to get.
     :param user_dao: user_dao.
     :raises HTTPException: if the user is not found.
+    :return: informations about the user.
     """
     user = await user_dao.get_user_by_username(username)
     if user is None:
@@ -54,6 +55,7 @@ async def get_specified_user_profile(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
+    return username
 
 
 @router.get("/me/avatar", response_class=FileResponse)

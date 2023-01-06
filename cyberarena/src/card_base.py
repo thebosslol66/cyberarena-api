@@ -1,4 +1,5 @@
 import abc
+from typing import Any, Dict
 
 
 class CardAbstract(metaclass=abc.ABCMeta):
@@ -17,6 +18,22 @@ class CardAbstract(metaclass=abc.ABCMeta):
         self.__cost: int = cost
         self.__hp: int = hp
         self.__ap: int = ap
+
+    def __str__(self) -> str:
+        """
+        Return a string representation of the card.
+
+        :return: A string representation of the card.
+        """
+        return self.name
+
+    def __repr__(self) -> str:
+        """
+        Return a string representation of the card.
+
+        :return: A string representation of the card.
+        """
+        return self.name
 
     @property
     def name(self) -> str:
@@ -54,23 +71,13 @@ class CardAbstract(metaclass=abc.ABCMeta):
         """
         return self.__ap
 
-    @abc.abstractmethod
     def attack_card(self, card: "CardAbstract") -> None:
         """
         Attack a card.
 
         :param card: Card to attack.
         """
-        card._receive_damage(self.__ap)
-
-    @abc.abstractmethod
-    def _receive_damage(self, damage: int) -> None:
-        """
-        Receive damage.
-
-        :param damage: Damage to receive.
-        """
-        self.__hp -= damage
+        CardAbstract._receive_damage(card, self.__ap)  # noqa: WPS437
 
     def is_alive(self) -> bool:
         """
@@ -80,18 +87,19 @@ class CardAbstract(metaclass=abc.ABCMeta):
         """
         return self.__hp > 0
 
-    def __str__(self) -> str:
+    @classmethod
+    @abc.abstractmethod
+    def create_card_from_json(cls, json: Dict[str, Any]) -> "CardAbstract":
         """
-        Return a string representation of the card.
+        Create a card from a json.
 
-        :return: A string representation of the card.
+        :param json: Json to use.
         """
-        return self.name
 
-    def __repr__(self) -> str:
+    def _receive_damage(self, damage: int) -> None:
         """
-        Return a string representation of the card.
+        Receive damage.
 
-        :return: A string representation of the card.
+        :param damage: Damage to receive.
         """
-        return self.name
+        self.__hp -= damage

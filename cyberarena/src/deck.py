@@ -1,7 +1,8 @@
-import random
+import os
 from typing import List
 
 from cyberarena.src.card import Card
+from cyberarena.src.settings import settings
 
 
 class Deck(Card):
@@ -10,13 +11,8 @@ class Deck(Card):
     def __init__(self) -> None:
         """Constructor."""
         self.__deck: List[Card] = []
-        self.__deckSize = 20
+        self.__deckSize = settings.deck_size
         self.__init_deck()
-
-    def __init_deck(self) -> None:
-        """Initialize the deck."""
-        for _ in range(0, self.__deckSize):
-            self.__deck.append(Card("Cyber-Heisenberg", 1, 1, 1))
 
     def get_deck_size(self) -> int:
         """
@@ -32,4 +28,9 @@ class Deck(Card):
 
         :return: A random card.
         """
-        return self.__deck[random.randint(0, self.__deckSize)]
+        return self.__deck[os.urandom(1)[0] % self.__deckSize]
+
+    def __init_deck(self) -> None:
+        """Initialize the deck."""
+        for _ in range(0, self.__deckSize):
+            self.__deck.append(Card("Cyber-Heisenberg", 1, 1, 1))
