@@ -3,7 +3,7 @@ from datetime import datetime
 import bcrypt
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql.schema import Column
-from sqlalchemy.sql.sqltypes import Boolean, Integer, String, BigInteger, DateTime
+from sqlalchemy.sql.sqltypes import BigInteger, Boolean, DateTime, Integer, String
 
 from cyberarena.db.base import Base
 
