@@ -14,22 +14,13 @@ class Deck(Card):
         self.__deckSize = settings.deck_size
         self.__init_deck()
 
-    def __init_deck(self) -> None:
-        """Initialize the deck."""
-        for _ in range(0, self.__deckSize):
-            self.__deck.append(Card("Cyber-Heisenberg", 1, 1, 1))
-        random.shuffle(self.__deck)
-
     def get_random_card(self) -> Optional[Card]:
         """
         Get a random card from the deck.
 
         :return: A random card.
         """
-        if len(self.__deck) > 0:
-            return self.__deck.pop()
-        else:
-            return None
+        return self.__deck.pop() if self.__deck else None
 
     def get_size(self) -> int:
         """
@@ -38,3 +29,9 @@ class Deck(Card):
         :return: The size of the deck.
         """
         return self.__deckSize
+
+    def __init_deck(self) -> None:
+        """Initialize the deck."""
+        for _ in range(0, self.__deckSize):
+            self.__deck.append(Card("Cyber-Heisenberg", 1, 1, 1))
+        random.shuffle(self.__deck)

@@ -1,4 +1,5 @@
-import pytest as pytest
+# flake8: noqa
+import pytest
 
 from cyberarena.src.deck import Deck
 from cyberarena.src.hand import Hand
