@@ -55,7 +55,7 @@ class CardAbstract(metaclass=abc.ABCMeta):
         return self.__ap
 
     @abc.abstractmethod
-    def _attack_card(self, card: "CardAbstract") -> None:
+    def attack_card(self, card: "CardAbstract") -> None:
         """
         Attack a card.
 
