@@ -1,7 +1,9 @@
+from datetime import datetime
+
 import bcrypt
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql.schema import Column
-from sqlalchemy.sql.sqltypes import Boolean, Integer, String
+from sqlalchemy.sql.sqltypes import Boolean, Integer, String, BigInteger, DateTime
 
 from cyberarena.db.base import Base
 
@@ -11,7 +13,7 @@ class UserModel(Base):
 
     __tablename__ = "user_model"
 
-    id = Column(Integer(), primary_key=True, autoincrement=True)
+    id = Column(Integer(), primary_key=True, autoincrement=True, nullable=False)
     username = Column(
         String(length=200),  # noqa: WPS432
         unique=True,
@@ -24,8 +26,14 @@ class UserModel(Base):
         nullable=False,
     )
     refresh_token_value = Column(String(length=128), nullable=True)  # noqa: WPS432
-    is_active = Column(Boolean(), nullable=False, default=False)  # noqa: WPS432
-    is_superuser = Column(Boolean(), nullable=False, default=False)  # noqa: WPS432
+    is_active = Column(Boolean(), nullable=False, default=False)
+    is_superuser = Column(Boolean(), nullable=False, default=False)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+    last_login = Column(DateTime, default=datetime.utcnow)
+
+    coins = Column(BigInteger(), nullable=False, default=0)
+    last_daily_reward = Column(DateTime, default=datetime.utcnow)
 
     @hybrid_property
     def password(self) -> str:
