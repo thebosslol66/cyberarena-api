@@ -44,7 +44,6 @@ async def test_new_sign_up(
             "email": email,
         },
     )
-
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["status"] == 0
 
@@ -550,8 +549,7 @@ async def test_sign_in_username_correct(
     await create_dummy_user(dbsession)
     user_dao = UserDAO(dbsession)
     user = await user_dao.get_user_by_username(username)
-    if user is None:
-        raise ValueError("User is None")
+    assert user is not None
     await user_dao.update_active(-1 if user.id is None else user.id, True)
 
     response = await client.post(
@@ -622,8 +620,7 @@ async def test_sign_in_email_correct(
     await create_dummy_user(dbsession)
     user_dao = UserDAO(dbsession)
     user = await user_dao.get_user_by_username(username)
-    if user is None:
-        raise ValueError("User is None")
+    assert user is not None
     await user_dao.update_active(-1 if user.id is None else user.id, True)
 
     response = await client.post(
@@ -700,8 +697,7 @@ async def test_sign_in_invalid_password(
     await create_dummy_user(dbsession)
     user_dao = UserDAO(dbsession)
     user = await user_dao.get_user_by_username(username)
-    if user is None:
-        raise ValueError("User is None")
+    assert user is not None
     await user_dao.update_active(-1 if user.id is None else user.id, True)
 
     response = await client.post(
@@ -738,8 +734,7 @@ async def test_sign_in_inactive_user(
     await create_dummy_user(dbsession)
     user_dao = UserDAO(dbsession)
     user = await user_dao.get_user_by_username(username)
-    if user is None:
-        raise ValueError("User is None")
+    assert user is not None
     await user_dao.update_active(-1 if user.id is None else user.id, False)
 
     response = await client.post(
@@ -776,8 +771,7 @@ async def test_sign_in_invalid_username(
     await create_dummy_user(dbsession)
     user_dao = UserDAO(dbsession)
     user = await user_dao.get_user_by_username(username)
-    if user is None:
-        raise ValueError("User is None")
+    assert user is not None
     await user_dao.update_active(-1 if user.id is None else user.id, True)
 
     response = await client.post(
@@ -814,8 +808,7 @@ async def test_sign_in_invalid_email(
     await create_dummy_user(dbsession)
     user_dao = UserDAO(dbsession)
     user = await user_dao.get_user_by_username(username)
-    if user is None:
-        raise ValueError("User is None")
+    assert user is not None
     await user_dao.update_active(-1 if user.id is None else user.id, True)
 
     response = await client.post(
@@ -857,8 +850,7 @@ async def test_refresh_token(
     await create_dummy_user(dbsession)
     user_dao = UserDAO(dbsession)
     user = await user_dao.get_user_by_username(username)
-    if user is None:
-        raise ValueError("User is None")
+    assert user is not None
     await user_dao.update_active(user.id, True)
 
     refresh_token = await utils.create_refresh_token(user, user_dao)
@@ -932,8 +924,7 @@ async def test_refresh_token_invalid_token(
     await create_dummy_user(dbsession)
     user_dao = UserDAO(dbsession)
     user = await user_dao.get_user_by_username(username)
-    if user is None:
-        raise ValueError("User is None")
+    assert user is not None
     await user_dao.update_active(-1 if user.id is None else user.id, True)
 
     refresh_token = await utils.create_refresh_token(user, user_dao)
@@ -969,8 +960,7 @@ async def test_refresh_token_expired_token(
     await create_dummy_user(dbsession)
     user_dao = UserDAO(dbsession)
     user = await user_dao.get_user_by_username(username)
-    if user is None:
-        raise ValueError("User is None")
+    assert user is not None
     await user_dao.update_active(-1 if user.id is None else user.id, True)
 
     refresh_token = await utils.create_refresh_token(user, user_dao)
@@ -1011,8 +1001,7 @@ async def test_refresh_token_user_not_have_token(
     await create_dummy_user(dbsession)
     user_dao = UserDAO(dbsession)
     user = await user_dao.get_user_by_username(username)
-    if user is None:
-        raise ValueError("User is None")
+    assert user is not None
     await user_dao.update_active(-1 if user.id is None else user.id, True)
 
     response = await client.post(
@@ -1045,8 +1034,7 @@ async def test_refresh_token_stolen(
     await create_dummy_user(dbsession)
     user_dao = UserDAO(dbsession)
     user = await user_dao.get_user_by_username(username)
-    if user is None:
-        raise ValueError("User is None")
+    assert user is not None
     await user_dao.update_active(-1 if user.id is None else user.id, True)
 
     refresh_token = await utils.create_refresh_token(user, user_dao)

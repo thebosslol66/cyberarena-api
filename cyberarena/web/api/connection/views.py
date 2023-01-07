@@ -89,7 +89,7 @@ async def login_for_access_token(
         form_data.password,
         user_dao,
     )
-    if not user:
+    if user is None:
         raise HTTPException(
             status_code=400,  # noqa: WPS432
             detail="Incorrect username or password",
@@ -130,7 +130,7 @@ async def refresh_token_endpoint(
         ask_new_tokens.refresh_token,
         user_dao,
     )
-    if not user:
+    if user is None:
         raise HTTPException(
             status_code=400,  # noqa: WPS432
             detail="Invalid refresh token",

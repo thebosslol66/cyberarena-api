@@ -71,12 +71,25 @@ async def test_card_constructor_no_obligatory_attribute(
 
 
 @pytest.mark.anyio
-async def test_card_constructor_no_obligatory_attribute_empty(
+async def test_card_constructor_obligatory_attribute_empty(
     card_constructor: CardConstructor,
 ) -> None:
     assert (
         card_constructor.construct(
             os.path.join(cards_path, "invalid", "name_empty.json"),
+        )
+        is False
+    )
+    assert card_constructor.get_card() is None
+
+
+@pytest.mark.anyio
+async def test_card_constructor_obligatory_attribute_is_a_number(
+    card_constructor: CardConstructor,
+) -> None:
+    assert (
+        card_constructor.construct(
+            os.path.join(cards_path, "invalid", "name_number.json"),
         )
         is False
     )
@@ -131,3 +144,30 @@ async def test_card_constructor_numerical_attribute_is_float(
     )
     assert card_constructor.get_card() is not None
     assert card_constructor.get_card().hp == 11  # TODO: test log output
+
+
+@pytest.mark.anyio
+async def test_card_constructor_numerical_attribute_is_negative(
+    card_constructor: CardConstructor,
+) -> None:
+    assert (
+        card_constructor.construct(
+            os.path.join(cards_path, "invalid", "hp_is_negative.json"),
+        )
+        is False
+    )
+    assert card_constructor.get_card() is None
+
+
+@pytest.mark.anyio
+async def test_card_constructor_add_unused_attribute(
+    card_constructor: CardConstructor,
+) -> None:
+    assert (
+        card_constructor.construct(
+            os.path.join(cards_path, "invalid", "unused_attribute.json"),
+        )
+        is True
+    )
+    assert card_constructor.get_card() is not None
+    assert card_constructor.get_card().hp == 11

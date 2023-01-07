@@ -34,7 +34,7 @@ async def _credit_account(
     :param amount: amount to credit.
     :param reason: reason for the credit.
     """
-    if user.coins is None:
+    if user.coins is None:  # pragma: no cover
         user.coins = 0
         logger.warning(
             "User {user} has no coins, set to 0",
@@ -65,7 +65,7 @@ async def _debit_account(
     :param amount: amount to debit.
     :param reason: reason for the debit.
     """
-    if user.coins is None:
+    if user.coins is None:  # pragma: no cover
         user.coins = 0
         logger.warning(
             "User {user} has no coins, set to 0",

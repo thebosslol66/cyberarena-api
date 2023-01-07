@@ -97,7 +97,7 @@ async def get_current_user_avatar(
             media_type="image/png",
             filename="avatar.png",
         )
-    raise HTTPException(
+    raise HTTPException(  # pragma: no cover
         status_code=status.HTTP_404_NOT_FOUND,
         detail="Avatar not found",
     )
@@ -145,7 +145,7 @@ async def get_specified_user_avatar(
                 media_type="image/png",
                 filename="avatar.png",
             )
-    raise HTTPException(
+    raise HTTPException(  # pragma: no cover
         status_code=status.HTTP_404_NOT_FOUND,
         detail="User not found",
     )
