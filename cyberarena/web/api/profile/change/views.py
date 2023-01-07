@@ -134,18 +134,24 @@ async def save_avatar_img(avatar_img: UploadFile, path: str) -> dict[str, str]:
     :param avatar_img: avatar image.
     :param path: path to save the image including it's name.
     :return: dict with the key msg to tell the image has been saved.
-    :raises HTTPException: if the image failed to be saved.
+    :raises HTTPException: if the image failed to be saved
+        or if the image is not PNG or JPEG.
     """
     try:
         # Open the img as same as the original image
         img = Image.open(avatar_img.file)
+        if img.format not in {"PNG", "JPEG"}:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Image format not supported",
+            )
         img.save(path, "PNG", optimize=True)
         return {"msg": "Avatar changed"}
 
-    except Exception:
-        raise HTTPException(
+    except Exception as error:  # noqa: WPS329
+        raise error if error.__class__.__name__ == "HTTPException" else HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="The image cannot be saved",
+            detail="Failed to save the image",
         )
 
 
