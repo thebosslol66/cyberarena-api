@@ -68,7 +68,7 @@ def override_get_current_user(username: str) -> Callable[[], UserModel]:
 async def test_daily_rewards_login_after_signup(
     fastapi_app: FastAPI,
     client: AsyncClient,
-    user_dao: UserDAO = Depends(),
+    dbsession: AsyncSession,
 ) -> None:
     """
     Tests that daily rewards works after signup.
@@ -84,26 +84,23 @@ async def test_daily_rewards_login_after_signup(
         json={
             "username": username,
             "password": password,
+            "email": "test@test.com",
         },
     )
     assert response.status_code == status.HTTP_200_OK
 
-    url = fastapi_app.url_path_for("login")
-    response = await client.post(
-        url,
-        json={
-            "username": username,
-            "password": password,
-        },
+    fastapi_app.dependency_overrides[get_current_user] = override_get_current_user(
+        username,
     )
-    assert response.status_code == status.HTTP_200_OK
 
     url = fastapi_app.url_path_for("ask_daily_free_coins")
     response = await client.get(url)
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == settings.daily_coin_reward
+
+    user_dao = UserDAO(dbsession)
     user = await user_dao.get_user_by_username(username)
-    assert user.daily_reward_date == utils.now().date()
+    assert user.last_daily_reward.date() == utils.now().date()
     assert user.coins == settings.daily_coin_reward
 
 
