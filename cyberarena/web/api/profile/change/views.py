@@ -38,7 +38,7 @@ async def change_password(
 
         user_model = VerifyUserModel("", password_data.new_setting, "", user_dao)
 
-        if not is_password_correct(user_model):
+        if not (await is_password_correct(user_model)):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="The new password is not correct",
@@ -69,7 +69,8 @@ async def change_email(
     :raises HTTPException: if email is incorrect.
     """
     if user.is_correct_password(change_email_data.password):
-        if user_dao.get_user_by_email(change_email_data.new_setting) is not None:
+        second_user = await user_dao.get_user_by_email(change_email_data.new_setting)
+        if second_user is not None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already used",
@@ -100,7 +101,10 @@ async def change_username(
     :raises HTTPException: if username is incorrect.
     """
     if user.is_correct_password(change_username_data.password):
-        if user_dao.get_user_by_username(change_username_data.new_setting) is not None:
+        second_user = await user_dao.get_user_by_username(
+            change_username_data.new_setting,
+        )
+        if second_user is not None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Username already used",

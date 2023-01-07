@@ -96,7 +96,7 @@ async def test_get_current_user_profile(
     assert response.json() == {
         "username": "test",
         "email": "test@test.com",
-        "active": True,
+        "active": False,
     }
 
 
@@ -182,7 +182,7 @@ async def test_change_password(
 
     username = "test"
     password = "aAZ?o2aaaaa"
-    new_password = "aAZ?o2aaaaa"
+    new_password = "aAZ?o2aaaaaa"
 
     await create_dummy_user(dbsession)
     dao = UserDAO(dbsession)
@@ -195,10 +195,11 @@ async def test_change_password(
     response = await client.put(
         url,
         json={
-            "old_password": password,
-            "new_password": new_password,
+            "password": password,
+            "new_setting": new_password,
         },
     )
+    print(response.json())
     assert response.status_code == status.HTTP_200_OK
     user = await dao.get_user_by_username(username)
     assert not user.is_correct_password(password)
@@ -222,8 +223,8 @@ async def test_change_password_protected_route(
     response = await client.put(
         url,
         json={
-            "old_password": password,
-            "new_password": new_password,
+            "password": password,
+            "new_setting": new_password,
         },
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -257,11 +258,11 @@ async def test_change_password_wrong_old_password(
     response = await client.put(
         url,
         json={
-            "old_password": wrong_password,
-            "new_password": new_password,
+            "password": wrong_password,
+            "new_setting": new_password,
         },
     )
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
     user = await dao.get_user_by_username(username)
     assert user.is_correct_password(password)
 
@@ -288,8 +289,8 @@ async def test_change_password_same_password(
     response = await client.put(
         url,
         json={
-            "old_password": password,
-            "new_password": password,
+            "password": password,
+            "new_setting": password,
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -322,8 +323,8 @@ async def test_change_password_wrong_new_password(
         response = await client.put(
             url,
             json={
-                "old_password": password,
-                "new_password": new_password,
+                "password": password,
+                "new_setting": new_password,
             },
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -362,7 +363,7 @@ async def test_change_email(
         url,
         json={
             "password": password,
-            "new_email": new_email,
+            "new_setting": new_email,
         },
     )
     assert response.status_code == status.HTTP_200_OK
@@ -393,7 +394,7 @@ async def test_change_email_protected_route(
         url,
         json={
             "password": password,
-            "new_email": new_email,
+            "new_setting": new_email,
         },
     )
 
@@ -412,7 +413,6 @@ async def test_change_email_wrong_password(
     """Tests change email with wrong password."""
 
     username = "test"
-    password = "aAZ?o2aaaaa"
     wrong_password = "aAZ?o2aaaaaa"
     old_email = "test@test.com"
     new_email = "test2@test.com"
@@ -428,11 +428,11 @@ async def test_change_email_wrong_password(
     response = await client.put(
         url,
         json={
-            "password": password,
-            "new_email": new_email,
+            "password": wrong_password,
+            "new_setting": new_email,
         },
     )
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
     user = await dao.get_user_by_username(username)
     assert user.email != new_email
     assert user.email == old_email
@@ -462,7 +462,7 @@ async def test_change_email_same_email(
         url,
         json={
             "password": password,
-            "new_email": old_email,
+            "new_setting": old_email,
         },
     )
 
@@ -503,7 +503,7 @@ async def test_change_email_wrong_email(
             url,
             json={
                 "password": password,
-                "new_email": wrong_email,
+                "new_setting": wrong_email,
             },
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -536,7 +536,7 @@ async def test_change_email_other_account_have_same_email(
         url,
         json={
             "password": password,
-            "new_email": new_email,
+            "new_setting": new_email,
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -574,7 +574,7 @@ async def test_change_username(
         url,
         json={
             "password": password,
-            "new_username": new_username,
+            "new_setting": new_username,
         },
     )
     assert response.status_code == status.HTTP_200_OK
@@ -606,7 +606,7 @@ async def test_change_username_wrong_password(
         url,
         json={
             "password": "wrong_password",
-            "new_username": new_username,
+            "new_setting": new_username,
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -637,7 +637,7 @@ async def test_change_username_same_username(
         url,
         json={
             "password": password,
-            "new_username": username,
+            "new_setting": username,
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -670,7 +670,7 @@ async def test_change_username_other_account_have_same_username(
         url,
         json={
             "password": password,
-            "new_username": new_username,
+            "new_setting": new_username,
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
