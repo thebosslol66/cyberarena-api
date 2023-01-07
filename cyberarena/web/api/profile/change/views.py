@@ -8,6 +8,7 @@ from cyberarena.settings import settings
 from cyberarena.web.api.connection.utils import (
     VerifyUserModel,
     get_current_user,
+    is_email_correct,
     is_password_correct,
 )
 from cyberarena.web.api.profile.change.schema import ChangeUserInformations
@@ -38,7 +39,7 @@ async def change_password(
 
         user_model = VerifyUserModel("", password_data.new_setting, "", user_dao)
 
-        if not (await is_password_correct(user_model)):
+        if (await is_password_correct(user_model)) is not None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="The new password is not correct",
@@ -74,6 +75,12 @@ async def change_email(
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already used",
+            )
+        user_model = VerifyUserModel("", "", change_email_data.new_setting, user_dao)
+        if (await is_email_correct(user_model)) is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="The new email is not correct",
             )
         await user_dao.update_email(
             user.id if user.id is not None else -1,

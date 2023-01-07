@@ -1,3 +1,4 @@
+import re
 import uuid
 from datetime import datetime, timedelta
 from typing import Any, Callable, Dict, List, Optional
@@ -90,10 +91,9 @@ async def is_email_correct(user_model: VerifyUserModel) -> Optional[str]:
     :param user_model: User model.
     :return: True if email is correct, otherwise return the error message.
     """
-    if not any(char == "@" for char in user_model.email):
-        return "Email must contain @ character"
-    if not any(char == "." for char in user_model.email):
-        return "Email must contain . character"
+    regex = r"([A-Za-z0-9]+[_.-])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+"
+    if (re.fullmatch(regex, user_model.email)) is None:
+        return "Email invalid"
     return None
 
 

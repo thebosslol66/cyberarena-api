@@ -506,6 +506,7 @@ async def test_change_email_wrong_email(
                 "new_setting": wrong_email,
             },
         )
+        print(wrong_email)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         user = await dao.get_user_by_username(username)
         assert user.email != wrong_email
