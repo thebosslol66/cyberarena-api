@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import bcrypt
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -33,7 +33,11 @@ class UserModel(Base):
     last_login = Column(DateTime, default=datetime.utcnow)
 
     coins = Column(BigInteger(), nullable=False, default=0)
-    last_daily_reward = Column(DateTime, default=datetime.utcnow)
+    last_daily_reward = Column(
+        DateTime,
+        default=lambda: datetime.utcnow() - timedelta(days=1),
+        nullable=False,
+    )
 
     @hybrid_property
     def password(self) -> str:
