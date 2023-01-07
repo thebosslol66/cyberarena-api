@@ -49,9 +49,9 @@ async def is_username_correct(user_model: VerifyUserModel) -> Optional[str]:
     """
     if len(user_model.username) < 4:
         return "Username is too short"
-    if not any(char.isalnum() for char in user_model.username):
+    if any(not char.isalnum() for char in user_model.username):
         return "Username must contain only alphanumeric character"
-    if not any(not char.isspace() for char in user_model.username):
+    if any(char.isspace() for char in user_model.username):
         return "Username must not contain spaces"
     return None
 
