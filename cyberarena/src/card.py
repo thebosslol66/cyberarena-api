@@ -1,21 +1,56 @@
-from typing import Any, Dict
-
 from cyberarena.src.card_base import CardAbstract
 
 
 class Card(CardAbstract):
     """Card class."""
 
-    @classmethod
-    def create_card_from_json(cls, json: Dict[str, Any]) -> CardAbstract:
+    def __init__(  # noqa: WPS211
+        self,
+        name: str,
+        cost: int,
+        hp: int,
+        ap: int,
+        dp: int = 0,
+    ) -> None:
         """
-        Create a card from a json.
+        Constructor for Card.
 
-        :param json: The json to create the card from.
-        :return: The card created.
+        :param name: Name of the card.
+        :param cost: Cost of the card.
+        :param hp: Health points of the card.
+        :param ap: Attack points of the card.
+        :param dp: Defense points of the card.
+        :raises ValueError: If the cost, hp, ap or dp is negative.
         """
-        name = json.get("name", "Cyber-Heisenberg")
-        cost = json.get("cost", 1)
-        hp = json.get("hp", 1)
-        ap = json.get("ap", 0)
-        return Card(name, cost, hp, ap)
+        super().__init__(name, hp, ap)
+        self._cost: int = cost
+        self._dp: int = dp
+        if self._dp < 0 or self._cost < 0:
+            raise ValueError("The dp or cost is negative.")
+
+    @property
+    def cost(self) -> int:
+        """
+        Getter for cost.
+
+        :return: cost.
+        """
+        return self._cost
+
+    @property
+    def dp(self) -> int:
+        """
+        Getter for dp.
+
+        :return: dp.
+        """
+        return self._dp
+
+    def _receive_damage(self, damage: int) -> None:
+        """
+        Receive damage.
+
+        :param damage: The damage to receive.
+        """
+        if damage > self._dp:
+            self._hp -= damage - self._dp

@@ -8,6 +8,7 @@ from cyberarena.settings import settings
 from cyberarena.web.api.connection.utils import (
     VerifyUserModel,
     get_current_user,
+    is_email_correct,
     is_password_correct,
 )
 from cyberarena.web.api.profile.change.schema import ChangeUserInformations
@@ -38,7 +39,7 @@ async def change_password(
 
         user_model = VerifyUserModel("", password_data.new_setting, "", user_dao)
 
-        if not is_password_correct(user_model):
+        if (await is_password_correct(user_model)) is not None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="The new password is not correct",
@@ -69,10 +70,17 @@ async def change_email(
     :raises HTTPException: if email is incorrect.
     """
     if user.is_correct_password(change_email_data.password):
-        if user_dao.get_user_by_email(change_email_data.new_setting) is not None:
+        second_user = await user_dao.get_user_by_email(change_email_data.new_setting)
+        if second_user is not None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already used",
+            )
+        user_model = VerifyUserModel("", "", change_email_data.new_setting, user_dao)
+        if (await is_email_correct(user_model)) is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="The new email is not correct",
             )
         await user_dao.update_email(
             user.id if user.id is not None else -1,
@@ -100,7 +108,10 @@ async def change_username(
     :raises HTTPException: if username is incorrect.
     """
     if user.is_correct_password(change_username_data.password):
-        if user_dao.get_user_by_username(change_username_data.new_setting) is not None:
+        second_user = await user_dao.get_user_by_username(
+            change_username_data.new_setting,
+        )
+        if second_user is not None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Username already used",
@@ -123,18 +134,24 @@ async def save_avatar_img(avatar_img: UploadFile, path: str) -> dict[str, str]:
     :param avatar_img: avatar image.
     :param path: path to save the image including it's name.
     :return: dict with the key msg to tell the image has been saved.
-    :raises HTTPException: if the image failed to be saved.
+    :raises HTTPException: if the image failed to be saved
+        or if the image is not PNG or JPEG.
     """
     try:
         # Open the img as same as the original image
         img = Image.open(avatar_img.file)
+        if img.format not in {"PNG", "JPEG"}:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Image format not supported",
+            )
         img.save(path, "PNG", optimize=True)
         return {"msg": "Avatar changed"}
 
-    except Exception:
-        raise HTTPException(
+    except Exception as error:  # noqa: WPS329
+        raise error if error.__class__.__name__ == "HTTPException" else HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="The image cannot be saved",
+            detail="Failed to save the image",
         )
 
 

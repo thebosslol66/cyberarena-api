@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from cyberarena.src.card import Card
 from cyberarena.src.deck import Deck
@@ -24,11 +24,16 @@ class Hand:
         """
         return len(self.__hand)
 
-    def get_random_card(self) -> None:
-        """Get a random card from the hand."""
+    def get_random_card(self) -> Optional[Card]:
+        """
+        Get a random card from the hand.
+
+        :return: A random card from the deck.
+        """
         card = self.__Deck.get_random_card()
-        if card is not None:
+        if card:
             self.__hand.append(card)
+        return self.__Deck.get_random_card()
 
     def use_card(self, card: Card) -> None:
         """
@@ -38,10 +43,10 @@ class Hand:
         """
         self.__hand.remove(card)
 
-    def use_card_debug(self, i: int) -> None:
+    def use_card_debug(self, index: int) -> None:
         """
         Use a card.
 
-        :param i: indice de la card to use.
+        :param index: index of the card tu get.
         """
-        self.__hand.remove(self.__hand[i])
+        self.__hand.remove(self.__hand[index])

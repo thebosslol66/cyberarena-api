@@ -112,5 +112,4 @@ async def give_daily_free_coins(
         return 0
     user.last_daily_reward = now()
     await _credit_account(user, settings.daily_coin_reward, "Daily free coins")
-    await session.commit()
     return settings.daily_coin_reward

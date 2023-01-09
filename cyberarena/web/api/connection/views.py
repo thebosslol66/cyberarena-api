@@ -51,7 +51,7 @@ async def sign_up(
         )
         response.message = "User created"
     # TODO: remove this to active the account later by email
-    await set_user_active(sign_up_data.username, user_dao)
+    # await set_user_active(sign_up_data.username, user_dao)
     return response
 
 
