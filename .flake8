@@ -97,6 +97,8 @@ per-file-ignores =
   F403,
   ; Found wrong metadata variable
   WPS410,
+  ; For local import in modules
+  WPS300,
 
 exclude =
   ./.cache,
