@@ -1,8 +1,8 @@
 # flake8: noqa
 import pytest
 
-from cyberarena.src.deck import Deck
-from cyberarena.src.hand import Hand
+from cyberarena.game_module.deck import Deck
+from cyberarena.game_module.hand import Hand
 
 
 @pytest.mark.anyio

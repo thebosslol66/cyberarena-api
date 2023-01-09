@@ -1,12 +1,12 @@
 import abc
 
 
-class CardAbstract(metaclass=abc.ABCMeta):
-    """class CardAbstract."""
+class AbstractCard(metaclass=abc.ABCMeta):
+    """class AbstractCard."""
 
     def __init__(self, name: str, hp: int, ap: int) -> None:
         """
-        Constructor for CardAbstract.
+        Constructor for AbstractCard.
 
         :param name: Name of the card.
         :param hp: Health points of the card.
@@ -58,17 +58,17 @@ class CardAbstract(metaclass=abc.ABCMeta):
         """
         Getter for ap.
 
-        :return: The ap of this CardAbstract.
+        :return: The ap of this AbstractCard.
         """
         return self._ap
 
-    def attack_card(self, card: "CardAbstract") -> None:
+    def attack_card(self, card: "AbstractCard") -> None:
         """
         Attack a card.
 
         :param card: Card to attack.
         """
-        CardAbstract._receive_damage(card, self.ap)  # noqa: WPS437
+        AbstractCard._receive_damage(card, self.ap)  # noqa: WPS437
 
     def is_alive(self) -> bool:
         """

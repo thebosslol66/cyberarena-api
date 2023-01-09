@@ -4,11 +4,12 @@ from typing import Any, Dict, Optional
 
 from loguru import logger
 
-from cyberarena.src.card import Card
-from cyberarena.src.card_base import CardAbstract
+from cyberarena.game_module.card.playable import Playable
+
+from .playable import AbstractCard  # noqa: WPS300
 
 
-class CardConstructorAbstract(metaclass=abc.ABCMeta):
+class ConstructorAbstract(metaclass=abc.ABCMeta):
     """
     CardConstructorAbstract class.
 
@@ -23,7 +24,7 @@ class CardConstructorAbstract(metaclass=abc.ABCMeta):
     def __init__(self) -> None:
         """Constructor."""
         self._name: str = "Unknown"
-        self._card: Optional[CardAbstract] = None
+        self._card: Optional[AbstractCard] = None
         self.json_data: Dict[str, Any] = {}
 
     @abc.abstractmethod
@@ -53,7 +54,7 @@ class CardConstructorAbstract(metaclass=abc.ABCMeta):
         self._check_unrecognized_attribute()
         return True
 
-    def get_card(self) -> Optional[CardAbstract]:
+    def get_card(self) -> Optional[AbstractCard]:
         """
         Get the card cunstucred by the card constructor.
 
@@ -178,18 +179,18 @@ class CardConstructorAbstract(metaclass=abc.ABCMeta):
                 )
 
 
-class CardConstructor(CardConstructorAbstract):
+class ConstructorPlayable(ConstructorAbstract):
     """CardConstructor class.
 
     This class is used to generate a card from a json file.
     It can be used to validate a json file.
     """
 
-    NUMERICAL_ATTRIBUTES = ["dp", "cost"] + CardConstructorAbstract.NUMERICAL_ATTRIBUTES
+    NUMERICAL_ATTRIBUTES = ["dp", "cost"] + ConstructorAbstract.NUMERICAL_ATTRIBUTES
     OBLIGATORY_ATTRIBUTES = [
         "type",
         "rarity",
-    ] + CardConstructorAbstract.OBLIGATORY_ATTRIBUTES
+    ] + ConstructorAbstract.OBLIGATORY_ATTRIBUTES
 
     def construct(self, filename: str) -> bool:
         """
@@ -208,5 +209,5 @@ class CardConstructor(CardConstructorAbstract):
         hp = self.json_data["hp"]
         ap = self.json_data["ap"]
         dp = self.json_data["dp"]
-        self._card = Card(name, cost, hp, ap, dp)
+        self._card = Playable(name, cost, hp, ap, dp)
         return True

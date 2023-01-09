@@ -1,7 +1,7 @@
-from cyberarena.src.card_base import CardAbstract
+from cyberarena.game_module.card.base import AbstractCard
 
 
-class Card(CardAbstract):
+class Playable(AbstractCard):
     """Card class."""
 
     def __init__(  # noqa: WPS211
