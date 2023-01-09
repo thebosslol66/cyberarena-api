@@ -16,7 +16,12 @@ router = APIRouter()
 router.include_router(change_router)
 
 
-@router.get("/me", response_model=UserInformations)
+@router.get(
+    "/me",
+    response_model=UserInformations,
+    summary="Get user informations.",
+    description="Get informations about current logged user.\n",
+)
 async def get_current_user_profile(
     current_user: UserModel = Depends(get_current_user),
 ) -> UserInformations:
@@ -36,7 +41,13 @@ async def get_current_user_profile(
 # TODO: know if the profile is accessible by everyone or only connected user
 # TODO: If the profile is acessible by everyone, select if all is
 #  accessible by everyone or only connected user
-@router.get("/{username}")
+@router.get(
+    "/{username}",
+    summary="Get informations of the user with username.",
+    description="Get informations of the user with username.\n"
+    "\nIf the user is not found, "
+    "you will have a status code of 404.\n",
+)
 async def get_specified_user_profile(
     username: str,
     user_dao: UserDAO = Depends(),
@@ -58,7 +69,14 @@ async def get_specified_user_profile(
     return username
 
 
-@router.get("/me/avatar", response_class=FileResponse)
+@router.get(
+    "/me/avatar",
+    response_class=FileResponse,
+    summary="Get user's avatar.",
+    description="Get user's avatar wich is logged in. "
+    "It return it's avatar file,\n"
+    "\nIf the user has no avatar, return a default avatar.\n",
+)
 async def get_current_user_avatar(
     current_user: UserModel = Depends(get_current_user),
 ) -> FileResponse:
@@ -103,7 +121,14 @@ async def get_current_user_avatar(
     )
 
 
-@router.get("/{username}/avatar", response_class=FileResponse)
+@router.get(
+    "/{username}/avatar",
+    response_class=FileResponse,
+    summary="Get user's avatar.",
+    description="Get user's avatar with his username. "
+    "It return it's avatar file,\n"
+    "\nIf the user has no avatar, return a default avatar.\n",
+)
 async def get_specified_user_avatar(
     username: str,
     user_dao: UserDAO = Depends(),
