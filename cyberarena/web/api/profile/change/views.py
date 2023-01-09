@@ -16,7 +16,16 @@ from cyberarena.web.api.profile.change.schema import ChangeUserInformations
 router: APIRouter = APIRouter(prefix="/change")
 
 
-@router.put("/password")
+@router.put(
+    "/password",
+    summary="Change the password of the current user.",
+    description="Change the password of the current user.\n"
+    "\nIf the password is not correct, "
+    "you will have a status code of 400.\n"
+    "\nThe password must be at least 8 characters long, "
+    "contain at least one uppercase letter, "
+    "one lowercase letter and one number.\n",
+)
 async def change_password(
     password_data: ChangeUserInformations,
     user: UserModel = Depends(get_current_user),
@@ -55,7 +64,13 @@ async def change_password(
         )
 
 
-@router.put("/email")
+@router.put(
+    "/email",
+    summary="Change the email of the current user.",
+    description="Change the email of the current user.\n"
+    "\nIf the password is not correct, "
+    "you will have a status code of 400.\n",
+)
 async def change_email(
     change_email_data: ChangeUserInformations,
     user: UserModel = Depends(get_current_user),
@@ -93,7 +108,13 @@ async def change_email(
         )
 
 
-@router.put("/username")
+@router.put(
+    "/username",
+    summary="Change the username of the current user.",
+    description="Change the username of the current user.\n"
+    "\nIf the password is not correct, "
+    "you will have a status code of 400.\n",
+)
 async def change_username(
     change_username_data: ChangeUserInformations,
     user: UserModel = Depends(get_current_user),
@@ -127,7 +148,10 @@ async def change_username(
         )
 
 
-async def save_avatar_img(avatar_img: UploadFile, path: str) -> dict[str, str]:
+async def save_avatar_img(  # noqa: WPS231
+    avatar_img: UploadFile,
+    path: str,
+) -> dict[str, str]:
     """
     Save the avatar image to the static/img/avatars folder.
 
@@ -145,6 +169,12 @@ async def save_avatar_img(avatar_img: UploadFile, path: str) -> dict[str, str]:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Image format not supported",
             )
+        max_size: int = settings.max_avatar_size
+        if img.width > max_size or img.height > max_size:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Image too big",
+            )
         img.save(path, "PNG", optimize=True)
         return {"msg": "Avatar changed"}
 
@@ -155,7 +185,15 @@ async def save_avatar_img(avatar_img: UploadFile, path: str) -> dict[str, str]:
         )
 
 
-@router.put("/avatar")
+@router.put(
+    "/avatar",
+    summary="Change the avatar of the current user.",
+    description="Change the avatar of the current user.\n"
+    "\nNeed a jpeg image or png image.\n"
+    f"\nThe image must be lower than {settings.max_avatar_size} and maax avatar"
+    f"side of {settings.max_avatar_side}.\n"
+    "\nElse if not correct return error 400.\n",
+)
 async def change_avatar(
     avatar_img: UploadFile,
     user: UserModel = Depends(get_current_user),

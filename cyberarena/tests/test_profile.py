@@ -831,7 +831,7 @@ async def test_change_avatar_too_large(
         url,
         files={
             "avatar_img": open(
-                "cyberarena/tests_data/imgs/test_avatar_bad_1024x1024.png",
+                "cyberarena/tests_data/imgs/test_avatar_bad_618x769.png",
                 "rb",
             ),
         },
