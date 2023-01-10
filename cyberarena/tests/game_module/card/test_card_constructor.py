@@ -4,22 +4,22 @@ import os
 
 import pytest
 
-from cyberarena.game_module.card import ConstructorPlayableCard
+from cyberarena.game_module.card import ConstructorPlayableCharacterCard
 
 cards_path = os.path.join("cyberarena", "tests_data", "cards")
 
 
 @pytest.fixture
-def card_constructor() -> ConstructorPlayableCard:
-    return ConstructorPlayableCard()
+def card_constructor() -> ConstructorPlayableCharacterCard:
+    return ConstructorPlayableCharacterCard()
 
 
 ######################################################################
-#                     TESTS CARD CONSTRUCTOR                         #
+#           TESTS CARD CONSTRUCTOR PLAYABLE CHARACTER                #
 ######################################################################
 @pytest.mark.anyio
 async def test_card_constructor_default(
-    card_constructor: ConstructorPlayableCard,
+    card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
     assert (
         card_constructor.construct(os.path.join(cards_path, "hiesenberg", "data.json"))
@@ -36,7 +36,7 @@ async def test_card_constructor_default(
 
 @pytest.mark.anyio
 async def test_card_constructor_file_not_found(
-    card_constructor: ConstructorPlayableCard,
+    card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
     with pytest.raises(FileNotFoundError):
         card_constructor.construct(os.path.join(cards_path, "hiesenberg", "data2.json"))
@@ -44,7 +44,7 @@ async def test_card_constructor_file_not_found(
 
 @pytest.mark.anyio
 async def test_card_constructor_invalid_json(
-    card_constructor: ConstructorPlayableCard,
+    card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
     with pytest.raises(json.JSONDecodeError):
         card_constructor.construct(
@@ -59,7 +59,7 @@ async def test_card_constructor_invalid_json(
 @pytest.mark.anyio
 async def test_card_constructor_no_obligatory_attribute(
     attribute_name: str,
-    card_constructor: ConstructorPlayableCard,
+    card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
     assert (
         card_constructor.construct(
@@ -72,7 +72,7 @@ async def test_card_constructor_no_obligatory_attribute(
 
 @pytest.mark.anyio
 async def test_card_constructor_obligatory_attribute_empty(
-    card_constructor: ConstructorPlayableCard,
+    card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
     assert (
         card_constructor.construct(
@@ -85,7 +85,7 @@ async def test_card_constructor_obligatory_attribute_empty(
 
 @pytest.mark.anyio
 async def test_card_constructor_obligatory_attribute_is_a_number(
-    card_constructor: ConstructorPlayableCard,
+    card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
     assert (
         card_constructor.construct(
@@ -103,7 +103,7 @@ async def test_card_constructor_obligatory_attribute_is_a_number(
 @pytest.mark.anyio
 async def test_card_constructor_no_numerical_attribute(
     attribute_name: str,
-    card_constructor: ConstructorPlayableCard,
+    card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
     assert (
         card_constructor.construct(
@@ -121,7 +121,7 @@ async def test_card_constructor_no_numerical_attribute(
 @pytest.mark.anyio
 async def test_card_constructor_invalid_numerical_attribute(
     attribute_name: str,
-    card_constructor: ConstructorPlayableCard,
+    card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
     assert (
         card_constructor.construct(
@@ -134,7 +134,7 @@ async def test_card_constructor_invalid_numerical_attribute(
 
 @pytest.mark.anyio
 async def test_card_constructor_numerical_attribute_is_float(
-    card_constructor: ConstructorPlayableCard,
+    card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
     assert (
         card_constructor.construct(
@@ -148,7 +148,7 @@ async def test_card_constructor_numerical_attribute_is_float(
 
 @pytest.mark.anyio
 async def test_card_constructor_numerical_attribute_is_negative(
-    card_constructor: ConstructorPlayableCard,
+    card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
     assert (
         card_constructor.construct(
@@ -161,7 +161,7 @@ async def test_card_constructor_numerical_attribute_is_negative(
 
 @pytest.mark.anyio
 async def test_card_constructor_add_unused_attribute(
-    card_constructor: ConstructorPlayableCard,
+    card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
     assert (
         card_constructor.construct(

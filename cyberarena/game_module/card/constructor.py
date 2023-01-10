@@ -1,12 +1,11 @@
 import abc
 import json
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from loguru import logger
 
-from cyberarena.game_module.card.playable import Playable
-
-from .playable import AbstractCard  # noqa: WPS300
+from .base import AbstractCard  # noqa: WPS300
+from .playable_character import PlayableCharacterCard  # noqa: WPS300
 
 
 class ConstructorAbstract(metaclass=abc.ABCMeta):
@@ -17,9 +16,9 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
     It is use for construct card on plate and character.
     """
 
-    OBLIGATORY_ATTRIBUTES = ["name"]
-    NUMERICAL_ATTRIBUTES = ["hp", "ap"]
-    OPTIONAL_ATTRIBUTES = ["type", "ability", "description"]
+    OBLIGATORY_ATTRIBUTES: List[str] = ["name"]
+    NUMERICAL_ATTRIBUTES: List[str] = []
+    OPTIONAL_ATTRIBUTES: List[str] = ["description"]
 
     def __init__(self) -> None:
         """Constructor."""
@@ -180,14 +179,19 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
                 )
 
 
-class ConstructorPlayable(ConstructorAbstract):
+class ConstructorPlayableCharacterCard(ConstructorAbstract):
     """CardConstructor class.
 
     This class is used to generate a card from a json file.
     It can be used to validate a json file.
     """
 
-    NUMERICAL_ATTRIBUTES = ["dp", "cost"] + ConstructorAbstract.NUMERICAL_ATTRIBUTES
+    NUMERICAL_ATTRIBUTES = [
+        "hp",
+        "ap",
+        "dp",
+        "cost",
+    ] + ConstructorAbstract.NUMERICAL_ATTRIBUTES
     OBLIGATORY_ATTRIBUTES = [
         "type",
         "rarity",
@@ -210,5 +214,5 @@ class ConstructorPlayable(ConstructorAbstract):
         hp = self.json_data["hp"]
         ap = self.json_data["ap"]
         dp = self.json_data["dp"]
-        self._card = Playable(name, cost, hp, ap, dp)
+        self._card = PlayableCharacterCard(name, cost, hp, ap, dp)
         return True

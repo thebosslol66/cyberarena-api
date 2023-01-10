@@ -5,7 +5,7 @@ from loguru import logger
 
 from ..exceptions import LibraryFileNotFoundError  # noqa: WPS300
 from .base import AbstractCard  # noqa: WPS300
-from .constructor import ConstructorPlayable  # noqa: WPS300
+from .constructor import ConstructorPlayableCharacterCard  # noqa: WPS300
 
 
 class Library(object):
@@ -95,7 +95,7 @@ class Library(object):
 
     def __load_library(self) -> None:
         """Load all cards in the library."""
-        constructor_playable = ConstructorPlayable()
+        constructor_playable = ConstructorPlayableCharacterCard()
         for card_data in self.__get_cards_path():
             # TODO: Load the card in the correct constructor
             constructor_playable.construct(card_data)
