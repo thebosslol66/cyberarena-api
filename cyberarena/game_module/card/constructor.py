@@ -80,6 +80,7 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
         try:
             with open(filename, "r") as file:
                 self.json_data = json.load(file)
+            # TODO: replace with module exeption
         except FileNotFoundError as error:
             logger.error(f"The file '{filename}' does not exist.")
             raise error
