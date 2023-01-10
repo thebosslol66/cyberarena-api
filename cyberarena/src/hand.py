@@ -35,18 +35,37 @@ class Hand:
             self.__hand.append(card)
         return self.__Deck.get_random_card()
 
-    def use_card(self, card: Card) -> None:
+    def use_card(self, card: Card, mana: int) -> Card:
         """
         Use a card.
 
         :param card: Card to use.
+        :param mana: mana of the player.
+        :return: True if the card is used, False otherwise.
         """
-        self.__hand.remove(card)
+        if card.cost <= mana:
+            self.__hand.remove(card)
+            return card
+        return Card("None", 0, 0, 0)
 
-    def use_card_debug(self, index: int) -> None:
+    def use_card_debug(self, index: int, mana: int) -> Card:
         """
         Use a card.
 
         :param index: index of the card tu get.
+        :param mana: mana of the player.
+        :return: True if the card is used, False otherwise.
         """
-        self.__hand.remove(self.__hand[index])
+        card = self.__hand[index]
+        if self.__hand[index].cost <= mana:
+            self.__hand.remove(self.__hand[index])
+            return card
+        return Card("None", 0, 0, 0)
+
+    def get_hand(self) -> List[Card]:
+        """
+        Get the hand.
+
+        :return: The hand.
+        """
+        return self.__hand

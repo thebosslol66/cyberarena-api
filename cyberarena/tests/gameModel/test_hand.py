@@ -13,5 +13,5 @@ async def test_hand() -> None:
     assert hand.get_hand_size() == 0
     hand.get_random_card()
     assert hand.get_hand_size() == 1
-    hand.use_card_debug(0)
+    hand.use_card_debug(0, 10)
     assert hand.get_hand_size() == 0

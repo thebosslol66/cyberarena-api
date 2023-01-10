@@ -35,3 +35,11 @@ class Deck(Card):
         for _ in range(0, self.__deckSize):
             self.__deck.append(Card("Cyber-Heisenberg", 1, 1, 1))
         random.shuffle(self.__deck)
+
+    def get_deck(self) -> List[Card]:
+        """
+        Get the deck.
+
+        :return: The deck.
+        """
+        return self.__deck
