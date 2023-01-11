@@ -434,3 +434,55 @@ class DecoratorCostBoost(AbstractDecorator):
         :return: self or self._card.
         """
         return self if self._cost > 0 else self.card
+
+
+class DecoratorTemporaryTurnCostBoost(_AbstractTurnDecorator, DecoratorCostBoost):
+    """class DecoratorTemporaryTurnCostBoost.
+
+    This class reduce the price of the card but losethe bonus
+        at the end of the number of turn
+    """
+
+    def __init__(
+        self,
+        card: AbstractCharacterCard,
+        cost_boost: int,
+        turns: int,
+    ) -> None:
+        """
+        Constructor for DecoratorTemporaryTurnCostBoost.
+
+        :param card: Card to decorate.
+        :param cost_boost: Cost boost.
+        :param turns: Number of turn before losing the bonus
+        """
+        super().__init__(card=card, turns=turns, cost_boost=cost_boost)
+
+    def __repr__(self) -> str:
+        """
+        Return a string representation of the card.
+
+        :return: A string representation of the card.
+        """
+        return "{0}(card={1}, cost_boost={2}, turns={3})".format(
+            self.__class__.__name__,
+            repr(self._card),
+            self._cost,
+            self._turns,
+        )
+
+    def end_turn(self) -> None:
+        """End the turn."""
+        super().end_turn()
+        if self._turns <= 0:
+            self._cost = 0
+
+    def refresh_card_reference(self) -> AbstractCharacterCard:
+        """
+        Return self or self._card if the boost have 0 hp.
+
+        This function must be called after each action and after a turn
+
+        :return: self or self._card.
+        """
+        return DecoratorCostBoost.refresh_card_reference(self)

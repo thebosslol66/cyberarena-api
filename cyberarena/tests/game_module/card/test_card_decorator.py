@@ -390,3 +390,49 @@ async def test_card_decorator_cost_boost_too_much_reduction(
     assert new_card.ap == 1
     assert new_card.cost == 0
     assert new_card.dp == 0
+
+
+######################################################################
+#           TESTS CARD DECORATOR TEMPORARY TURN COST BOOST           #
+######################################################################
+
+
+@pytest.mark.anyio
+async def test_card_decorator_temporary_turn_cost_boost_cost_modification(
+    default_card: PlayableCharacterCard,
+) -> None:
+    new_card = boost.DecoratorTemporaryTurnCostBoost(default_card, 1, 1)
+    assert new_card.hp == 1
+    assert new_card.ap == 1
+    assert new_card.cost == 0
+    assert new_card.dp == 0
+
+
+@pytest.mark.anyio
+async def test_card_decorator_temporary_turn_cost_boost_refresh_ref(
+    default_card: PlayableCharacterCard,
+) -> None:
+    new_card = boost.DecoratorTemporaryTurnCostBoost(default_card, 1, 1)
+    assert new_card.refresh_card_reference() == new_card
+
+
+@pytest.mark.anyio
+async def test_card_decorator_temporary_turn_cost_boost_refresh_ref_useless_decorator(
+    default_card: PlayableCharacterCard,
+) -> None:
+    new_card = boost.DecoratorTemporaryTurnCostBoost(default_card, 0, 1)
+    assert new_card.refresh_card_reference() == default_card
+
+
+@pytest.mark.anyio
+async def test_card_decorator_temporary_turn_cost_boost_end_turn(
+    default_card: PlayableCharacterCard,
+) -> None:
+    new_card = boost.DecoratorTemporaryTurnCostBoost(default_card, 1, 1)
+    new_card.end_turn()
+    assert new_card.hp == 1
+    assert new_card.ap == 1
+    assert new_card.cost == 1
+    assert new_card.dp == 0
+    assert new_card.is_alive() is True
+    assert new_card.refresh_card_reference() == default_card
