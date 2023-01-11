@@ -412,3 +412,50 @@ class DecoratorTemporaryTurnAttackBoost(_AbstractTurnDecorator):
         """
         self.card._add_attack_points_modifier(self._ap)
         self.card.attack_card(card)
+
+
+class DecoratorCostBoost(AbstractDecorator):
+    """class DecoratorPriceBoost."""
+
+    def __init__(self, card: AbstractCharacterCard, cost_boost: int) -> None:
+        """
+        Constructor for DecoratorPriceBoost.
+
+        It reduce the price of the card for an undefined amount of turn.
+
+        :param card: Card to decorate.
+        :param cost_boost: Cost boost.
+        """
+        super().__init__(card)
+        self._cost: int = cost_boost
+
+    def __repr__(self) -> str:
+        """
+        Return a string representation of the card.
+
+        :return: A string representation of the card.
+        """
+        return "{0}(card={1}, cost_boost={2})".format(
+            self.__class__.__name__,
+            repr(self._card),
+            self._cost,
+        )
+
+    @property
+    def cost(self) -> int:
+        """
+        Getter for price.
+
+        :return: price.
+        """
+        return max(0, self.card.cost - self._cost)
+
+    def refresh_card_reference(self) -> AbstractCharacterCard:
+        """
+        Return self or self._card if the boost have 0 hp.
+
+        This function must be called after each action and after a turn
+
+        :return: self or self._card.
+        """
+        return self if self._cost > 0 else self.card
