@@ -16,13 +16,14 @@ class AbstractDecorator(AbstractCharacterCard, metaclass=abc.ABCMeta):
         """
         self._card: AbstractCharacterCard = card
 
+    @abc.abstractmethod
     def __repr__(self) -> str:
         """
         Return a string representation of the card.
 
         :return: A string representation of the card.
         """
-        return self._card.__repr__()  # noqa: WPS609
+        return "{0}(card={1})".format(self.__class__.__name__, repr(self._card))
 
     @property
     def name(self) -> str:
@@ -182,6 +183,18 @@ class DecoratorHealthBoost(AbstractDecorator):
         super().__init__(card)
         self._hp: int = hp_boost
 
+    def __repr__(self) -> str:
+        """
+        Return a string representation of the card.
+
+        :return: A string representation of the card.
+        """
+        return "{0}(card={1}, hp_boost={2})".format(
+            self.__class__.__name__,
+            repr(self._card),
+            self._hp,
+        )
+
     @property
     def hp(self) -> int:
         """
@@ -225,6 +238,18 @@ class DecoratorDefenseBoost(AbstractDecorator):
         """
         super().__init__(card)
         self._dp: int = dp_boost
+
+    def __repr__(self) -> str:
+        """
+        Return a string representation of the card.
+
+        :return: A string representation of the card.
+        """
+        return "{0}(card={1}, dp_boost={2})".format(
+            self.__class__.__name__,
+            repr(self._card),
+            self._dp,
+        )
 
     @property
     def dp(self) -> int:
@@ -293,6 +318,19 @@ class DecoratorTemporaryTurnDefenseBoost(_AbstractTurnDecorator, DecoratorDefens
         """
         super().__init__(card=card, turns=turns, dp_boost=dp_boost)
 
+    def __repr__(self) -> str:
+        """
+        Return a string representation of the card.
+
+        :return: A string representation of the card.
+        """
+        return "{0}(card={1}, dp_boost={2}, turns={3})".format(
+            self.__class__.__name__,
+            repr(self._card),
+            self._dp,
+            self._turns,
+        )
+
     def end_turn(self) -> None:
         """End the turn."""
         super().end_turn()
@@ -327,6 +365,19 @@ class DecoratorTemporaryTurnAttackBoost(_AbstractTurnDecorator):
         """
         super().__init__(card=card, turns=turns)
         self._ap: int = ap_boost
+
+    def __repr__(self) -> str:
+        """
+        Return a string representation of the card.
+
+        :return: A string representation of the card.
+        """
+        return "{0}(card={1}, ap_boost={2}, turns={3})".format(
+            self.__class__.__name__,
+            repr(self._card),
+            self._ap,
+            self._turns,
+        )
 
     @property
     def ap(self) -> int:
