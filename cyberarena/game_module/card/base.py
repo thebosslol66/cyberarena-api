@@ -97,9 +97,6 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
         self._hp: int = hp
         self._ap: int = ap
         self._dp: int = dp
-
-        self._temporary_attack_points_modifier: int = 0
-
         valuer_error: str = ""
         if self._hp < 0:
             valuer_error = "The hp is negative."
@@ -185,16 +182,7 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
 
         :param card: The card to attack.
         """
-        card._receive_damage(self.ap + self._temporary_attack_points_modifier)
-        self._temporary_attack_points_modifier = 0
-
-    def _add_attack_points_modifier(self, modifier: int) -> None:
-        """
-        Add a modifier to the attack points.
-
-        :param modifier: The modifier to add.
-        """
-        self._temporary_attack_points_modifier += modifier
+        card._receive_damage(self.ap)
 
     def _receive_damage(self, damage: int) -> None:
         """

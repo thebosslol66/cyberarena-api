@@ -96,14 +96,6 @@ class AbstractDecorator(AbstractCharacterCard, metaclass=abc.ABCMeta):
         """
         return self._card.is_alive()
 
-    def attack_card(self, card: AbstractCharacterCard) -> None:
-        """
-        Attack a card.
-
-        :param card: The card to attack.
-        """
-        self._card.attack_card(card)
-
     @abc.abstractmethod
     def refresh_card_reference(self) -> AbstractCharacterCard:
         """
@@ -126,14 +118,6 @@ class AbstractDecorator(AbstractCharacterCard, metaclass=abc.ABCMeta):
         :param damage: The damage to receive.
         """
         self._card._receive_damage(damage)
-
-    def _add_attack_points_modifier(self, modifier: int) -> None:
-        """
-        Add attack points modifier.
-
-        :param modifier: The modifier to add.
-        """
-        self._card._add_attack_points_modifier(modifier)
 
 
 class _AbstractTurnDecorator(AbstractDecorator):
@@ -403,15 +387,6 @@ class DecoratorTemporaryTurnAttackBoost(_AbstractTurnDecorator):
         :return: self or self._card.
         """
         return self if self._ap > 0 else self.card
-
-    def attack_card(self, card: AbstractCharacterCard) -> None:
-        """
-        Attack a card.
-
-        :param card: The card to attack.
-        """
-        self.card._add_attack_points_modifier(self._ap)
-        self.card.attack_card(card)
 
 
 class DecoratorCostBoost(AbstractDecorator):
