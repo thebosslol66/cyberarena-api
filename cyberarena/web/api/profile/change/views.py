@@ -169,7 +169,7 @@ async def save_avatar_img(  # noqa: WPS231
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Image format not supported",
             )
-        max_size: int = settings.max_avatar_size
+        max_size: int = settings.max_avatar_side
         if img.width > max_size or img.height > max_size:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
