@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Optional
 
 from loguru import logger
 
-from .base import AbstractCard  # noqa: WPS300
-from .playable_character import PlayableCharacterCard  # noqa: WPS300
+from .base import AbstractCard
+from .playable_character import PlayableCharacterCard
 
 
 class ConstructorAbstract(metaclass=abc.ABCMeta):

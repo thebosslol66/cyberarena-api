@@ -100,6 +100,13 @@ per-file-ignores =
   ; For local import in modules
   WPS300,
 
+  ; All cyberarena card files
+  cyberarena/game_module/card/*.py:
+  ; Local folder import
+  WPS300,
+  ; Accessing private attribute of the same class
+  WPS437,
+
 exclude =
   ./.cache,
   ./.git,

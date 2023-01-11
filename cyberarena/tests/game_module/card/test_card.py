@@ -1,13 +1,13 @@
 # flake8: noqa
 import pytest as pytest
 
-from cyberarena.game_module.card import PlayableCharacterCard
+from cyberarena.game_module.card import PlayableCard
 
 
 @pytest.mark.anyio
 async def test_card() -> None:
     """Test card."""
-    card = PlayableCharacterCard("Cyber-Heisenberg", 1, 1, 1)
+    card = PlayableCard("Cyber-Heisenberg", 1, 1, 1)
     assert card.name == "Cyber-Heisenberg"
     assert card.cost == 1
     assert card.hp == 1
@@ -17,8 +17,8 @@ async def test_card() -> None:
 @pytest.mark.anyio
 async def test_card_attack() -> None:
     """Test card attack."""
-    card = PlayableCharacterCard("Cyber-Heisenberg", 1, 1, 1)
-    card2 = PlayableCharacterCard("Cyber-Heisenberg", 1, 1, 1)
+    card = PlayableCard("Cyber-Heisenberg", 1, 1, 1)
+    card2 = PlayableCard("Cyber-Heisenberg", 1, 1, 1)
     card.attack_card(card2)
     assert card2.hp == 0
     assert card2.ap == 1

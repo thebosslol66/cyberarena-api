@@ -4,15 +4,17 @@ import abc
 class AbstractCard(metaclass=abc.ABCMeta):
     """class AbstractCard."""
 
-    def __init__(self, name: str, description: str = "") -> None:
+    def __init__(self, name: str, description: str = "", cost: int = 0) -> None:
         """
         Constructor for AbstractCard.
 
         :param name: Name of the card.
         :param description: Description of the card.
+        :param cost: Cost of the card.
         """
         self._name: str = name
         self._description: str = description
+        self._cost: int = cost
 
     @abc.abstractmethod
     def __str__(self) -> str:
@@ -54,6 +56,15 @@ class AbstractCard(metaclass=abc.ABCMeta):
         """
         return self._description
 
+    @property
+    def cost(self) -> int:
+        """
+        Getter for cost.
+
+        :return: cost.
+        """
+        return self._cost
+
 
 class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
     """class AbstractCharacterCard."""
@@ -65,6 +76,7 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
         ap: int,
         dp: int = 0,
         description: str = "",
+        cost: int = 0,
     ) -> None:
         """
         Constructor for AbstractCharacterCard.
@@ -74,11 +86,13 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
         :param ap: Attack points of the card.
         :param dp: Defense points of the card.
         :param description: Description of the card.
+        :param cost: Cost of the card.
         :raises ValueError: If the hp, ap or dp is negative.
         """
         super().__init__(
             name=name,
             description=description,
+            cost=cost,
         )
         self._hp: int = hp
         self._ap: int = ap
@@ -154,13 +168,21 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
         """
         return self.hp > 0
 
+    def end_turn(self) -> None:
+        """
+        This can execute some code when the turn is ended.
+
+        It is usefull to remove effects or kill a car if it can live only for a number
+            of turn.
+        """
+
     def attack_card(self, card: "AbstractCharacterCard") -> None:
         """
         Attack a card.
 
         :param card: The card to attack.
         """
-        card._receive_damage(self.ap)  # noqa: WPS437
+        card._receive_damage(self.ap)
 
     def _receive_damage(self, damage: int) -> None:
         """
@@ -170,24 +192,3 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
         """
         if damage > self.dp:
             self._hp -= damage - self.dp
-
-
-class PlayableCard(object):
-    """class PlayableCard."""
-
-    def __init__(self, cost: int):
-        """
-        Constructor for PlayableCard.
-
-        :param cost: The cost of the card.
-        """
-        self._cost = cost
-
-    @property
-    def cost(self) -> int:
-        """
-        Getter for cost.
-
-        :return: cost.
-        """
-        return self._cost

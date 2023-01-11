@@ -1,7 +1,7 @@
-from cyberarena.game_module.card.base import AbstractCharacterCard, PlayableCard
+from .base import AbstractCharacterCard
 
 
-class PlayableCharacterCard(AbstractCharacterCard, PlayableCard):
+class PlayableCharacterCard(AbstractCharacterCard):
     """Card class."""
 
     def __init__(  # noqa: WPS211
@@ -31,8 +31,8 @@ class PlayableCharacterCard(AbstractCharacterCard, PlayableCard):
             hp=hp,
             ap=ap,
             dp=dp,
+            cost=cost,
         )
-        PlayableCard.__init__(self, cost)  # noqa: WPS609
 
     def __str__(self) -> str:
         """
@@ -40,7 +40,7 @@ class PlayableCharacterCard(AbstractCharacterCard, PlayableCard):
 
         :return: A string representation of the card.
         """
-        return "{0} ({1}/{2}/{3}) cost={4}".format(
+        return "Character card: {0} ({1}/{2}/{3}) cost={4}".format(
             self.name,
             self.hp,
             self.ap,

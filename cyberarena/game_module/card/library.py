@@ -1,11 +1,11 @@
 import os
-from typing import Any, Dict, Generator, List, Optional
+from typing import Any, Dict, Generator, List, Optional, Tuple
 
 from loguru import logger
 
-from ..exceptions import LibraryFileNotFoundError  # noqa: WPS300
-from .base import AbstractCard  # noqa: WPS300
-from .constructor import ConstructorPlayableCharacterCard  # noqa: WPS300
+from ..exceptions import LibraryFileNotFoundError
+from .base import AbstractCard
+from .constructor import ConstructorAbstract, ConstructorPlayableCharacterCard
 
 
 class Library(object):
@@ -68,7 +68,7 @@ class Library(object):
             )
         self.__load_library()
 
-    def __get_cards_path(self) -> Generator[str, None, None]:
+    def __get_cards_path(self) -> Generator[Tuple[str, str], None, None]:
         """
         Get each cards in a specific directory.
 
@@ -85,7 +85,7 @@ class Library(object):
                 ),
             )
             if is_file:
-                yield os.path.join(self.__library_path, card_dir)
+                yield os.path.join(self.__library_path, card_dir), "playable_caracter"
             else:
                 logger.warning(
                     "The card '{0}' does not have a data file '{1}'.",
@@ -95,7 +95,10 @@ class Library(object):
 
     def __load_library(self) -> None:
         """Load all cards in the library."""
-        constructor_playable = ConstructorPlayableCharacterCard()
-        for card_data in self.__get_cards_path():
+        constructor: Dict[str, ConstructorAbstract] = {
+            "playable_caracter": ConstructorPlayableCharacterCard(),
+            "playable_object": ConstructorPlayableCharacterCard(),
+        }
+        for card_data, card_type in self.__get_cards_path():
             # TODO: Load the card in the correct constructor
-            constructor_playable.construct(card_data)
+            constructor[card_type].construct(card_data)
