@@ -1,4 +1,5 @@
 import abc
+from typing import Any
 
 from .base import AbstractCharacterCard
 
@@ -14,14 +15,6 @@ class AbstractDecorator(AbstractCharacterCard, metaclass=abc.ABCMeta):
         :param card: Card to decorate.
         """
         self._card: AbstractCharacterCard = card
-
-    def __str__(self) -> str:
-        """
-        Return a string representation of the card.
-
-        :return: A string representation of the card.
-        """
-        return self._card.__str__()  # noqa: WPS609
 
     def __repr__(self) -> str:
         """
@@ -85,6 +78,15 @@ class AbstractDecorator(AbstractCharacterCard, metaclass=abc.ABCMeta):
         """
         return self._card.cost
 
+    @property
+    def card(self) -> AbstractCharacterCard:
+        """
+        Getter for card.
+
+        :return: card.
+        """
+        return self._card
+
     def is_alive(self) -> bool:
         """
         Check if the card is alive.
@@ -124,6 +126,48 @@ class AbstractDecorator(AbstractCharacterCard, metaclass=abc.ABCMeta):
         """
         self._card._receive_damage(damage)
 
+    def _add_attack_points_modifier(self, modifier: int) -> None:
+        """
+        Add attack points modifier.
+
+        :param modifier: The modifier to add.
+        """
+        self._card._add_attack_points_modifier(modifier)
+
+
+class _AbstractTurnDecorator(AbstractDecorator):
+    """class AbstractTurnDecorator."""
+
+    @abc.abstractmethod
+    def __init__(
+        self,
+        card: AbstractCharacterCard,
+        turns: int = 0,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Constructor for AbstractTurnDecorator.
+
+        :param card: Card to decorate.
+        :param turns: Number of turns.
+        :param kwargs: Keyword arguments.
+        """
+        super().__init__(card, **kwargs)
+        self._turns: int = turns
+
+    @abc.abstractmethod
+    def end_turn(self) -> None:
+        """End the turn."""
+        self._turns -= 1
+
+    @abc.abstractmethod
+    def refresh_card_reference(self) -> AbstractCharacterCard:
+        """
+        Return self or self._card if the decorator is useless or use.
+
+        This function must be called after each action and after a turn
+        """
+
 
 class DecoratorHealthBoost(AbstractDecorator):
     """class DecoratorHealthBoost."""
@@ -145,7 +189,7 @@ class DecoratorHealthBoost(AbstractDecorator):
 
         :return: hp.
         """
-        return self._card.hp + self._hp
+        return self.card.hp + self._hp
 
     def refresh_card_reference(self) -> AbstractCharacterCard:
         """
@@ -155,7 +199,7 @@ class DecoratorHealthBoost(AbstractDecorator):
 
         :return: self or self._card.
         """
-        return self if self._hp > 0 else self._card
+        return self if self._hp > 0 else self.card
 
     def _receive_damage(self, damage: int) -> None:
         """
@@ -165,7 +209,7 @@ class DecoratorHealthBoost(AbstractDecorator):
         """
         self._hp -= damage
         if self._hp < 0:
-            self._card._receive_damage(-self._hp)
+            self.card._receive_damage(-self._hp)
             self._hp = 0
 
 
@@ -189,7 +233,7 @@ class DecoratorDefenseBoost(AbstractDecorator):
 
         :return: dp.
         """
-        return self._dp + self._card.dp
+        return self._dp + self.card.dp
 
     def refresh_card_reference(self) -> AbstractCharacterCard:
         """
@@ -199,7 +243,7 @@ class DecoratorDefenseBoost(AbstractDecorator):
 
         :return: self or self._card.
         """
-        return self if self._dp > 0 else self._card
+        return self if self._dp > 0 else self.card
 
     def _receive_damage(self, damage: int) -> None:
         """
@@ -207,8 +251,8 @@ class DecoratorDefenseBoost(AbstractDecorator):
 
         :param damage: The damage to receive.
         """
-        new_damage = max(0, damage - self._dp)
-        self._card._receive_damage(new_damage)
+        if self._dp < damage:
+            self.card._receive_damage(damage - self._dp)
 
 
 class DecoratorTemporaryHitDefenseBoost(DecoratorDefenseBoost):
@@ -228,10 +272,10 @@ class DecoratorTemporaryHitDefenseBoost(DecoratorDefenseBoost):
         self._dp -= damage
         if self._dp < 0:
             self._dp = 0
-        self._card._receive_damage(new_damage)
+        self.card._receive_damage(new_damage)
 
 
-class DecoratorTemporaryTurnDefenseBoost(DecoratorDefenseBoost):
+class DecoratorTemporaryTurnDefenseBoost(_AbstractTurnDecorator, DecoratorDefenseBoost):
     """
     class DecoratorDefenseBoost.
 
@@ -239,19 +283,81 @@ class DecoratorTemporaryTurnDefenseBoost(DecoratorDefenseBoost):
         at the end of the number of turn
     """
 
-    def __init__(self, card: AbstractCharacterCard, dp_boost: int, turn: int) -> None:
+    def __init__(self, card: AbstractCharacterCard, dp_boost: int, turns: int) -> None:
         """
         Constructor for DecoratorDefenseBoost.
 
         :param card: Card to decorate.
         :param dp_boost: Defense boost.
-        :param turn: Number of turn
+        :param turns: Number of turn before losing the bonus
         """
-        super().__init__(card, dp_boost)
-        self._turn: int = turn
+        super().__init__(card=card, turns=turns, dp_boost=dp_boost)
 
     def end_turn(self) -> None:
         """End the turn."""
-        self._turn -= 1
-        if self._turn <= 0:
+        super().end_turn()
+        if self._turns == 0:
             self._dp = 0
+
+    def refresh_card_reference(self) -> AbstractCharacterCard:
+        """
+        Return self or self._card if the boost have 0 hp.
+
+        This function must be called after each action and after a turn
+
+        :return: self or self._card.
+        """
+        return DecoratorDefenseBoost.refresh_card_reference(self)
+
+
+class DecoratorTemporaryTurnAttackBoost(_AbstractTurnDecorator):
+    """class DecoratorTemporaryTurnAttackBoost.
+
+    This class add attack points to card but losethe bonus
+        at the end of the number of turn
+    """
+
+    def __init__(self, card: AbstractCharacterCard, ap_boost: int, turns: int) -> None:
+        """
+        Constructor for DecoratorTemporaryTurnAttackBoost.
+
+        :param card: Card to decorate.
+        :param ap_boost: Attack boost.
+        :param turns: Number of turn before losing the bonus
+        """
+        super().__init__(card=card, turns=turns)
+        self._ap: int = ap_boost
+
+    @property
+    def ap(self) -> int:
+        """
+        Getter for ap.
+
+        :return: ap.
+        """
+        return self._ap + self.card.ap
+
+    def end_turn(self) -> None:
+        """End the turn."""
+        super().end_turn()
+        if self._turns <= 0:
+            self._ap = 0
+
+    def refresh_card_reference(self) -> AbstractCharacterCard:
+        """
+        Return self or self._card if the boost have 0 hp.
+
+        This function must be called after each action and after a turn
+
+        :return: self or self._card.
+        """
+        return self if self._ap > 0 else self.card
+
+    def attack_card(self, card: AbstractCharacterCard) -> None:
+        """
+        Attack a card.
+
+        :param card: The card to attack.
+        """
+        self.card._add_attack_points_modifier(self._ap)
+        self.card.attack_card(card)

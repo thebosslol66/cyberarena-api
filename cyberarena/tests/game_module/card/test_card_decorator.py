@@ -206,7 +206,7 @@ async def test_card_decorator_temporary_hit_defense_boost_refresh_ref_useless_de
 
 
 @pytest.mark.anyio
-async def test_card_decorator_temporary_turn_defense_boost_attack_modification(
+async def test_card_decorator_temporary_turn_defense_boost_defense_modification(
     default_card: PlayableCharacterCard,
 ) -> None:
     new_card = boost.DecoratorTemporaryTurnDefenseBoost(default_card, 10, 1)
@@ -265,6 +265,67 @@ async def test_card_decorator_temporary_turn_defense_boost_end_turn(
     default_card: PlayableCharacterCard,
 ) -> None:
     new_card = boost.DecoratorTemporaryTurnDefenseBoost(default_card, 10, 1)
+    new_card.end_turn()
+    assert new_card.hp == 1
+    assert new_card.ap == 1
+    assert new_card.cost == 1
+    assert new_card.dp == 0
+    assert new_card.is_alive() is True
+    assert new_card.refresh_card_reference() == default_card
+
+
+######################################################################
+#        TESTS CARD DECORATOR TEMPORARY TURN ATTACK BOOST            #
+######################################################################
+
+
+@pytest.mark.anyio
+async def test_card_decorator_temporary_turn_attack_boost_ap_modification(
+    default_card: PlayableCharacterCard,
+) -> None:
+    new_card = boost.DecoratorTemporaryTurnAttackBoost(default_card, 10, 1)
+    assert new_card.hp == 1
+    assert new_card.ap == 11
+    assert new_card.cost == 1
+    assert new_card.dp == 0
+
+
+@pytest.mark.anyio
+async def test_card_decorator_temporary_turn_attack_boost_attack_modification(
+    default_card: PlayableCharacterCard,
+) -> None:
+    new_card = boost.DecoratorTemporaryTurnAttackBoost(default_card, 10, 1)
+    new_card2 = PlayableCharacterCard("Cyber-Heisenberg", 1, 12, 1)
+    new_card.attack_card(new_card2)
+    print(new_card, new_card.ap)
+    assert new_card2.hp == 1
+    assert new_card2.ap == 1
+    assert new_card2.cost == 1
+    assert new_card2.dp == 0
+    assert new_card2.is_alive() is True
+
+
+@pytest.mark.anyio
+async def test_card_decorator_temporary_turn_attack_boost_refresh_ref(
+    default_card: PlayableCharacterCard,
+) -> None:
+    new_card = boost.DecoratorTemporaryTurnAttackBoost(default_card, 10, 1)
+    assert new_card.refresh_card_reference() == new_card
+
+
+@pytest.mark.anyio
+async def test_card_decorator_temporary_turn_attack_boost_refresh_ref_useless_decorator(
+    default_card: PlayableCharacterCard,
+) -> None:
+    new_card = boost.DecoratorTemporaryTurnAttackBoost(default_card, 0, 1)
+    assert new_card.refresh_card_reference() == default_card
+
+
+@pytest.mark.anyio
+async def test_card_decorator_temporary_turn_attack_boost_end_turn(
+    default_card: PlayableCharacterCard,
+) -> None:
+    new_card = boost.DecoratorTemporaryTurnAttackBoost(default_card, 10, 1)
     new_card.end_turn()
     assert new_card.hp == 1
     assert new_card.ap == 1
