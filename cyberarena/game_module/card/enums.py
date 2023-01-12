@@ -1,9 +1,9 @@
 from enum import auto
 
-from strenum import StrEnum
+from strenum import LowercaseStrEnum
 
 
-class ObjectCardType(StrEnum):
+class ObjectCardType(LowercaseStrEnum):
     """
     Enum for listing different type of cards.
 

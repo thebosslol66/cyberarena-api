@@ -26,6 +26,7 @@ class FactoryCard(object):
         if not self._load_json(filename) or self.json_data is None:
             return None
         constructor: Optional[ConstructorAbstract] = self._return_constructor()
+        self.json_data.pop("card_type", None)
         if constructor is None:
             return None
         if not constructor.construct(self.json_data):
@@ -76,13 +77,14 @@ class FactoryCard(object):
             ObjectCardType.CHARACTER: playable_character_card,
             ObjectCardType.PLAYER: playable_character_card,
         }
-        return_value = possible_return.get(ObjectCardType(card_type), None)
-        if return_value is None:
-            card_name = self.json_data.get("name", "Unknown")
-            logger.error(
-                f"The card '{card_name}' " "have an unrecognized type.",
-            )
-        return return_value
+        for key, value in possible_return.items():
+            if card_type == str(key):
+                return value
+        card_name = self.json_data.get("name", "Unknown")
+        logger.error(
+            f"The card '{card_name}' have an unrecognized type: {card_type}.",
+        )
+        return None
 
 
 factory_card = FactoryCard()
