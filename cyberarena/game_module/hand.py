@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from cyberarena.game_module.card import PlayableCard
+from cyberarena.game_module.card import AbstractCard
 from cyberarena.game_module.deck import Deck
 
 
@@ -13,7 +13,7 @@ class Hand:
 
         :param deck: Deck assigned to the Hand.
         """
-        self.__hand: List[PlayableCard] = []
+        self.__hand: List[AbstractCard] = []
         self.__Deck = deck
 
     def get_hand_size(self) -> int:
@@ -24,7 +24,7 @@ class Hand:
         """
         return len(self.__hand)
 
-    def get_random_card(self) -> Optional[PlayableCard]:
+    def get_random_card(self) -> Optional[AbstractCard]:
         """
         Get a random card from the hand.
 
@@ -35,7 +35,7 @@ class Hand:
             self.__hand.append(card)
         return self.__Deck.get_random_card()
 
-    def use_card(self, card: PlayableCard) -> None:
+    def use_card(self, card: AbstractCard) -> None:
         """
         Use a card.
 
