@@ -96,5 +96,4 @@ class Library(object):
     def __load_library(self) -> None:
         """Load all cards in the library."""
         for card_data in self.__get_cards_path():
-            # TODO: Load the card in the correct constructor
             factory_card.create_card_from_file(card_data)
