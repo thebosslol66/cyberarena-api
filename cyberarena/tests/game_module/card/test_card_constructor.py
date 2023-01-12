@@ -14,6 +14,11 @@ def card_constructor() -> ConstructorPlayableCharacterCard:
     return ConstructorPlayableCharacterCard()
 
 
+def open_json_file(path: str) -> dict:
+    with open(path, "r") as file:
+        return json.load(file)
+
+
 ######################################################################
 #           TESTS CARD CONSTRUCTOR PLAYABLE CHARACTER                #
 ######################################################################
@@ -21,10 +26,8 @@ def card_constructor() -> ConstructorPlayableCharacterCard:
 async def test_card_constructor_default(
     card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
-    assert (
-        card_constructor.construct(os.path.join(cards_path, "hiesenberg", "data.json"))
-        is True
-    )
+    data = open_json_file(os.path.join(cards_path, "hiesenberg", "data.json"))
+    assert card_constructor.construct(data) is True
     card = card_constructor.get_card()
     assert card is not None
     assert card.name == "Cyber-Heisenberg"
@@ -32,24 +35,6 @@ async def test_card_constructor_default(
     assert card.hp == 11
     assert card.ap == 13
     assert card.dp == 12
-
-
-@pytest.mark.anyio
-async def test_card_constructor_file_not_found(
-    card_constructor: ConstructorPlayableCharacterCard,
-) -> None:
-    with pytest.raises(FileNotFoundError):
-        card_constructor.construct(os.path.join(cards_path, "hiesenberg", "data2.json"))
-
-
-@pytest.mark.anyio
-async def test_card_constructor_invalid_json(
-    card_constructor: ConstructorPlayableCharacterCard,
-) -> None:
-    with pytest.raises(json.JSONDecodeError):
-        card_constructor.construct(
-            os.path.join(cards_path, "invalid", "invalid_json.json"),
-        )
 
 
 @pytest.mark.parametrize(
@@ -61,9 +46,12 @@ async def test_card_constructor_no_obligatory_attribute(
     attribute_name: str,
     card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
+    data = open_json_file(
+        os.path.join(cards_path, "invalid", f"no_{attribute_name}.json"),
+    )
     assert (
         card_constructor.construct(
-            os.path.join(cards_path, "invalid", f"no_{attribute_name}.json"),
+            data,
         )
         is False
     )
@@ -74,9 +62,10 @@ async def test_card_constructor_no_obligatory_attribute(
 async def test_card_constructor_obligatory_attribute_empty(
     card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
+    data = open_json_file(os.path.join(cards_path, "invalid", "name_empty.json"))
     assert (
         card_constructor.construct(
-            os.path.join(cards_path, "invalid", "name_empty.json"),
+            data,
         )
         is False
     )
@@ -87,9 +76,12 @@ async def test_card_constructor_obligatory_attribute_empty(
 async def test_card_constructor_obligatory_attribute_is_a_number(
     card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
+    data = open_json_file(
+        os.path.join(cards_path, "invalid", "name_number.json"),
+    )
     assert (
         card_constructor.construct(
-            os.path.join(cards_path, "invalid", "name_number.json"),
+            data,
         )
         is False
     )
@@ -105,9 +97,12 @@ async def test_card_constructor_no_numerical_attribute(
     attribute_name: str,
     card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
+    data = open_json_file(
+        os.path.join(cards_path, "invalid", f"no_{attribute_name}.json"),
+    )
     assert (
         card_constructor.construct(
-            os.path.join(cards_path, "invalid", f"no_{attribute_name}.json"),
+            data,
         )
         is False
     )
@@ -123,9 +118,12 @@ async def test_card_constructor_invalid_numerical_attribute(
     attribute_name: str,
     card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
+    data = open_json_file(
+        os.path.join(cards_path, "invalid", f"{attribute_name}_not_int.json"),
+    )
     assert (
         card_constructor.construct(
-            os.path.join(cards_path, "invalid", f"{attribute_name}_not_int.json"),
+            data,
         )
         is False
     )
@@ -136,9 +134,12 @@ async def test_card_constructor_invalid_numerical_attribute(
 async def test_card_constructor_numerical_attribute_is_float(
     card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
+    data = open_json_file(
+        os.path.join(cards_path, "invalid", "hp_is_float.json"),
+    )
     assert (
         card_constructor.construct(
-            os.path.join(cards_path, "invalid", "hp_is_float.json"),
+            data,
         )
         is True
     )
@@ -150,9 +151,12 @@ async def test_card_constructor_numerical_attribute_is_float(
 async def test_card_constructor_numerical_attribute_is_negative(
     card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
+    data = open_json_file(
+        os.path.join(cards_path, "invalid", "hp_is_negative.json"),
+    )
     assert (
         card_constructor.construct(
-            os.path.join(cards_path, "invalid", "hp_is_negative.json"),
+            data,
         )
         is False
     )
@@ -160,14 +164,16 @@ async def test_card_constructor_numerical_attribute_is_negative(
 
 
 @pytest.mark.anyio
-async def test_card_constructor_add_unused_attribute(
+async def test_card_constructor_unused_attribute(
     card_constructor: ConstructorPlayableCharacterCard,
 ) -> None:
+    data = open_json_file(
+        os.path.join(cards_path, "invalid", "unused_attribute.json"),
+    )
     assert (
         card_constructor.construct(
-            os.path.join(cards_path, "invalid", "unused_attribute.json"),
+            data,
         )
         is True
     )
     assert card_constructor.get_card() is not None
-    assert card_constructor.get_card().hp == 11

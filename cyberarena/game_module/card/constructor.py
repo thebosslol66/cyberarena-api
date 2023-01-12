@@ -1,5 +1,4 @@
 import abc
-import json
 from typing import Any, Dict, List, Optional
 
 from loguru import logger
@@ -27,15 +26,16 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
         self.json_data: Dict[str, Any] = {}
 
     @abc.abstractmethod
-    def construct(self, filename: str) -> bool:
+    def construct(self, json_data: Dict[str, Any]) -> bool:
         """
         Construct a card from a json file.
 
-        :param filename: The json file to load.
+        :param json_data: The content of a json file card.
         :return: True if the card is constructed, False otherwise.
         """
         self._reset()
-        return self._load_json(filename) and self.check_json()
+        self.json_data = json_data
+        return self.check_json()
 
     def check_json(self) -> bool:
         """
@@ -66,27 +66,6 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
         self._name = "Unknown"
         self._card = None
         self.json_data = {}
-
-    def _load_json(self, filename: str) -> bool:
-        """
-        Load a json file.
-
-        :param filename: The json file to load.
-        :return: True if the file is loaded, False otherwise. # noqa: DAR003
-        :raises FileNotFoundError: If the file is not found.
-        :raise json.JSONDecodeError: If the file is not a json file.
-        """
-        try:
-            with open(filename, "r") as file:
-                self.json_data = json.load(file)
-            # TODO: replace with module exeption
-        except FileNotFoundError as error:
-            logger.error(f"The file '{filename}' does not exist.")
-            raise error
-        except json.JSONDecodeError as error:
-            logger.error(f"The file '{filename}' is not a valid json.")
-            raise error
-        return True
 
     def _warning_message(self, message: str) -> None:
         """
@@ -197,17 +176,17 @@ class ConstructorPlayableCharacterCard(ConstructorAbstract):
         "rarity",
     ] + ConstructorAbstract.OBLIGATORY_ATTRIBUTES
 
-    def construct(self, filename: str) -> bool:
+    def construct(self, json_data: Dict[str, Any]) -> bool:
         """
         Generate a card from a json file.
 
         Create a playable card from a json file.
         Can be get with get_card() method.
 
-        :param filename: The json file path.
+        :param json_data: The content of a json file card.
         :return: True if the card is correctly generated.
         """
-        if not super().construct(filename):
+        if not super().construct(json_data):
             return False
         name = self.json_data["name"]
         cost = self.json_data["cost"]
@@ -216,3 +195,6 @@ class ConstructorPlayableCharacterCard(ConstructorAbstract):
         dp = self.json_data["dp"]
         self._card = PlayableCharacterCard(name, cost, hp, ap, dp)
         return True
+
+
+playable_character_card = ConstructorPlayableCharacterCard()
