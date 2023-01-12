@@ -11,10 +11,15 @@ class AbstractCard(metaclass=abc.ABCMeta):
         :param name: Name of the card.
         :param description: Description of the card.
         :param cost: Cost of the card.
+        :raises ValueError: If the name is negative or if the cost is negative.
         """
         self._name: str = name
         self._description: str = description
         self._cost: int = cost
+        if self._name == "":
+            raise ValueError("The name of the card cannot be empty.")
+        if self._cost < 0:
+            raise ValueError("The cost of the card cannot be negative.")
 
     @abc.abstractmethod
     def __str__(self) -> str:

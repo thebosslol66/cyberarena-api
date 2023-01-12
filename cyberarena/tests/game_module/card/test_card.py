@@ -15,6 +15,41 @@ async def test_card() -> None:
 
 
 @pytest.mark.anyio
+async def test_card_empty_name() -> None:
+    """Test card."""
+    with pytest.raises(ValueError):
+        PlayableCharacterCard("", 1, 1, 1)
+
+
+@pytest.mark.anyio
+async def test_card_negative_cost() -> None:
+    """Test card."""
+    with pytest.raises(ValueError):
+        PlayableCharacterCard("Cyber-Heisenberg", -1, 1, 1)
+
+
+@pytest.mark.anyio
+async def test_card_negative_health() -> None:
+    """Test card."""
+    with pytest.raises(ValueError):
+        PlayableCharacterCard("Cyber-Heisenberg", 1, -1, 1)
+
+
+@pytest.mark.anyio
+async def test_card_negative_attack() -> None:
+    """Test card."""
+    with pytest.raises(ValueError):
+        PlayableCharacterCard("Cyber-Heisenberg", 1, 1, -1)
+
+
+@pytest.mark.anyio
+async def test_card_negative_defense() -> None:
+    """Test card."""
+    with pytest.raises(ValueError):
+        PlayableCharacterCard("Cyber-Heisenberg", 1, 1, 1, dp=-1)
+
+
+@pytest.mark.anyio
 async def test_card_attack() -> None:
     """Test card attack."""
     card = PlayableCharacterCard("Cyber-Heisenberg", 1, 1, 1)
