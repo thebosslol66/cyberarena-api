@@ -91,6 +91,8 @@ exclude_lines = [
     "if TYPE_CHECKING:",
     "@abc.abstractmethod",
     "@abstractmethod",
+    "def __repr__",
+    "def __str__",
     ]
 skip_covered = true
 skip_empty = true

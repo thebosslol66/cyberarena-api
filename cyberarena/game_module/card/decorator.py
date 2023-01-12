@@ -111,7 +111,7 @@ class AbstractDecorator(AbstractCharacterCard, metaclass=abc.ABCMeta):
         """End the turn."""
         self._card.end_turn()
 
-    def _receive_damage(self, damage: int) -> None:
+    def _receive_damage(self, damage: int) -> None:  # pragma: no cover
         """
         Receive damage.
 
@@ -302,7 +302,7 @@ class DecoratorTemporaryTurnDefenseBoost(_AbstractTurnDecorator, DecoratorDefens
         """
         super().__init__(card=card, turns=turns, dp_boost=dp_boost)
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: no cover
         """
         Return a string representation of the card.
 

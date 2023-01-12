@@ -34,7 +34,7 @@ class PlayableCharacterCard(AbstractCharacterCard):
             cost=cost,
         )
 
-    def __str__(self) -> str:  # pragma: no cover
+    def __str__(self) -> str:
         """
         Return a string representation of the card.
 
@@ -48,13 +48,13 @@ class PlayableCharacterCard(AbstractCharacterCard):
             self.cost,
         )
 
-    def __repr__(self) -> str:  # pragma: no cover
+    def __repr__(self) -> str:
         """
         Return a string representation of the card.
 
         :return: A string representation of the card.
         """
         return "{0}, cost={1})".format(
-            super().__repr__()[:-1],
+            repr(super())[:-1],
             self.cost,
         )
