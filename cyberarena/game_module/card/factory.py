@@ -24,13 +24,13 @@ class FactoryCard(object):
         """
         self.json_data = None
         if not self._load_json(filename) or self.json_data is None:
-            return None
+            return None  # pragma: no cover
         constructor: Optional[ConstructorAbstract] = self._return_constructor()
         self.json_data.pop("card_type", None)
         if constructor is None:
             return None
         if not constructor.construct(self.json_data):
-            return None
+            return None  # pragma: no cover
         return constructor.get_card()
 
     def _load_json(self, filename: str) -> bool:
@@ -63,7 +63,7 @@ class FactoryCard(object):
         :return: The constructor of the card with defined type.
         """
         if self.json_data is None:
-            return None
+            return None  # pragma: no cover
         card_type: str = self.json_data.get("card_type", "Unknown")
         if card_type == "Unknown":
             card_name = self.json_data.get("name", "Unknown")

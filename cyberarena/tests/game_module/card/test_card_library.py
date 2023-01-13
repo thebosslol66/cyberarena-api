@@ -10,7 +10,7 @@ from cyberarena.game_module.card import LibraryCard
 CARD_PATH = os.path.join("cyberarena", "tests_data", "cards")
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def remove_invalid_card_folder(
     tmpdir: Any,
 ) -> None:
@@ -25,9 +25,7 @@ def remove_invalid_card_folder(
 
 
 @pytest.mark.anyio
-async def test_card_library_singleton(
-    remove_invalid_card_folder: None,
-) -> None:
+async def test_card_library_singleton() -> None:
     """Test the singleton of the library."""
     library1 = LibraryCard(CARD_PATH)
     library2 = LibraryCard()
@@ -35,8 +33,9 @@ async def test_card_library_singleton(
 
 
 @pytest.mark.anyio
-@pytest.mark.skip(reason="Not implemented")
-async def test_card_library_list_files(
-    remove_invalid_card_folder: None,
-) -> None:
+async def test_card_library_list_files() -> None:
     library = LibraryCard(CARD_PATH)
+    assert len(library) == len(os.listdir(CARD_PATH))
+
+
+# TODO: make test (ex: if type is not written, file not exist etc.)

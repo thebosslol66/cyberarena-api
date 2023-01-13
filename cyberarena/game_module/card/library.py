@@ -16,6 +16,7 @@ class Library(object):
     """
 
     __instance: typing.Optional["Library"] = None
+    __init_flag = False
 
     def __new__(
         cls,
@@ -38,10 +39,10 @@ class Library(object):
                 The filename in folder containing data of cards
 
         """
-        if Library.__instance is None:
+        if cls.__instance is None:
             logger.debug("Instanciate the singleton Library.")
-            Library.__instance = super().__new__(cls)
-        return Library.__instance
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
 
     def __init__(
         self,
@@ -57,7 +58,7 @@ class Library(object):
         :raises LibraryFileNotFoundError:
             If the library path not Exist.
         """
-        if Library.__instance is not None:
+        if Library.__init_flag:
             return
         self.__library: typing.Dict[str, AbstractCard] = {}
         self.__library_path = path_name
@@ -71,6 +72,7 @@ class Library(object):
                 f"The library path is not valid: '{path_name}'",
             )
         self.__load_library()
+        Library.__init_flag = True
 
     def __iter__(self) -> typing.Iterator[str]:
         """
@@ -86,7 +88,7 @@ class Library(object):
 
         :return: The number of cards in the library.
         """
-        return len(self.__library.keys())
+        return len(self.keys())
 
     def __getitem__(self, key: str) -> AbstractCard:
         """
@@ -151,7 +153,11 @@ class Library(object):
                 ),
             )
             if is_file:
-                yield os.path.join(self.__library_path, card_dir)
+                yield os.path.join(
+                    self.__library_path,
+                    card_dir,
+                    self.__default_filename,
+                )
             else:
                 logger.warning(
                     "The card '{0}' does not have a data file '{1}'.",
