@@ -1,7 +1,7 @@
 import pytest as pytest
 
-from cyberarena.src.card import Card
-from cyberarena.src.player import Player
+from cyberarena.game_module.card.base import AbstractCard
+from cyberarena.game_module.player import Player
 
 
 @pytest.mark.anyio
@@ -33,7 +33,7 @@ async def test_player_use_hp_is_correct() -> None:
     player = Player("Heisenberg")
     player.increase_mana(10)
     player.draw_card()
-    card: Card = player.use_card_debug(0)
+    card: AbstractCard = player.use_card_debug(0)
     assert card.hp == 1
 
 
@@ -43,7 +43,7 @@ async def test_player_use_ap_is_correct() -> None:
     player = Player("Heisenberg")
     player.increase_mana(10)
     player.draw_card()
-    card: Card = player.use_card_debug(0)
+    card: AbstractCard = player.use_card_debug(0)
     assert card.ap == 1
 
 
@@ -53,5 +53,5 @@ async def test_player_use_name_is_correct() -> None:
     player = Player("Heisenberg")
     player.increase_mana(10)
     player.draw_card()
-    card: Card = player.use_card_debug(0)
+    card: AbstractCard = player.use_card_debug(0)
     assert card.name == "Cyber-Heisenberg"

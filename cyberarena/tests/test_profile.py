@@ -199,7 +199,6 @@ async def test_change_password(
             "new_setting": new_password,
         },
     )
-    print(response.json())
     assert response.status_code == status.HTTP_200_OK
     user = await dao.get_user_by_username(username)
     assert not user.is_correct_password(password)
@@ -685,8 +684,9 @@ async def test_change_username_other_account_have_same_username(
 
 
 @pytest.fixture
-def erease_avatar_file() -> None:
+def erease_avatar_file() -> None:  # pragma: no cover
     """Fixture to delete avatar file."""
+    yield
     for file in os.listdir(settings.avatar_path):
         os.remove(os.path.join(settings.avatar_path, file))
 
@@ -831,7 +831,7 @@ async def test_change_avatar_too_large(
         url,
         files={
             "avatar_img": open(
-                "cyberarena/tests_data/imgs/test_avatar_bad_1024x1024.png",
+                "cyberarena/tests_data/imgs/test_avatar_bad_618x769.png",
                 "rb",
             ),
         },

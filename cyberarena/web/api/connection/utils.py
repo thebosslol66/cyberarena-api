@@ -52,8 +52,6 @@ async def is_username_correct(user_model: VerifyUserModel) -> Optional[str]:
         return "Username is too short"
     if any(not char.isalnum() for char in user_model.username):
         return "Username must contain only alphanumeric character"
-    if any(char.isspace() for char in user_model.username):
-        return "Username must not contain spaces"
     return None
 
 
@@ -163,7 +161,6 @@ async def verify_user_sign_in(
                 status=response,
                 message=verification_response,
             )
-
     return SignUpStatusDTO(status=0, message="")
 
 

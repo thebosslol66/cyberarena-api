@@ -24,7 +24,26 @@ from cyberarena.web.api.connection.utils import (
 router = APIRouter()
 
 
-@router.post("/sign-up", response_model=SignUpStatusDTO)
+@router.post(
+    "/sign-up",
+    response_model=SignUpStatusDTO,
+    summary="Sign up new user.",
+    description="Sign up new user with a username, an email and a password.\n"
+    "\nThe email must be valid and a mail will"
+    " be send to confirm it.\n\n"
+    "If the user is register correctly"
+    " you will have a status code of 0.\n"
+    "\n* 1: The username is not correct\n"
+    "* 2: The password is not correct\n"
+    "* 3: The email is not correct\n"
+    "* 4: The username is already used\n"
+    "* 5: The email is already used\n"
+    "\n The name must do 4 char minimum and only contain"
+    "letters and numbers.\n"
+    "\n The password must do 8 char minimum and contain at least "
+    "one small letter, one capital letter and one number "
+    "and one special character.\n",
+)
 async def sign_up(
     sign_up_data: SignUpData,
     user_dao: UserDAO = Depends(),
@@ -55,7 +74,11 @@ async def sign_up(
     return response
 
 
-@router.get("/activate")
+@router.get(
+    "/activate",
+    summary="Activate user account.",
+    description="Activate user account with the token send by email.\n",
+)
 async def set_user_active(
     username: str,
     user_dao: UserDAO = Depends(),
@@ -71,7 +94,16 @@ async def set_user_active(
         await user_dao.update_active(user.id, active=True)
 
 
-@router.post("/token", response_model=Tokens)
+@router.post(
+    "/token",
+    response_model=Tokens,
+    summary="Get a token from login credentials.",
+    description="Get a token from login credentials.\n"
+    "\nIf the credentials are not correct return 400 http error "
+    "with the description of error.\n\n"
+    "For the moment, if the user is inactive, it return error 400 "
+    "too.",
+)
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     user_dao: UserDAO = Depends(),
@@ -89,7 +121,7 @@ async def login_for_access_token(
         form_data.password,
         user_dao,
     )
-    if not user:
+    if user is None:
         raise HTTPException(
             status_code=400,  # noqa: WPS432
             detail="Incorrect username or password",
@@ -113,7 +145,15 @@ async def login_for_access_token(
     )
 
 
-@router.post("/refresh-token", response_model=Tokens)
+@router.post(
+    "/refresh-token",
+    response_model=Tokens,
+    summary="Get a new access token with a refresh token.",
+    description="Get a new access token with a refresh token.\n\n"
+    "The refresh token must be valid and not expired.\n\n"
+    "If the same refresh token is used twice, "
+    "it invalid all refresh token.",
+)
 async def refresh_token_endpoint(
     ask_new_tokens: AskNewTokenData,
     user_dao: UserDAO = Depends(),
@@ -130,7 +170,7 @@ async def refresh_token_endpoint(
         ask_new_tokens.refresh_token,
         user_dao,
     )
-    if not user:
+    if user is None:
         raise HTTPException(
             status_code=400,  # noqa: WPS432
             detail="Invalid refresh token",

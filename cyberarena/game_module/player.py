@@ -1,6 +1,7 @@
-from cyberarena.src.card import Card
-from cyberarena.src.deck import Deck
-from cyberarena.src.hand import Hand
+from cyberarena.game_module.card.base import AbstractCard
+from cyberarena.game_module.card.playable import Playable as PlayableCard
+from cyberarena.game_module.deck import Deck
+from cyberarena.game_module.hand import Hand
 
 
 class Player:
@@ -31,35 +32,39 @@ class Player:
         """Draw a card."""
         self.__hand.get_random_card()
 
-    def use_card(self, card: Card) -> Card:
+    def use_card(self, card: PlayableCard) -> AbstractCard:
         """
         Use a card.
 
         :param card: Card to use.
         :return: the card used or a card with name "None".
         """
-        res: Card = self.__hand.use_card(card, self.mana)
-        if res.cost != 0:
-            self.mana -= res.cost
+        if card.get_type() != "Playable":
+            # todo: fairé réaction à attaque d'un champ
+            pass
+
+        res: PlayableCard = self.__hand.use_card(card, self.mana)
+        if res.get_cost != 0:
+            self.mana -= res.get_cost
             print("Card used")
             return res
         print("Card not used")
-        return Card("None", 0, 0, 0, 0)
+        return PlayableCard("None", 0, 0, 0, 0)
 
-    def use_card_debug(self, index: int) -> Card:
+    def use_card_debug(self, index: int) -> AbstractCard:
         """
-        Use a card.
+        Use a card debug mode.
 
         :param index: index of the card to get.
         :return: the card used or a card with name "None".
         """
-        res: Card = self.__hand.use_card_debug(index, self.mana)
-        if res.cost != 0:
-            self.mana -= res.cost
+        res: PlayableCard = self.__hand.use_card_debug(index, self.mana)
+        if res.get_cost != 0:
+            self.mana -= res.get_cost
             print("Card used")
             return res
         print("Card not used")
-        return Card("None", 0, 0, 0, 0)
+        return PlayableCard("None", 0, 0, 0, 0)
 
     def increase_mana(self, value: int) -> int:
         """

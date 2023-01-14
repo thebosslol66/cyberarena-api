@@ -1,7 +1,7 @@
-from cyberarena.src.card_base import CardAbstract
+from cyberarena.game_module.card.base import AbstractCard
 
 
-class Card(CardAbstract):
+class Playable(AbstractCard):
     """Card class."""
 
     def __init__(  # noqa: WPS211
@@ -29,7 +29,7 @@ class Card(CardAbstract):
             raise ValueError("The dp or cost is negative.")
 
     @property
-    def cost(self) -> int:
+    def get_cost(self) -> int:
         """
         Getter for cost.
 
@@ -54,3 +54,11 @@ class Card(CardAbstract):
         """
         if damage > self._dp:
             self._hp -= damage - self._dp
+
+    def get_type(self) -> str:
+        """
+        Get the type of the card.
+
+        :return: The type of the card.
+        """
+        return "Playable"

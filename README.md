@@ -194,3 +194,11 @@ docker run -p "3306:3306" -e "MYSQL_PASSWORD=cyberarena" -e "MYSQL_USER=cyberare
 ```bash
 pytest -vv .
 ```
+
+### Coverage
+
+To run tests with coverage you should run:
+
+```bash
+docker-compose -f deploy/docker-compose.yml --project-directory . build; docker-compose -f deploy/docker-compose.yml  --project-directory . run -v "$PWD/cov:/app/src/cov" --rm api pytest --cov=cyberarena/ --cov-report term-missing:skip-covered --cov-report html:cov/cov_html -vv .; docker-compose -f deploy/docker-compose.yml --project-directory . down
+```

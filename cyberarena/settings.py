@@ -58,6 +58,7 @@ class Settings(BaseSettings):
     refresh_token_expire_minutes: int = 60 * 24 * 7
 
     max_avatar_size: int = 1000000
+    max_avatar_side: int = 512
     avatar_path: str = "cyberarena/static/img/avatars/"
 
     daily_coin_reward: int = 10
