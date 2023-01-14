@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     """
 
     deck_size: int = 20
+    board_size: int = 5
 
     class Config:
         env_file = ".env"

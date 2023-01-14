@@ -9,7 +9,7 @@ async def test_card() -> None:
     """Test card."""
     card = PlayableCharacterCard("Cyber-Heisenberg", 1, 1, 1)
     assert card.name == "Cyber-Heisenberg"
-    assert card.get_cost == 1
+    assert card.cost == 1
     assert card.hp == 1
     assert card.ap == 1
 
@@ -57,10 +57,10 @@ async def test_card_attack() -> None:
     card.attack_card(card2)
     assert card2.hp == 0
     assert card2.ap == 1
-    assert card2.get_cost == 1
+    assert card2.cost == 1
     assert card2.is_alive() is False
 
     assert card.hp == 1
     assert card.ap == 1
-    assert card.get_cost == 1
+    assert card.cost == 1
     assert card.is_alive() is True
