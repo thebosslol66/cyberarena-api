@@ -1,6 +1,6 @@
-from typing import List, Optional
+from typing import List
 
-from cyberarena.game_module.card.playable import Playable
+from cyberarena.game_module.card import PlayableCharacterCard
 from cyberarena.game_module.deck import Deck
 
 
@@ -13,7 +13,7 @@ class Hand:
 
         :param deck: Deck assigned to the Hand.
         """
-        self.__hand: List[Playable] = []
+        self.__hand: List[PlayableCharacterCard] = []
         self.__Deck = deck
 
     def get_hand_size(self) -> int:
@@ -24,18 +24,20 @@ class Hand:
         """
         return len(self.__hand)
 
-    def get_random_card(self) -> Optional[Playable]:
+    def get_random_card(self) -> PlayableCharacterCard:
         """
-        Get a random card from the hand.
+        Get a random card from the deck.
 
         :return: A random card from the deck.
         """
         card = self.__Deck.get_random_card()
+        if card.name == "None":
+            pass
         if card:
             self.__hand.append(card)
         return self.__Deck.get_random_card()
 
-    def use_card(self, card: Playable, mana: int) -> Playable:
+    def use_card(self, card: PlayableCharacterCard, mana: int) -> PlayableCharacterCard:
         """
         Use a card.
 
@@ -43,12 +45,12 @@ class Hand:
         :param mana: mana of the player.
         :return: True if the card is used, False otherwise.
         """
-        if card.get_cost <= mana:
+        if card.cost <= mana:
             self.__hand.remove(card)
             return card
-        return Playable("None", 0, 0, 0, 0)
+        return PlayableCharacterCard("None", 0, 0, 0, 0)
 
-    def use_card_debug(self, index: int, mana: int) -> Playable:
+    def use_card_debug(self, index: int, mana: int) -> PlayableCharacterCard:
         """
         Use a card.
 
@@ -57,12 +59,12 @@ class Hand:
         :return: True if the card is used, False otherwise.
         """
         card = self.__hand[index]
-        if self.__hand[index].get_cost <= mana:
+        if self.__hand[index].cost <= mana:
             self.__hand.remove(self.__hand[index])
             return card
-        return Playable("None", 0, 0, 0, 0)
+        return PlayableCharacterCard("None", 0, 0, 0, 0)
 
-    def get_hand(self) -> List[Playable]:
+    def get_hand(self) -> List[PlayableCharacterCard]:
         """
         Get the hand.
 

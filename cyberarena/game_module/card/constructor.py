@@ -1,12 +1,10 @@
 import abc
-import json
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from loguru import logger
 
-from cyberarena.game_module.card.playable import Playable
-
-from .playable import AbstractCard  # noqa: WPS300
+from .base import AbstractCard
+from .playable_character import PlayableCharacterCard
 
 
 class ConstructorAbstract(metaclass=abc.ABCMeta):
@@ -17,9 +15,9 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
     It is use for construct card on plate and character.
     """
 
-    OBLIGATORY_ATTRIBUTES = ["name"]
-    NUMERICAL_ATTRIBUTES = ["hp", "ap"]
-    OPTIONAL_ATTRIBUTES = ["type", "ability", "description"]
+    OBLIGATORY_ATTRIBUTES: List[str] = ["name"]
+    NUMERICAL_ATTRIBUTES: List[str] = []
+    OPTIONAL_ATTRIBUTES: List[str] = ["description"]
 
     def __init__(self) -> None:
         """Constructor."""
@@ -28,15 +26,16 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
         self.json_data: Dict[str, Any] = {}
 
     @abc.abstractmethod
-    def construct(self, filename: str) -> bool:
+    def construct(self, json_data: Dict[str, Any]) -> bool:
         """
         Construct a card from a json file.
 
-        :param filename: The json file to load.
+        :param json_data: The content of a json file card.
         :return: True if the card is constructed, False otherwise.
         """
         self._reset()
-        return self._load_json(filename) and self.check_json()
+        self.json_data = json_data
+        return self.check_json()
 
     def check_json(self) -> bool:
         """
@@ -67,27 +66,6 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
         self._name = "Unknown"
         self._card = None
         self.json_data = {}
-
-    def _load_json(self, filename: str) -> bool:
-        """
-        Load a json file.
-
-        :param filename: The json file to load.
-        :return: True if the file is loaded, False otherwise. # noqa: DAR003
-        :raises FileNotFoundError: If the file is not found.
-        :raise json.JSONDecodeError: If the file is not a json file.
-        """
-        try:
-            with open(filename, "r") as file:
-                self.json_data = json.load(file)
-            # TODO: replace with module exeption
-        except FileNotFoundError as error:
-            logger.error(f"The file '{filename}' does not exist.")
-            raise error
-        except json.JSONDecodeError as error:
-            logger.error(f"The file '{filename}' is not a valid json.")
-            raise error
-        return True
 
     def _warning_message(self, message: str) -> None:
         """
@@ -180,35 +158,43 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
                 )
 
 
-class ConstructorPlayable(ConstructorAbstract):
+class ConstructorPlayableCharacterCard(ConstructorAbstract):
     """CardConstructor class.
 
     This class is used to generate a card from a json file.
     It can be used to validate a json file.
     """
 
-    NUMERICAL_ATTRIBUTES = ["dp", "cost"] + ConstructorAbstract.NUMERICAL_ATTRIBUTES
+    NUMERICAL_ATTRIBUTES = [
+        "hp",
+        "ap",
+        "dp",
+        "cost",
+    ] + ConstructorAbstract.NUMERICAL_ATTRIBUTES
     OBLIGATORY_ATTRIBUTES = [
         "type",
         "rarity",
     ] + ConstructorAbstract.OBLIGATORY_ATTRIBUTES
 
-    def construct(self, filename: str) -> bool:
+    def construct(self, json_data: Dict[str, Any]) -> bool:
         """
         Generate a card from a json file.
 
         Create a playable card from a json file.
         Can be get with get_card() method.
 
-        :param filename: The json file path.
+        :param json_data: The content of a json file card.
         :return: True if the card is correctly generated.
         """
-        if not super().construct(filename):
+        if not super().construct(json_data):
             return False
         name = self.json_data["name"]
         cost = self.json_data["cost"]
         hp = self.json_data["hp"]
         ap = self.json_data["ap"]
         dp = self.json_data["dp"]
-        self._card = Playable(name, cost, hp, ap, dp)
+        self._card = PlayableCharacterCard(name, cost, hp, ap, dp)
         return True
+
+
+playable_character_card = ConstructorPlayableCharacterCard()
