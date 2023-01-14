@@ -1,7 +1,7 @@
 from typing import List, Optional
 
-from cyberarena.src.card import Card
-from cyberarena.src.deck import Deck
+from cyberarena.game_module.card.playable import Playable
+from cyberarena.game_module.deck import Deck
 
 
 class Hand:
@@ -13,7 +13,7 @@ class Hand:
 
         :param deck: Deck assigned to the Hand.
         """
-        self.__hand: List[Card] = []
+        self.__hand: List[Playable] = []
         self.__Deck = deck
 
     def get_hand_size(self) -> int:
@@ -24,7 +24,7 @@ class Hand:
         """
         return len(self.__hand)
 
-    def get_random_card(self) -> Optional[Card]:
+    def get_random_card(self) -> Optional[Playable]:
         """
         Get a random card from the hand.
 
@@ -35,7 +35,7 @@ class Hand:
             self.__hand.append(card)
         return self.__Deck.get_random_card()
 
-    def use_card(self, card: Card, mana: int) -> Card:
+    def use_card(self, card: Playable, mana: int) -> Playable:
         """
         Use a card.
 
@@ -43,12 +43,12 @@ class Hand:
         :param mana: mana of the player.
         :return: True if the card is used, False otherwise.
         """
-        if card.cost <= mana:
+        if card.get_cost <= mana:
             self.__hand.remove(card)
             return card
-        return Card("None", 0, 0, 0)
+        return Playable("None", 0, 0, 0, 0)
 
-    def use_card_debug(self, index: int, mana: int) -> Card:
+    def use_card_debug(self, index: int, mana: int) -> Playable:
         """
         Use a card.
 
@@ -57,12 +57,12 @@ class Hand:
         :return: True if the card is used, False otherwise.
         """
         card = self.__hand[index]
-        if self.__hand[index].cost <= mana:
+        if self.__hand[index].get_cost <= mana:
             self.__hand.remove(self.__hand[index])
             return card
-        return Card("None", 0, 0, 0)
+        return Playable("None", 0, 0, 0, 0)
 
-    def get_hand(self) -> List[Card]:
+    def get_hand(self) -> List[Playable]:
         """
         Get the hand.
 
