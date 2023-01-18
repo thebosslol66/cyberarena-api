@@ -88,3 +88,11 @@ class Player:
         :return: The hand of the player.
         """
         return self.__hand
+
+    def cheat_add_card_to_hand(self, card: PlayableCharacterCard) -> None:
+        """
+        Add a card to the hand.
+
+        :param card: Card to add.
+        """
+        self.__hand.cheat_add_card(card)

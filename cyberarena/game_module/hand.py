@@ -16,7 +16,7 @@ class Hand:
         self.__hand: List[PlayableCharacterCard] = []
         self.__Deck = deck
 
-    def get_hand_size(self) -> int:
+    def __len__(self) -> int:
         """
         Get the hand size.
 
@@ -35,7 +35,7 @@ class Hand:
             pass
         if card:
             self.__hand.append(card)
-        return self.__Deck.get_random_card()
+        return card
 
     def use_card(self, card: PlayableCharacterCard, mana: int) -> PlayableCharacterCard:
         """
@@ -71,3 +71,11 @@ class Hand:
         :return: The hand.
         """
         return self.__hand
+
+    def cheat_add_card(self, card: PlayableCharacterCard) -> None:
+        """
+        Add a card to the hand.
+
+        :param card: Card to add.
+        """
+        self.__hand.append(card)

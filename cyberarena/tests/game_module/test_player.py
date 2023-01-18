@@ -55,3 +55,12 @@ async def test_player_use_name_is_correct() -> None:
     player.draw_card()
     card: AbstractCard = player.use_card_debug(0)
     assert card.name == "Cyber-Heisenberg"
+
+
+@pytest.mark.anyio
+async def test_player_use_card_cost_too_high() -> None:
+    """Test player card is correct."""
+    player = Player("Heisenberg")
+    player.draw_card()
+    card = player.use_card_debug(0)
+    assert card.name == "None"

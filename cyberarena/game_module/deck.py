@@ -14,6 +14,18 @@ class Deck(object):
         self.__deckSize = settings.deck_size
         self.__init_deck()
 
+    def use_card(self, card: PlayableCharacterCard, mana: int) -> PlayableCharacterCard:
+        """
+        Use a card.
+
+        :param card: Card to use.
+        :param mana: Mana of the player.
+        :return: the card used or a card with name "None".
+        """
+        if card.cost <= mana:
+            return card
+        return PlayableCharacterCard("None", 0, 0, 0)
+
     def get_random_card(self) -> PlayableCharacterCard:
         """
         Get a random card from the deck.
@@ -21,19 +33,21 @@ class Deck(object):
         :return: A random card.
         """
         if self.__deck:
+            print("pop")
             return self.__deck.pop()
         return PlayableCharacterCard("None", 0, 0, 0)
 
-    def get_size(self) -> int:
+    def __len__(self) -> int:
         """
         Get the size of the deck.
 
         :return: The size of the deck.
         """
-        return self.__deckSize
+        return len(self.__deck)
 
     def __init_deck(self) -> None:
         """Initialize the deck."""
         for _ in range(0, self.__deckSize):
+
             self.__deck.append(PlayableCharacterCard("Cyber-Heisenberg", 1, 1, 1))
         random.shuffle(self.__deck)

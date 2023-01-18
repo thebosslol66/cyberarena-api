@@ -21,9 +21,15 @@ class Board:
         :param side: Side of the board the card is being deployed in.
         """
         if side == 1:
-            self.__side1.append(card)
+            if self.__side1.__len__() < self.__boardSize:
+                self.__side1.append(card)
+            else:
+                print("Board is full")
         else:
-            self.__side2.append(card)
+            if self.__side2.__len__() < self.__boardSize:
+                self.__side2.append(card)
+            else:
+                print("Board is full")
 
     def show_board(self) -> None:
         """Show the board."""
@@ -34,14 +40,51 @@ class Board:
         for card in self.__side2:
             print(card)
 
-    def attack_card(self, card: PlayableCharacterCard, side: int) -> None:
+    def attack_card(
+        self,
+        cardatt: PlayableCharacterCard,
+        cardrecv: PlayableCharacterCard,
+        side: int,
+    ) -> None:
         """
         Attack a card.
 
-        :param card: Card to attack.
-        :param side: Side of the board the card is being attacked in.
+        :param cardatt: Card attacking.
+        :param cardrecv: Card receiving the attack.
+        :param side: Side of the board of the card recving damage.
         """
-        if side == 1:
-            self.__side2.remove(card)
+        cardatt.attack_card(cardrecv)
+        if not cardrecv.is_alive():
+            if side == 1:
+                self.__side1.remove(cardrecv)
+            else:
+                self.__side2.remove(cardrecv)
+
+    def get_board_size(self) -> int:
+        """
+        Get the size of the board.
+
+        :return: The size of the board.
+        """
+        return self.__side1.__len__() + self.__side2.__len__()
+
+    def get_max_board_size(self) -> int:
+        """
+        Get the max size of the board.
+
+        :return: The max size of the board.
+        """
+        return self.__boardSize
+
+    def get_card_debug(self, player: int, index: int) -> PlayableCharacterCard:
+        """
+        Get a card debug mode.
+
+        :param player: Player to get the card from.
+        :param index: Index of the card to get.
+        :return: The card.
+        """
+        if player == 1:
+            return self.__side1[index]
         else:
-            self.__side1.remove(card)
+            return self.__side2[index]
