@@ -4,6 +4,8 @@ import abc
 class AbstractCard(metaclass=abc.ABCMeta):
     """class AbstractCard."""
 
+    id = -1
+
     def __init__(self, name: str, description: str = "", cost: int = 0) -> None:
         """
         Constructor for AbstractCard.

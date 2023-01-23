@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 
-from cyberarena.game_module.card import PlayableCharacterCard
+from cyberarena.game_module.card import AbstractCard, PlayableCharacterCard
 from cyberarena.game_module.deck import Deck
 
 
@@ -13,7 +13,7 @@ class Hand:
 
         :param deck: Deck assigned to the Hand.
         """
-        self.__hand: List[PlayableCharacterCard] = []
+        self.__hand: List[AbstractCard] = []
         self.__Deck = deck
 
     def __len__(self) -> int:
@@ -24,20 +24,22 @@ class Hand:
         """
         return len(self.__hand)
 
-    def get_random_card(self) -> PlayableCharacterCard:
+    def get_random_card(self, idcard: int) -> AbstractCard:
         """
         Get a random card from the deck.
 
+        :param idcard: ID of the card.
         :return: A random card from the deck.
         """
         card = self.__Deck.get_random_card()
         if card.name == "None":
             pass
         if card:
+            card.id = idcard
             self.__hand.append(card)
         return card
 
-    def use_card(self, card: PlayableCharacterCard, mana: int) -> PlayableCharacterCard:
+    def use_card(self, card: AbstractCard, mana: int) -> AbstractCard:
         """
         Use a card.
 
@@ -50,7 +52,7 @@ class Hand:
             return card
         return PlayableCharacterCard("None", 0, 0, 0, 0)
 
-    def use_card_debug(self, index: int, mana: int) -> PlayableCharacterCard:
+    def use_card_debug(self, index: int, mana: int) -> AbstractCard:
         """
         Use a card.
 
@@ -64,7 +66,19 @@ class Hand:
             return card
         return PlayableCharacterCard("None", 0, 0, 0, 0)
 
-    def get_hand(self) -> List[PlayableCharacterCard]:
+    def get_card_id(self, idcard: int) -> Optional[AbstractCard]:
+        """
+        Get a card by its ID.
+
+        :param idcard: ID of the card.
+        :return: The card.
+        """
+        for card in self.__hand:
+            if card.id == idcard:
+                return card
+        return None
+
+    def get_hand(self) -> List[AbstractCard]:
         """
         Get the hand.
 
@@ -72,10 +86,12 @@ class Hand:
         """
         return self.__hand
 
-    def cheat_add_card(self, card: PlayableCharacterCard) -> None:
+    def cheat_add_card(self, card: AbstractCard, idcard: int) -> None:
         """
         Add a card to the hand.
 
         :param card: Card to add.
+        :param idcard: ID of the card.
         """
+        card.id = idcard
         self.__hand.append(card)

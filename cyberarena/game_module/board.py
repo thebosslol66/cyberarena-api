@@ -1,8 +1,8 @@
-from typing import List
+from typing import List, Optional
 
 from loguru import logger
 
-from cyberarena.game_module.card import PlayableCharacterCard
+from cyberarena.game_module.card import AbstractCard, PlayableCharacterCard
 from cyberarena.game_module.settings import settings
 
 
@@ -11,11 +11,11 @@ class Board:
 
     def __init__(self) -> None:
         """Constructor."""
-        self.__side1: List[PlayableCharacterCard] = []
-        self.__side2: List[PlayableCharacterCard] = []
+        self.__side1: List[AbstractCard] = []
+        self.__side2: List[AbstractCard] = []
         self.__boardSize = settings.board_size
 
-    def deploy_card(self, card: PlayableCharacterCard, side: int) -> None:
+    def deploy_card(self, card: AbstractCard, side: int) -> None:
         """
         Deploy a card.
 
@@ -44,8 +44,8 @@ class Board:
 
     def attack_card(
         self,
-        cardatt: PlayableCharacterCard,
-        cardrecv: PlayableCharacterCard,
+        cardatt: AbstractCard,
+        cardrecv: AbstractCard,
         side: int,
     ) -> None:
         """
@@ -55,12 +55,16 @@ class Board:
         :param cardrecv: Card receiving the attack.
         :param side: Side of the board of the card recving damage.
         """
-        cardatt.attack_card(cardrecv)
-        if not cardrecv.is_alive():
-            if side == 1:
-                self.__side1.remove(cardrecv)
-            else:
-                self.__side2.remove(cardrecv)
+        if isinstance(cardatt, PlayableCharacterCard) and isinstance(
+            cardrecv,
+            PlayableCharacterCard,
+        ):
+            cardatt.attack_card(cardrecv)
+            if not cardrecv.is_alive():
+                if side == 1:
+                    self.__side1.remove(cardrecv)
+                else:
+                    self.__side2.remove(cardrecv)
 
     def get_board_size(self) -> int:
         """
@@ -78,7 +82,7 @@ class Board:
         """
         return self.__boardSize
 
-    def get_card_debug(self, player: int, index: int) -> PlayableCharacterCard:
+    def get_card_debug(self, player: int, index: int) -> Optional[AbstractCard]:
         """
         Get a card debug mode.
 
@@ -87,5 +91,27 @@ class Board:
         :return: The card.
         """
         if player == 1:
+            if index > len(self.__side1):
+                return None
             return self.__side1[index]
+        if index > len(self.__side2):
+            return None
         return self.__side2[index]
+
+    def get_card_id(self, player: int, id: int) -> Optional[AbstractCard]:
+        """
+        Get a card by id.
+
+        :param player: Player to get the card from.
+        :param id: id of the card to get.
+        :return: The card.
+        """
+        if player == 1:
+            for card in self.__side1:
+                if card.id == id:
+                    return card
+        else:
+            for card in self.__side2:
+                if card.id == id:
+                    return card
+        return None

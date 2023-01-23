@@ -34,7 +34,7 @@ async def test_player_use_hp_is_correct() -> None:
     player = Player("Heisenberg")
     player.increase_mana(10)
     player.draw_card()
-    card: AbstractCard = player.use_card_debug(0)
+    card: AbstractCard | None = player.use_card_debug(0)
     assert card.hp == 1
 
 
@@ -64,4 +64,4 @@ async def test_player_use_card_cost_too_high() -> None:
     player = Player("Heisenberg")
     player.draw_card()
     card = player.use_card_debug(0)
-    assert card.name == "None"
+    assert card is None
