@@ -1,4 +1,5 @@
-import pytest as pytest
+# flake8: noqa
+import pytest
 
 from cyberarena.game_module.card.base import AbstractCard
 from cyberarena.game_module.player import Player

@@ -1,3 +1,4 @@
+# flake8: noqa
 import pytest
 
 from cyberarena.game_module.board import Board

@@ -1,3 +1,5 @@
+from loguru import logger
+
 from cyberarena.game_module.board import Board
 from cyberarena.game_module.card import PlayableCharacterCard
 from cyberarena.game_module.player import Player
@@ -26,7 +28,7 @@ class Game:
         """
         card = player.use_card(card)
         if card.name == "None":
-            print("cost too high")
+            logger.debug("cost too high")
             return
         if player == self.player1:
             self.__board.deploy_card(card, 1)
@@ -42,7 +44,7 @@ class Game:
         """
         card = player.use_card_debug(index)
         if card.name == "None":
-            print("cost too high")
+            logger.debug("cost too high")
             return
         if player == self.player1:
             self.__board.deploy_card(card, 1)
@@ -63,7 +65,7 @@ class Game:
         :param cardrecv: Card receiving the attack.
         """
         if not self.check_turn(player):
-            print("It's not your turn!")
+            logger.debug("It's not your turn!")
             return
         if player == self.player1:
             self.__board.attack_card(cardatt, cardrecv, 2)

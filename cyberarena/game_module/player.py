@@ -1,3 +1,5 @@
+from loguru import logger
+
 from cyberarena.game_module.card import PlayableCharacterCard
 from cyberarena.game_module.deck import Deck
 from cyberarena.game_module.hand import Hand
@@ -41,9 +43,9 @@ class Player:
         res: PlayableCharacterCard = self.__hand.use_card(card, self.mana)
         if res.cost != 0:
             self.mana -= res.cost
-            print("Card used")
+            logger.debug("Card used")
             return res
-        print("Card not used")
+        logger.debug("Card not used")
         return PlayableCharacterCard("None", 0, 0, 0)
 
     def use_card_debug(self, index: int) -> PlayableCharacterCard:
@@ -56,9 +58,9 @@ class Player:
         res: PlayableCharacterCard = self.__hand.use_card_debug(index, self.mana)
         if res.cost != 0:
             self.mana -= res.cost
-            print("Card used")
+            logger.debug("Card used")
             return res
-        print("Card not used")
+        logger.debug("Card not used")
         return PlayableCharacterCard("None", 0, 0, 0)
 
     def increase_mana(self, value: int) -> int:

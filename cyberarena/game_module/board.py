@@ -1,5 +1,7 @@
 from typing import List
 
+from loguru import logger
+
 from cyberarena.game_module.card import PlayableCharacterCard
 from cyberarena.game_module.settings import settings
 
@@ -21,24 +23,24 @@ class Board:
         :param side: Side of the board the card is being deployed in.
         """
         if side == 1:
-            if self.__side1.__len__() < self.__boardSize:
+            if len(self.__side1) < self.__boardSize:
                 self.__side1.append(card)
             else:
-                print("Board is full")
+                logger.debug("Board is full")
         else:
-            if self.__side2.__len__() < self.__boardSize:
+            if len(self.__side2) < self.__boardSize:
                 self.__side2.append(card)
             else:
-                print("Board is full")
+                logger.debug("Board is full")
 
     def show_board(self) -> None:
         """Show the board."""
-        print("Side 1:")
+        logger.debug("Side 1:")
         for card in self.__side1:
-            print(card)
-        print("Side 2:")
+            logger.debug(card)
+        logger.debug("Side 2:")
         for card in self.__side2:
-            print(card)
+            logger.debug(card)
 
     def attack_card(
         self,
@@ -66,7 +68,7 @@ class Board:
 
         :return: The size of the board.
         """
-        return self.__side1.__len__() + self.__side2.__len__()
+        return len(self.__side1) + len(self.__side2)
 
     def get_max_board_size(self) -> int:
         """
@@ -86,5 +88,4 @@ class Board:
         """
         if player == 1:
             return self.__side1[index]
-        else:
-            return self.__side2[index]
+        return self.__side2[index]

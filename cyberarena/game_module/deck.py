@@ -33,7 +33,6 @@ class Deck(object):
         :return: A random card.
         """
         if self.__deck:
-            print("pop")
             return self.__deck.pop()
         return PlayableCharacterCard("None", 0, 0, 0)
 
