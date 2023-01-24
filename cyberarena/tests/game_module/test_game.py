@@ -244,8 +244,8 @@ async def test_game_card_id_is_correct() -> None:
     player1 = Player("Heisenberg")
     player2 = Player("Jessie")
     game = Game(player1, player2)
-    assert game.player1.id == 0
-    assert game.player2.id == 100
+    assert game.player1.idcard == 0
+    assert game.player2.idcard == 100
 
 
 @pytest.mark.anyio

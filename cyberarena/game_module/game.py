@@ -163,3 +163,11 @@ class Game:
         self.turn += 1
         player = 2 if self.turn % 2 == 0 else 1
         self.__board.end_turn(player)
+
+    def get_id(self) -> int:
+        """
+        Get the game id.
+
+        :return: The game id.
+        """
+        return self.id

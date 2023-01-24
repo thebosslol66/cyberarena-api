@@ -3,6 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+from starlette import status
 
 from cyberarena.db.dao.user_dao import UserDAO
 from cyberarena.db.models.user_model import UserModel
@@ -69,8 +70,6 @@ async def sign_up(
             sign_up_data.password,
         )
         response.message = "User created"
-    # TODO: remove this to active the account later by email
-    # await set_user_active(sign_up_data.username, user_dao)
     return response
 
 
@@ -123,13 +122,8 @@ async def login_for_access_token(
     )
     if user is None:
         raise HTTPException(
-            status_code=400,  # noqa: WPS432
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect username or password",
-        )
-    if not user.is_active:
-        raise HTTPException(
-            status_code=400,  # noqa: WPS432
-            detail="Inactive user",
         )
     user.last_login = datetime.now()
     access_token = await create_access_token(user, "")  # TODO: add scopes from user db

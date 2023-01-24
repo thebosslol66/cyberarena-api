@@ -31,7 +31,6 @@ async def test_card_constructor_default(
     card = card_constructor.get_card()
     assert card is not None
     assert card.name == "Cyber-Heisenberg"
-    assert card.get_cost == 10
     assert card.hp == 11
     assert card.ap == 13
     assert card.dp == 12

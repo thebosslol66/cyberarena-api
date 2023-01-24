@@ -8,12 +8,14 @@ from cyberarena.game_module.player import Player
 class GameManager:
     """Game Manager Class."""
 
+    idgames = 0
+
     def __init__(self) -> None:
         """Constructor."""
         self.__games: List[Game] = []
         self.__players: List[Player] = []
 
-    def create_game(self, p1id: int, p2id: int, d1: Deck, d2: Deck) -> None:
+    def create_game(self, p1id: int, p2id: int, d1: Deck, d2: Deck) -> Game:
         """
         Create a game.
 
@@ -21,6 +23,7 @@ class GameManager:
         :param p2id: Player 2 id.
         :param d1: Deck 1.
         :param d2: Deck 2.
+        :return: The game created.
         """
         p1 = Player()
         p2 = Player()
@@ -31,7 +34,10 @@ class GameManager:
         self.__players.append(p1)
         self.__players.append(p2)
         game = Game(p1, p2)
+        game.id = self.idgames
+        self.idgames += 1
         self.__games.append(game)
+        return game
 
     def __contains__(self, idgame: int, idplayer: int) -> bool:
         """
