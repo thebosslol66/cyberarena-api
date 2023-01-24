@@ -1,5 +1,7 @@
 from typing import List, Optional
 
+from loguru import logger
+
 from cyberarena.game_module.card import AbstractCard, PlayableCharacterCard
 from cyberarena.game_module.deck import Deck
 
@@ -24,7 +26,7 @@ class Hand:
         """
         return len(self.__hand)
 
-    def get_random_card(self, idcard: int) -> AbstractCard:
+    def get_random_card(self, idcard: int) -> Optional[AbstractCard]:
         """
         Get a random card from the deck.
 
@@ -32,11 +34,12 @@ class Hand:
         :return: A random card from the deck.
         """
         card = self.__Deck.get_random_card()
-        if card.name == "None":
-            pass
         if card:
             card.id = idcard
             self.__hand.append(card)
+        else:
+            logger.debug("Deck is empty")
+            return None
         return card
 
     def use_card(self, card: AbstractCard, mana: int) -> AbstractCard:

@@ -8,12 +8,11 @@ from cyberarena.game_module.player import Player
 class GameManager:
     """Game Manager Class."""
 
-    idgames = 0
-
     def __init__(self) -> None:
         """Constructor."""
         self.__games: List[Game] = []
         self.__players: List[Player] = []
+        self.idgames = 0
 
     def create_game(self, p1id: int, p2id: int, d1: Deck, d2: Deck) -> Game:
         """
@@ -50,8 +49,7 @@ class GameManager:
         """
         for game in self.__games:
             if game.id == idgame:
-                if game.player1.id == idplayer or game.player2.id == idplayer:
-                    return True
+                return game.player1.id == idplayer or game.player2.id == idplayer
         return False
 
     def deploy_card(self, idgame: int, idplayer: int, idcard: int) -> None:

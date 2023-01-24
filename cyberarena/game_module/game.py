@@ -1,14 +1,12 @@
 from loguru import logger
 
 from cyberarena.game_module.board import Board
-from cyberarena.game_module.card import AbstractCard
+from cyberarena.game_module.card import AbstractCard, PlayableCharacterCard
 from cyberarena.game_module.player import Player
 
 
 class Game:
     """Game Class."""
-
-    id = -1
 
     def __init__(self, p1: Player, p2: Player) -> None:
         """Constructor.
@@ -18,9 +16,10 @@ class Game:
         """
         self.player1 = p1
         self.player2 = p2
-        self.player2.idcard = 100
+        self.player2.idcardcurr = 100
         self.turn = 1
         self.__board = Board()
+        self.id = -1
 
     def deploy_card(self, player: Player, card: AbstractCard) -> None:
         """
@@ -70,8 +69,8 @@ class Game:
     def attack_card(
         self,
         player: Player,
-        cardatt: AbstractCard,
-        cardrecv: AbstractCard,
+        cardatt: PlayableCharacterCard,
+        cardrecv: PlayableCharacterCard,
     ) -> None:
         """
         Attack a card.
@@ -148,15 +147,9 @@ class Game:
         :return: The turn.
         """
         if self.turn % 2 == 0:
-            if player == self.player1:
-                return False
-            else:
-                return True
+            return player != self.player1
         else:
-            if player == self.player1:
-                return True
-            else:
-                return False
+            return player != self.player2
 
     def increase_turn_debug(self) -> None:
         """Debug increase turn."""

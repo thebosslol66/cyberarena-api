@@ -5,7 +5,7 @@ max-line-length = 88
 extend-ignore = E203
 docstring_style=sphinx
 
-ignore = S311,
+ignore =
   ; Found `f` string
   WPS305,
   ; Missing docstring in public module

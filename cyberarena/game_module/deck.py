@@ -1,5 +1,5 @@
 import random
-from typing import List
+from typing import List, Optional
 
 from cyberarena.game_module.card import AbstractCard, PlayableCharacterCard
 from cyberarena.game_module.settings import settings
@@ -28,7 +28,7 @@ class Deck(object):
             return card
         return PlayableCharacterCard("None", 0, 0, 0)
 
-    def get_random_card(self) -> AbstractCard:
+    def get_random_card(self) -> Optional[AbstractCard]:
         """
         Get a random card from the deck.
 
@@ -36,7 +36,7 @@ class Deck(object):
         """
         if self.__deck:
             return self.__deck.pop()
-        return PlayableCharacterCard("None", 0, 0, 0)
+        return None
 
     def __len__(self) -> int:
         """

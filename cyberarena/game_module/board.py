@@ -43,13 +43,13 @@ class Board:
         for card in self.__side1:
             logger.debug(card)
         logger.debug("Side 2:")
-        for card in self.__side2:
-            logger.debug(card)
+        for card2 in self.__side2:
+            logger.debug(card2)
 
     def attack_card(
         self,
-        cardatt: AbstractCard,
-        cardrecv: AbstractCard,
+        cardatt: PlayableCharacterCard,
+        cardrecv: PlayableCharacterCard,
         side: int,
     ) -> None:
         """
@@ -59,16 +59,12 @@ class Board:
         :param cardrecv: Card receiving the attack.
         :param side: Side of the board of the card recving damage.
         """
-        if isinstance(cardatt, PlayableCharacterCard) and isinstance(
-            cardrecv,
-            PlayableCharacterCard,
-        ):
-            cardatt.attack_card(cardrecv)
-            if not cardrecv.is_alive():
-                if side == 1:
-                    self.__side1.remove(cardrecv)
-                else:
-                    self.__side2.remove(cardrecv)
+        cardatt.attack_card(cardrecv)
+        if not cardrecv.is_alive():
+            if side == 1:
+                self.__side1.remove(cardrecv)
+            else:
+                self.__side2.remove(cardrecv)
 
     def get_board_size(self) -> int:
         """
@@ -86,7 +82,11 @@ class Board:
         """
         return self.__boardSize
 
-    def get_card_debug(self, player: int, index: int) -> Optional[AbstractCard]:
+    def get_card_debug(
+        self,
+        player: int,
+        index: int,
+    ) -> Optional[PlayableCharacterCard]:
         """
         Get a card debug mode.
 
@@ -102,22 +102,22 @@ class Board:
             return None
         return self.__side2[index]
 
-    def get_card_id(self, player: int, id: int) -> Optional[AbstractCard]:
+    def get_card_id(self, player: int, id_card: int) -> Optional[PlayableCharacterCard]:
         """
         Get a card by id.
 
         :param player: Player to get the card from.
-        :param id: id of the card to get.
+        :param id_card: id of the card to get.
         :return: The card.
         """
         if player == 1:
             for card in self.__side1:
-                if card.id == id:
+                if card.id == id_card:
                     return card
         else:
-            for card in self.__side2:
-                if card.id == id:
-                    return card
+            for card2 in self.__side2:
+                if card.id == id_card:
+                    return card2
         return None
 
     def end_turn(self, player: int) -> None:
