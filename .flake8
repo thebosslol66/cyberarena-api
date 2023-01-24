@@ -70,6 +70,8 @@ ignore =
   WPS407,
   ; Found too many empty lines in `def`
   WPS473,
+  ; I want fucking private vars
+  WPS112,
 
 per-file-ignores =
   ; all tests
@@ -95,6 +97,15 @@ per-file-ignores =
   F403,
   ; Found wrong metadata variable
   WPS410,
+  ; For local import in modules
+  WPS300,
+
+  ; All cyberarena card files
+  cyberarena/game_module/card/*.py:
+  ; Local folder import
+  WPS300,
+  ; Accessing private attribute of the same class
+  WPS437,
 
 exclude =
   ./.cache,

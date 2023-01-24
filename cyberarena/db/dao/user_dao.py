@@ -1,7 +1,7 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from fastapi import Depends
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from cyberarena.db.dependencies import get_db_session
@@ -11,7 +11,7 @@ from cyberarena.db.models.user_model import UserModel
 class UserDAO:
     """Class for accessing user table."""
 
-    def __init__(self, session: AsyncSession = Depends(get_db_session)):
+    def __init__(self, session: AsyncSession = Depends(get_db_session)) -> None:
         self.session = session
 
     async def create_user(
@@ -27,8 +27,10 @@ class UserDAO:
         :param email: email of a user.
         :param password: password of a user.
         """
+        user = UserModel(username=username, email=email)
+        user.set_password(password)
         self.session.add(
-            UserModel(username=username, email=email, password=password),
+            user,
         )
 
     async def get_user_by_username(self, username: str) -> Optional[UserModel]:
@@ -118,11 +120,15 @@ class UserDAO:
         :param _id: id of user instance.
         :param superuser: superuser status of user.
         """
-        query = select(UserModel).where(UserModel.id == _id)
-        rows = await self.session.execute(query)
-        user = rows.scalars().one()
-        user.superuser = superuser
-        self.session.add(user)
+        query = (
+            update(UserModel)
+            .where(UserModel.id == _id)
+            .values(
+                is_superuser=superuser,
+            )
+            .execution_options(synchronize_session="fetch")
+        )
+        await self.session.execute(query)
 
     async def update_password(self, _id: int, password: str) -> None:
         """
@@ -134,8 +140,16 @@ class UserDAO:
         query = select(UserModel).where(UserModel.id == _id)
         rows = await self.session.execute(query)
         user = rows.scalars().one()
-        user.password = password
-        self.session.add(user)
+        user.set_password(password)
+        query2 = (
+            update(UserModel)
+            .where(UserModel.id == _id)
+            .values(
+                password=user.password,
+            )
+            .execution_options(synchronize_session="fetch")
+        )
+        await self.session.execute(query2)
 
     async def update_email(self, _id: int, email: str) -> None:
         """
@@ -144,11 +158,16 @@ class UserDAO:
         :param _id: id of user instance.
         :param email: email of user.
         """
-        query = select(UserModel).where(UserModel.id == _id)
-        rows = await self.session.execute(query)
-        user = rows.scalars().one()
-        user.email = email
-        self.session.add(user)
+        query = (
+            update(UserModel)
+            .where(UserModel.id == _id)
+            .values(
+                email=email,
+                is_active=False,
+            )
+            .execution_options(synchronize_session="fetch")
+        )
+        await self.session.execute(query)
 
     async def update_username(self, _id: int, username: str) -> None:
         """
@@ -157,11 +176,15 @@ class UserDAO:
         :param _id: id of user instance.
         :param username: username of ugit ser.
         """
-        query = select(UserModel).where(UserModel.id == _id)
-        rows = await self.session.execute(query)
-        user = rows.scalars().one()
-        user.username = username
-        self.session.add(user)
+        query = (
+            update(UserModel)
+            .where(UserModel.id == _id)
+            .values(
+                username=username,
+            )
+            .execution_options(synchronize_session="fetch")
+        )
+        await self.session.execute(query)
 
     async def delete_user(self, _id: int) -> None:
         """
@@ -181,8 +204,35 @@ class UserDAO:
         :param _id: id of user instance.
         :param active: active status of user.
         """
-        query = select(UserModel).where(UserModel.id == _id)
-        rows = await self.session.execute(query)
-        user = rows.scalars().one()
-        user.active = active
-        self.session.add(user)
+        query = (
+            update(UserModel)
+            .where(UserModel.id == _id)
+            .values(
+                is_active=active,
+            )
+            .execution_options(synchronize_session="fetch")
+        )
+        await self.session.execute(query)
+
+    async def update_refresh_token(
+        self,
+        _id: int,
+        refresh_token: Union[str, None],
+    ) -> None:
+        """
+        Update refresh token of user.
+
+        :param _id: id of user instance.
+        :param refresh_token: refresh token of user.
+        """
+        query = (
+            update(UserModel)
+            .where(UserModel.id == _id)
+            .values(
+                refresh_token_value=refresh_token,
+            )
+            .execution_options(
+                synchronize_session="fetch",
+            )
+        )
+        await self.session.execute(query)

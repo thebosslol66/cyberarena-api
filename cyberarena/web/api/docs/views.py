@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.get("/docs", include_in_schema=False)
-async def swagger_ui_html(request: Request) -> HTMLResponse:
+async def swagger_ui_html(request: Request) -> HTMLResponse:  # pragma: no cover
     """
     Swagger UI.
 
@@ -28,7 +28,7 @@ async def swagger_ui_html(request: Request) -> HTMLResponse:
 
 
 @router.get("/swagger-redirect", include_in_schema=False)
-async def swagger_ui_redirect() -> HTMLResponse:
+async def swagger_ui_redirect() -> HTMLResponse:  # pragma: no cover
     """
     Redirect to swagger.
 
@@ -38,7 +38,7 @@ async def swagger_ui_redirect() -> HTMLResponse:
 
 
 @router.get("/redoc", include_in_schema=False)
-async def redoc_html(request: Request) -> HTMLResponse:
+async def redoc_html(request: Request) -> HTMLResponse:  # pragma: no cover
     """
     Redoc UI.
 

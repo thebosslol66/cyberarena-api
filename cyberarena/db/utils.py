@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from cyberarena.settings import settings
 
 
-async def create_database() -> None:
+async def create_database() -> None:  # pragma: no cover
     """Create a databse."""
     engine = create_async_engine(str(settings.db_url.with_path("/mysql")))
 
@@ -28,7 +28,7 @@ async def create_database() -> None:
         )
 
 
-async def drop_database() -> None:
+async def drop_database() -> None:  # pragma: no cover
     """Drop current database."""
     engine = create_async_engine(str(settings.db_url.with_path("/mysql")))
     async with engine.connect() as conn:
