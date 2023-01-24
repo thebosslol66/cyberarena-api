@@ -28,7 +28,7 @@ async def test_card_constructor_default(
 ) -> None:
     data = open_json_file(os.path.join(cards_path, "hiesenberg", "data.json"))
     assert card_constructor.construct(data) is True
-    card = card_constructor.get_card()
+    card_id, card = card_constructor.get_card()
     assert card is not None
     assert card.name == "Cyber-Heisenberg"
     assert card.hp == 11
@@ -38,7 +38,7 @@ async def test_card_constructor_default(
 
 @pytest.mark.parametrize(
     "attribute_name",
-    ["type", "rarity", "name"],
+    ["type", "rarity", "name", "id"],
 )
 @pytest.mark.anyio
 async def test_card_constructor_no_obligatory_attribute(
@@ -54,7 +54,7 @@ async def test_card_constructor_no_obligatory_attribute(
         )
         is False
     )
-    assert card_constructor.get_card() is None
+    assert card_constructor.get_card()[1] is None
 
 
 @pytest.mark.anyio
@@ -68,7 +68,7 @@ async def test_card_constructor_obligatory_attribute_empty(
         )
         is False
     )
-    assert card_constructor.get_card() is None
+    assert card_constructor.get_card()[1] is None
 
 
 @pytest.mark.anyio
@@ -84,7 +84,7 @@ async def test_card_constructor_obligatory_attribute_is_a_number(
         )
         is False
     )
-    assert card_constructor.get_card() is None
+    assert card_constructor.get_card()[1] is None
 
 
 @pytest.mark.parametrize(
@@ -105,7 +105,7 @@ async def test_card_constructor_no_numerical_attribute(
         )
         is False
     )
-    assert card_constructor.get_card() is None
+    assert card_constructor.get_card()[1] is None
 
 
 @pytest.mark.parametrize(
@@ -126,7 +126,7 @@ async def test_card_constructor_invalid_numerical_attribute(
         )
         is False
     )
-    assert card_constructor.get_card() is None
+    assert card_constructor.get_card()[1] is None
 
 
 @pytest.mark.anyio
@@ -142,8 +142,8 @@ async def test_card_constructor_numerical_attribute_is_float(
         )
         is True
     )
-    assert card_constructor.get_card() is not None
-    assert card_constructor.get_card().hp == 11  # TODO: test log output
+    assert card_constructor.get_card()[1] is not None
+    assert card_constructor.get_card()[1].hp == 11  # TODO: test log output
 
 
 @pytest.mark.anyio
@@ -159,7 +159,7 @@ async def test_card_constructor_numerical_attribute_is_negative(
         )
         is False
     )
-    assert card_constructor.get_card() is None
+    assert card_constructor.get_card()[1] is None
 
 
 @pytest.mark.anyio
@@ -175,4 +175,4 @@ async def test_card_constructor_unused_attribute(
         )
         is True
     )
-    assert card_constructor.get_card() is not None
+    assert card_constructor.get_card()[1] is not None

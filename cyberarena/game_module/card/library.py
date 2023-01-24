@@ -60,7 +60,7 @@ class Library(object):
         """
         if Library.__init_flag:
             return
-        self.__library: typing.Dict[str, AbstractCard] = {}
+        self.__library: typing.Dict[int, AbstractCard] = {}
         self.__library_path = path_name
         self.__default_filename = default_filename
         if not os.path.isdir(self.__library_path):
@@ -74,7 +74,7 @@ class Library(object):
         self.__load_library()
         Library.__init_flag = True
 
-    def __iter__(self) -> typing.Iterator[str]:
+    def __iter__(self) -> typing.Iterator[int]:
         """
         Iterate over the library.
 
@@ -90,7 +90,7 @@ class Library(object):
         """
         return len(self.keys())
 
-    def __getitem__(self, key: str) -> AbstractCard:
+    def __getitem__(self, key: int) -> AbstractCard:
         """
         Get a card by his name.
 
@@ -99,20 +99,20 @@ class Library(object):
         """
         return self.__library[key]
 
-    def __contains__(self, card: typing.Union[str, AbstractCard]) -> bool:
+    def __contains__(self, card: typing.Union[int, AbstractCard]) -> bool:
         """
         Check if the card is in the library.
 
         :param card: The card to check or his name.
         :return: True if the card is in the library.
         """
-        if isinstance(card, str):
+        if isinstance(card, int):
             return card in self.__library.keys()
         elif isinstance(card, AbstractCard):
             return card in self.__library.values()
         return False
 
-    def keys(self) -> typing.KeysView[str]:
+    def keys(self) -> typing.KeysView[int]:
         """
         Return the list of cards in the library.
 
@@ -128,7 +128,7 @@ class Library(object):
         """
         return self.__library.values()
 
-    def items(self) -> typing.ItemsView[str, AbstractCard]:
+    def items(self) -> typing.ItemsView[int, AbstractCard]:
         """
         Return the list of cards in the library.
 
@@ -168,6 +168,6 @@ class Library(object):
     def __load_library(self) -> None:
         """Load all cards in the library."""
         for card_data in self.__get_cards_path():
-            card = factory_card.create_card_from_file(card_data)
+            (card_id, card) = factory_card.create_card_from_file(card_data)
             if card is not None:
-                self.__library[card.name] = card
+                self.__library[card_id] = card

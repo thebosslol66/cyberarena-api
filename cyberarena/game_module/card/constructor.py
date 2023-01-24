@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from loguru import logger
 
@@ -16,12 +16,13 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
     """
 
     OBLIGATORY_ATTRIBUTES: List[str] = ["name"]
-    NUMERICAL_ATTRIBUTES: List[str] = []
+    NUMERICAL_ATTRIBUTES: List[str] = ["id"]
     OPTIONAL_ATTRIBUTES: List[str] = ["description"]
 
     def __init__(self) -> None:
         """Constructor."""
         self._name: str = "Unknown"
+        self._card_index: int = -1
         self._card: Optional[AbstractCard] = None
         self.json_data: Dict[str, Any] = {}
 
@@ -35,6 +36,7 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
         """
         self._reset()
         self.json_data = json_data
+        self._card_index = self.json_data.get("id", -1)
         return self.check_json()
 
     def check_json(self) -> bool:
@@ -53,13 +55,14 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
         self._check_unrecognized_attribute()
         return True
 
-    def get_card(self) -> Optional[AbstractCard]:
+    def get_card(self) -> Tuple[int, Optional[AbstractCard]]:
         """
         Get the card cunstucred by the card constructor.
 
-        :return: The card constructed by the card constructor.
+        :return: The idex of the card and the card constructed by the card constructor.
+            If don't exist return -1 and None.
         """
-        return self._card
+        return self._card_index, self._card
 
     def _reset(self) -> None:
         """Reset the card constructor."""

@@ -12,7 +12,7 @@ cards_path = os.path.join("cyberarena", "tests_data", "cards")
 
 @pytest.mark.anyio
 async def test_card_factory_create_character_card_from_file() -> None:
-    card = factory_card.create_card_from_file(
+    (card_id, card) = factory_card.create_card_from_file(
         os.path.join(cards_path, "hiesenberg", "data.json"),
     )
     assert card is not None
@@ -41,7 +41,7 @@ async def test_card_constructor_invalid_json() -> None:
 
 @pytest.mark.anyio
 async def test_card_constructor_invalid_card_type() -> None:
-    card = factory_card.create_card_from_file(
+    (card_id, card) = factory_card.create_card_from_file(
         os.path.join(cards_path, "invalid", "invalid_card_type.json"),
     )
     assert card is None

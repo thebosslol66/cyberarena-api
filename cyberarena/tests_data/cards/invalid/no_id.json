@@ -1,6 +1,5 @@
 {
-  "id": 0,
-  "name": "Cyber-Hisenberg",
+  "name": "Cyber-Heisenberg",
   "description": "A long description for the lore... #NotImplemented",
   "ap": 13,
   "dp": 12,
@@ -8,9 +7,11 @@
   "cost": 10,
   "type": "Cyber",
   "rarity": "Legendary",
+  "card_type": "character",
   "ability": {
     "text": "A description for the ability in the card #NotImplemented",
     "base_clases": [
       "Cyber"
     ]
   }
+}
