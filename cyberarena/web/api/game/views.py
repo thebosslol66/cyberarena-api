@@ -2,10 +2,11 @@ import uuid
 
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
+from starlette.responses import FileResponse
 
 from cyberarena.db.models.user_model import UserModel
 from cyberarena.web.api.connection.utils import get_current_user
-from cyberarena.web.api.game.schema import TicketModel, TicketStatus
+from cyberarena.web.api.game.schema import CardModel, TicketModel, TicketStatus
 from cyberarena.web.api.game.utils import ticket_manager
 
 router = APIRouter()
@@ -99,3 +100,40 @@ async def get_ticket_status(
         id=ticket_id,
         status=statu,
     )
+
+
+@router.get("/card/{card_id}/data")
+async def get_card(card_id: int) -> CardModel:
+    """
+    Get a card.
+
+    :param card_id: The id of the card to get
+    :return: The card
+    :raises HTTPException: If the card doesn't exist
+    """
+    card = CardModel(
+        id=card_id,
+        name="Card",
+        description="Description",
+        cost=1,
+        damage=1,
+        health=1,
+        defense=1,
+    )
+    if card is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Card doesn't exist.",
+        )
+    return card
+
+
+@router.get("/card/{card_id}/image")
+async def get_card_image(card_id: int) -> FileResponse:
+    """
+    Get the image of a card.
+
+    :param card_id: The id of the card to get the image
+    :return: The image of the card
+    """
+    return FileResponse("./tests_data/imgs/test_avatar_good_512x512.png")

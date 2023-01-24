@@ -11,3 +11,15 @@ class TicketModel(BaseModel):
     id: int
     status: TicketStatus
     room_id: Optional[int] = None
+
+
+class CardModel(BaseModel):
+    """Card Model."""
+
+    id: int
+    name: str
+    description: str
+    cost: int
+    damage: int
+    health: int
+    defense: int
