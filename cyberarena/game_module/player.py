@@ -10,7 +10,6 @@ from cyberarena.game_module.hand import Hand
 class Player:
     """Player Class."""
 
-    idcardcurr = 0
     id = -1
 
     def __init__(self, name: str = "") -> None:
@@ -25,6 +24,7 @@ class Player:
         self.life = 20
         self.mana = 0
         self.mana_max = 10
+        self.idcardcurr = 0
 
     def get_mana(self) -> int:
         """
