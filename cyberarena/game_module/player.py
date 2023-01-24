@@ -10,9 +10,10 @@ from cyberarena.game_module.hand import Hand
 class Player:
     """Player Class."""
 
-    id = 0
+    idcard = 0
+    id = -1
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str = "") -> None:
         """
         Constructor.
 
@@ -35,8 +36,8 @@ class Player:
 
     def draw_card(self) -> None:
         """Draw a card."""
-        self.__hand.get_random_card(self.id)
-        self.id += 1
+        self.__hand.get_random_card(self.idcard)
+        self.idcard += 1
 
     def use_card(self, card: AbstractCard) -> Optional[AbstractCard]:
         """
@@ -111,5 +112,14 @@ class Player:
 
         :param card: Card to add.
         """
-        self.__hand.cheat_add_card(card, self.id)
-        self.id += 1
+        self.__hand.cheat_add_card(card, self.idcard)
+        self.idcard += 1
+
+    def change_deck(self, deck: Deck) -> None:
+        """
+        Change the deck of the player.
+
+        :param deck: New deck.
+        """
+        self.__deck = deck
+        self.__hand = Hand(self.__deck)

@@ -11,8 +11,8 @@ class Board:
 
     def __init__(self) -> None:
         """Constructor."""
-        self.__side1: List[AbstractCard] = []
-        self.__side2: List[AbstractCard] = []
+        self.__side1: List[PlayableCharacterCard] = []
+        self.__side2: List[PlayableCharacterCard] = []
         self.__boardSize = settings.board_size
 
     def deploy_card(self, card: AbstractCard, side: int) -> None:
@@ -22,6 +22,10 @@ class Board:
         :param card: Card to deploy.
         :param side: Side of the board the card is being deployed in.
         """
+        if not isinstance(card, PlayableCharacterCard):
+            # todo: add support for other cards
+            return
+
         if side == 1:
             if len(self.__side1) < self.__boardSize:
                 self.__side1.append(card)
@@ -115,3 +119,16 @@ class Board:
                 if card.id == id:
                     return card
         return None
+
+    def end_turn(self, player: int) -> None:
+        """
+        Next turn.
+
+        :param player: Player ending the turn.
+        """
+        if player == 1:
+            for card in self.__side2:
+                card.end_turn()
+        else:
+            for card in self.__side1:
+                card.end_turn()

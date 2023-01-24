@@ -8,6 +8,8 @@ from cyberarena.game_module.player import Player
 class Game:
     """Game Class."""
 
+    id = -1
+
     def __init__(self, p1: Player, p2: Player) -> None:
         """Constructor.
 
@@ -16,7 +18,7 @@ class Game:
         """
         self.player1 = p1
         self.player2 = p2
-        self.player2.id = 100
+        self.player2.idcard = 100
         self.turn = 1
         self.__board = Board()
 
@@ -159,3 +161,5 @@ class Game:
     def increase_turn_debug(self) -> None:
         """Debug increase turn."""
         self.turn += 1
+        player = 2 if self.turn % 2 == 0 else 1
+        self.__board.end_turn(player)

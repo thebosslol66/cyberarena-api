@@ -78,14 +78,6 @@ class Hand:
                 return card
         return None
 
-    def get_hand(self) -> List[AbstractCard]:
-        """
-        Get the hand.
-
-        :return: The hand.
-        """
-        return self.__hand
-
     def cheat_add_card(self, card: AbstractCard, idcard: int) -> None:
         """
         Add a card to the hand.
