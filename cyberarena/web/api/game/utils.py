@@ -158,5 +158,15 @@ class TicketManager(object):
         self.__tickets.pop(ticket_id)
         return ticket
 
+    def find_match(self) -> None:
+        """Find a match."""
+        while len(self.__tickets) > 1:
+            ticket1 = self.__tickets.popitem()
+            ticket2 = self.__tickets.popitem()
+            ticket1[1].status = TicketStatus.CLOSED  # type: ignore[assignment]
+            ticket2[1].status = TicketStatus.CLOSED  # type: ignore[assignment]
+            self.__history[ticket1[0]] = ticket1[1]
+            self.__history[ticket2[0]] = ticket2[1]
+
 
 ticket_manager = TicketManager()

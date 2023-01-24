@@ -83,8 +83,18 @@ async def get_ticket_status(
     :param ticket_id: The id of the ticket to get the status
     :param current_user: The current user
     :return: The status of the ticket
+    :raises HTTPException: If the ticket doesn't exist or is closed
     """
+    ticket_manager.find_match()
     statu: TicketStatus = ticket_manager.get_ticket_status(ticket_id)
+    if statu == TicketStatus.DONT_EXIST:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Ticket doesn't exist.",
+        )
+    if statu == TicketStatus.CLOSED:
+        # TODO: get room id from user id from game manager
+        pass  # noqa: WPS420
     return TicketModel(
         id=ticket_id,
         status=statu,
