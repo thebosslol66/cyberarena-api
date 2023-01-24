@@ -116,7 +116,7 @@ class Board:
                     return card
         else:
             for card2 in self.__side2:
-                if card.id == id_card:
+                if card2.id == id_card:
                     return card2
         return None
 
@@ -130,5 +130,5 @@ class Board:
             for card in self.__side2:
                 card.end_turn()
         else:
-            for card in self.__side1:
-                card.end_turn()
+            for card2 in self.__side1:
+                card2.end_turn()

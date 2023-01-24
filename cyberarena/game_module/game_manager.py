@@ -59,7 +59,6 @@ class GameManager:
         :param idgame: Id of the game.
         :param idplayer: Id of the player.
         :param idcard: Id of the card.
-        :return: The card deployed.
         """
         for game in self.__games:
             if game.id == idgame:
@@ -67,7 +66,6 @@ class GameManager:
                     game.deploy_card_id(game.player1, idcard)
                 if game.player2.id == idplayer:
                     game.deploy_card_id(game.player2, idcard)
-        return None
 
     def get_game(self, idgame: int) -> Optional[Game]:
         """

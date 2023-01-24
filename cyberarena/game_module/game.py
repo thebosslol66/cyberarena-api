@@ -148,8 +148,7 @@ class Game:
         """
         if self.turn % 2 == 0:
             return player != self.player1
-        else:
-            return player != self.player2
+        return player != self.player2
 
     def increase_turn_debug(self) -> None:
         """Debug increase turn."""
