@@ -202,3 +202,11 @@ To run tests with coverage you should run:
 ```bash
 docker-compose -f deploy/docker-compose.yml --project-directory . build; docker-compose -f deploy/docker-compose.yml  --project-directory . run -v "$PWD/cov:/app/src/cov" --rm api pytest --cov=cyberarena/ --cov-report term-missing:skip-covered --cov-report html:cov/cov_html -vv .; docker-compose -f deploy/docker-compose.yml --project-directory . down
 ```
+
+
+## Some data to check
+
+https://able.bio/drenther/building-a-drag-and-drop-game-with-react-beautiful-dnd--094r3g8#start%2C-loop-and-reset
+https://www.geeksforgeeks.org/elo-rating-algorithm/
+https://www.daysofwonder.com/online/en/play/ranking/
+https://en.wikipedia.org/wiki/Elo_rating_system
