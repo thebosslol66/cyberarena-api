@@ -1,0 +1,18 @@
+{
+  "id": 0,
+  "name": "Cyber-Heisenberg",
+  "description": "A long description for the lore... #NotImplemented",
+  "ap": 2,
+  "dp": 0,
+  "hp": 4,
+  "cost": 5,
+  "type": "Cyber",
+  "rarity": "Legendary",
+  "card_type": "character",
+  "ability": {
+    "text": "",
+    "base_clases": [
+      "Cyber"
+    ]
+  }
+}
