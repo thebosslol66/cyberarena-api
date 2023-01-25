@@ -38,7 +38,7 @@ async def test_card_constructor_default(
 
 @pytest.mark.parametrize(
     "attribute_name",
-    ["type", "rarity", "name", "id"],
+    ["race", "rarity", "name", "id"],
 )
 @pytest.mark.anyio
 async def test_card_constructor_no_obligatory_attribute(
