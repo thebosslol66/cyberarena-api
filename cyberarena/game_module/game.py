@@ -28,6 +28,9 @@ class Game:
         :param player: Player deploying the card.
         :param card: Card to deploy.
         """
+        if not self.check_turn(player):
+            logger.debug("It's not your turn!")
+            return
         cardrcv = player.use_card(card)
         if cardrcv is None:
             logger.debug("cost too high")

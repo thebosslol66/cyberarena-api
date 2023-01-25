@@ -451,6 +451,7 @@ async def test_game_card_id_attack_invalid_cardrecv() -> None:
     game.player2.increase_mana(10)
     card = PlayableCharacterCard("Cyber-Jessie", 1, 1, 1, 0, "test")
     game.player2.cheat_add_card_to_hand(card)
+    game.increase_turn_debug()
     game.deploy_card_id(player2, 100)
     game.attack_card_id(player1, 0, 101)
     assert game.get_board().get_board_size() == 2
@@ -469,6 +470,7 @@ async def test_game_card_id_attack_invalid_cardatt() -> None:
     game.player2.increase_mana(10)
     card = PlayableCharacterCard("Cyber-Jessie", 1, 1, 1, 0, "test")
     game.player2.cheat_add_card_to_hand(card)
+    game.increase_turn_debug()
     game.deploy_card_id(player2, 100)
     game.attack_card_id(player1, 1, 100)
     assert game.get_board().get_board_size() == 2
@@ -600,7 +602,7 @@ async def test_game_test_draw_not_your_turn2() -> None:
 
 
 @pytest.mark.anyio
-async def test_game_test_attack_your_turn1() -> None:
+async def test_game_test_attack_not_your_turn1() -> None:
     """Test if the player1 can't attack when it's not his turn"""
     player1 = Player("Heisenberg")
     player2 = Player("Jessie")
@@ -617,7 +619,7 @@ async def test_game_test_attack_your_turn1() -> None:
 
 
 @pytest.mark.anyio
-async def test_game_test_attack_your_turn2() -> None:
+async def test_game_test_attack_not_your_turn2() -> None:
     """Test if the player2 cant attack when it's not his turn"""
     player1 = Player("Heisenberg")
     player2 = Player("Jessie")
@@ -631,4 +633,107 @@ async def test_game_test_attack_your_turn2() -> None:
     assert game.get_board().get_board_size() == 2
     game.increase_turn_debug()
     game.attack_card_id(player2, 100, 0)
+    assert game.get_board().get_board_size() == 2
+
+
+@pytest.mark.anyio
+async def test_game_test_deploy_not_your_turn1() -> None:
+    """Test of the player1 cant deploy when it's not his turn"""
+    player1 = Player("Heisenberg")
+    player2 = Player("Jessie")
+    game = Game(player1, player2)
+    game.player1.draw_card()
+    game.increase_turn_debug()
+    game.player2.draw_card()
+    game.deploy_card_id(player2, 100)
+    assert game.get_board().get_board_size() == 1
+    game.deploy_card_id(player1, 0)
+    assert game.get_board().get_board_size() == 1
+
+
+@pytest.mark.anyio
+async def test_game_test_deploy_not_your_turn2() -> None:
+    """Test of the player1 cant deploy when it's not his turn"""
+    player1 = Player("Heisenberg")
+    player2 = Player("Jessie")
+    game = Game(player1, player2)
+    game.player1.draw_card()
+    game.deploy_card_id(player1, 0)
+    assert game.get_board().get_board_size() == 1
+    game.increase_turn_debug()
+    game.player2.draw_card()
+    game.increase_turn_debug()
+    game.deploy_card_id(player2, 100)
+    assert game.get_board().get_board_size() == 1
+
+
+@pytest.mark.anyio
+async def test_game_test_deploy_not_enough_mana_p1_t1() -> None:
+    """Test if the player cant deploy if he doesnt have enough mana"""
+    player1 = Player("Heisenberg")
+    player2 = Player("Jessie")
+    game = Game(player1, player2)
+    game.player1.draw_card()
+    game.deploy_card_id(player1, 0)
+    assert game.get_board().get_board_size() == 1
+    game.player1.draw_card()
+    game.deploy_card_id(player1, 0)
+    assert game.get_board().get_board_size() == 1
+
+
+@pytest.mark.anyio
+async def test_game_test_deploy_not_enough_mana_p2_t1() -> None:
+    """Test if the player cant deploy if he doesnt have enough mana"""
+    player1 = Player("Heisenberg")
+    player2 = Player("Jessie")
+    game = Game(player1, player2)
+    game.increase_turn_debug()
+    game.player2.draw_card()
+    game.deploy_card_id(player2, 100)
+    assert game.get_board().get_board_size() == 1
+    game.player2.draw_card()
+    game.deploy_card_id(player2, 100)
+    assert game.get_board().get_board_size() == 1
+
+
+@pytest.mark.anyio
+async def test_game_test_deploy_not_enough_mana_p1_t2() -> None:
+    player1 = Player("Heisenberg")
+    player2 = Player("Jessie")
+    game = Game(player1, player2)
+    game.increase_turn_debug()
+    game.increase_turn_debug()
+    assert game.get_board().get_board_size() == 0
+    assert game.player1.mana == 2
+    assert game.player1.mana_max_turn == 2
+    game.player1.draw_card()
+    game.deploy_card_id(player1, 0)
+    assert game.get_board().get_board_size() == 1
+    game.player1.draw_card()
+    game.deploy_card_id(player1, 1)
+    assert game.get_board().get_board_size() == 2
+    game.player1.draw_card()
+    game.deploy_card_id(player1, 2)
+    assert game.get_board().get_board_size() == 2
+
+
+@pytest.mark.anyio
+async def test_game_test_deploy_not_enough_mana_p2_t2() -> None:
+    player1 = Player("Heisenberg")
+    player2 = Player("Jessie")
+    game = Game(player1, player2)
+    game.increase_turn_debug()
+    game.increase_turn_debug()
+    game.increase_turn_debug()
+    assert game.get_board().get_board_size() == 0
+    assert game.player2.mana == 2
+    assert game.player2.mana_max_turn == 2
+    game.player2.draw_card()
+    game.deploy_card_id(player2, 100)
+    assert game.get_board().get_board_size() == 1
+    game.player2.draw_card()
+    game.deploy_card_id(player2, 101)
+    assert game.get_board().get_board_size() == 2
+    game.player2.draw_card()
+    game.deploy_card_id(player2, 102)
     assert game.get_board().get_board_size() == 2

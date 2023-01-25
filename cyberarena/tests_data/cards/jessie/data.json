@@ -1,16 +1,16 @@
 {
-  "id": 0,
-  "name": "Cyber-Heisenberg",
+  "id": 1,
+  "name": "Cyber-Jessie",
   "description": "A long description for the lore... #NotImplemented",
-  "ap": 2,
+  "ap": 3,
   "dp": 0,
-  "hp": 4,
+  "hp": 3,
   "cost": 5,
   "type": "Cyber",
   "rarity": "legendary",
   "card_type": "character",
   "ability": {
-    "text": "throws fake cristal meth at the enemy",
+    "text": "Injects himself cyber-meth increasing all stats by 2",
     "base_clases": [
       "Cyber"
     ]
