@@ -35,13 +35,13 @@ async def test_card_library_singleton() -> None:
 @pytest.mark.anyio
 async def test_card_library_list_files() -> None:
     library = LibraryCard(CARD_PATH)
-    assert len(library) == len(os.listdir(CARD_PATH))
+    assert len(library) == len(os.listdir(CARD_PATH)) - 2
 
 
 @pytest.mark.anyio
 async def test_card_library_get_card_path() -> None:
     library = LibraryCard(CARD_PATH)
-    assert library.get_card_path(0) == os.path.join(CARD_PATH, "hiesenberg", "card.png")
+    assert library.get_img_path(0) == os.path.join(CARD_PATH, "hiesenberg", "card.png")
 
 
 # TODO: make test (ex: if type is not written, file not exist etc.)

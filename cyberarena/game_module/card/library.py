@@ -140,7 +140,7 @@ class Library(object):
         """
         return self.__library.items()
 
-    def get_card_path(self, card_id: int) -> str:
+    def get_img_path(self, card_id: int) -> str:
         """
         Return the path of the card image.
 
