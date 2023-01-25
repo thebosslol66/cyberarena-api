@@ -6,8 +6,8 @@
   "dp": 12,
   "hp": 11,
   "cost": 10,
-  "type": "Cyber",
-  "ability": {
+  "race": "robot",
+  "abilities": {
     "text": "A description for the ability in the card #NotImplemented",
     "base_clases": [
       "Cyber"

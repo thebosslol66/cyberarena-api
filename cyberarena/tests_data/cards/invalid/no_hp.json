@@ -5,8 +5,8 @@
   "ap": 13,
   "dp": 12,
   "cost": 10,
-  "type": "Cyber",
-  "rarity": "Legendary",
+  "race": "robot",
+  "rarity": "legendary",
   "ability": {
     "text": "A description for the ability in the card #NotImplemented",
     "base_clases": [

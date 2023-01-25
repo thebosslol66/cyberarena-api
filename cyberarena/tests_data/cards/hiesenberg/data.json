@@ -2,17 +2,20 @@
   "id": 0,
   "name": "Cyber-Heisenberg",
   "description": "A long description for the lore... #NotImplemented",
-  "ap": 2,
-  "dp": 0,
-  "hp": 4,
-  "cost": 5,
-  "type": "Cyber",
+  "ap": 13,
+  "dp": 12,
+  "hp": 11,
+  "cost": 10,
+  "race": "robot",
   "rarity": "legendary",
   "card_type": "character",
-  "ability": {
-    "text": "throws fake cristal meth at the enemy",
-    "base_clases": [
-      "Cyber"
-    ]
+  "abilities": {
+    "text": "A description for the ability in the card #NotImplemented",
+    "base_clases": {
+      "DecoratorTemporaryTurnDefenseBoost": {
+        "defense_boost": 2,
+        "turns": 2
+      }
+    }
   }
 }
