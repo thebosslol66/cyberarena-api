@@ -136,4 +136,4 @@ async def get_card_image(card_id: int) -> FileResponse:
     :param card_id: The id of the card to get the image
     :return: The image of the card
     """
-    return FileResponse("./tests_data/imgs/test_avatar_good_512x512.png")
+    return FileResponse("cyberarena/tests_data/imgs/test_avatar_good_512x512.png")
