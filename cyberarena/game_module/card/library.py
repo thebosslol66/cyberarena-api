@@ -48,6 +48,7 @@ class Library(object):
         self,
         path_name: str = "",
         default_filename: str = "data.json",
+        default_image: str = "card.png",
     ) -> None:
         """Virtually private constructor.
 
@@ -61,8 +62,10 @@ class Library(object):
         if Library.__init_flag:
             return
         self.__library: typing.Dict[int, AbstractCard] = {}
+        self.__library_card_path: typing.Dict[int, str] = {}
         self.__library_path = path_name
         self.__default_filename = default_filename
+        self.__default_image = default_image
         if not os.path.isdir(self.__library_path):
             logger.error(
                 "The path to the library is not a directory: {0}",
@@ -136,7 +139,24 @@ class Library(object):
         """
         return self.__library.items()
 
-    def __get_cards_path(self) -> typing.Generator[str, None, None]:
+    def get_card_path(self, card_id: int) -> str:
+        """
+        Return the path of the card image.
+
+        :param card_id: The id of the card.
+        :return: The path of the card image.
+        """
+        if card_id not in self.__library_card_path:
+            logger.error(
+                "The card '{0}' is not in the library.",
+                card_id,
+            )
+            raise KeyError(
+                f"The card '{card_id}' is not in the library.",
+            )
+        return self.__library_card_path[card_id]
+
+    def __get_cards_path(self) -> typing.Generator[typing.Tuple[str, str], None, None]:
         """
         Get each cards in a specific directory.
 
@@ -152,11 +172,22 @@ class Library(object):
                     self.__default_filename,
                 ),
             )
-            if is_file:
+            is_image = os.path.isfile(
+                os.path.join(
+                    self.__library_path,
+                    card_dir,
+                    self.__default_image,
+                ),
+            )
+            if is_file and is_image:
                 yield os.path.join(
                     self.__library_path,
                     card_dir,
                     self.__default_filename,
+                ), os.path.join(
+                    self.__library_path,
+                    card_dir,
+                    self.__default_image,
                 )
             else:
                 logger.warning(
@@ -167,7 +198,8 @@ class Library(object):
 
     def __load_library(self) -> None:
         """Load all cards in the library."""
-        for card_data in self.__get_cards_path():
+        for (card_data, card_img) in self.__get_cards_path():
             (card_id, card) = factory_card.create_card_from_file(card_data)
             if card is not None:
                 self.__library[card_id] = card
+                self.__library_card_path[card_id] = card_img
