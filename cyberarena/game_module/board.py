@@ -1,9 +1,10 @@
+import logging
 from typing import List, Optional
-
-from loguru import logger
 
 from cyberarena.game_module.card import AbstractCard, PlayableCharacterCard
 from cyberarena.game_module.settings import settings
+
+logger = logging.getLogger("cyberarena.game_module")
 
 
 class Board:

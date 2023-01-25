@@ -1,11 +1,12 @@
 import json
+import logging
 from typing import Any, Dict, Optional, Tuple
-
-from loguru import logger
 
 from .base import AbstractCard
 from .constructor import ConstructorAbstract, playable_character_card
 from .enums import ObjectCardType
+
+logger = logging.getLogger("cyberarena.game_module.card_validator")
 
 
 class FactoryCard(object):

@@ -1,10 +1,11 @@
+import logging
 from typing import Optional
-
-from loguru import logger
 
 from cyberarena.game_module.card import AbstractCard
 from cyberarena.game_module.deck import Deck
 from cyberarena.game_module.hand import Hand
+
+logger = logging.getLogger("cyberarena.game_module")
 
 
 class Player:

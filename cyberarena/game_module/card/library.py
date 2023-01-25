@@ -1,11 +1,12 @@
+import logging
 import os
 import typing
-
-from loguru import logger
 
 from ..exceptions import LibraryFileNotFoundError
 from .base import AbstractCard
 from .factory import factory_card
+
+logger = logging.getLogger("cyberarena.game_module.card_validator")
 
 
 class Library(object):
@@ -69,8 +70,9 @@ class Library(object):
         self.__default_image = default_image
         if not os.path.isdir(self.__library_path):
             logger.error(
-                "The path to the library is not a directory: {0}",
-                self.__library_path,
+                "The path to the library is not a directory: {0}".format(
+                    self.__library_path,
+                ),
             )
             raise LibraryFileNotFoundError(
                 f"The library path is not valid: '{path_name}'",
@@ -150,8 +152,9 @@ class Library(object):
         """
         if card_id not in self.__library_card_path:
             logger.error(
-                "The card '{0}' is not in the library.",
-                card_id,
+                "The card '{0}' is not in the library.".format(
+                    card_id,
+                ),
             )
             raise KeyError(
                 f"The card '{card_id}' is not in the library.",
@@ -194,15 +197,23 @@ class Library(object):
             else:
                 if not is_file:
                     logger.warning(
-                        "The card '{0}' does not have a data file '{1}'.",
-                        card_dir,
-                        self.__default_filename,
+                        "The folder '{0}' does not have a data file '{1}'.".format(
+                            os.path.join(
+                                self.__library_path,
+                                card_dir,
+                            ),
+                            self.__default_filename,
+                        ),
                     )
                 if not is_image:
                     logger.warning(
-                        "The card '{0}' does not have an image file '{1}'.",
-                        card_dir,
-                        self.__default_image,
+                        "The folder '{0}' does not have an image file '{1}'.".format(
+                            os.path.join(
+                                self.__library_path,
+                                card_dir,
+                            ),
+                            self.__default_image,
+                        ),
                     )
 
     def __load_library(self) -> None:

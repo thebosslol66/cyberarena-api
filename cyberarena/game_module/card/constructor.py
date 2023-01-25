@@ -1,11 +1,12 @@
 import abc
+import logging
 from typing import Any, Dict, List, Optional, Tuple
-
-from loguru import logger
 
 from .base import AbstractCard
 from .enums import ObjectCardRace, ObjectCardRarity
 from .playable_character import PlayableCharacterCard
+
+logger = logging.getLogger("cyberarena.game_module.card_validator")
 
 
 class ConstructorAbstract(metaclass=abc.ABCMeta):

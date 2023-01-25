@@ -49,6 +49,5 @@ class Deck(object):
     def __init_deck(self) -> None:
         """Initialize the deck."""
         for _ in range(0, self.__deckSize):
-
             self.__deck.append(PlayableCharacterCard("Cyber-Heisenberg", 1, 1, 1))
         random.shuffle(self.__deck)
