@@ -190,8 +190,10 @@ class ConstructorPlayableCharacterCard(ConstructorAbstract):
         :param json_data: The content of a json file card.
         :return: True if the card is correctly generated.
         """
+        if not super().construct(json_data):
+            return False
         no_valid_race_or_rarity = not self._verify_race() or not self._verify_rarity()
-        if not super().construct(json_data) or no_valid_race_or_rarity:
+        if no_valid_race_or_rarity:
             return False
         name = self.json_data["name"]
         cost = self.json_data["cost"]
