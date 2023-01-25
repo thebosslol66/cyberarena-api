@@ -192,11 +192,18 @@ class Library(object):
                     self.__default_image,
                 )
             else:
-                logger.warning(
-                    "The card '{0}' does not have a data file '{1}'.",
-                    card_dir,
-                    self.__default_filename,
-                )
+                if not is_file:
+                    logger.warning(
+                        "The card '{0}' does not have a data file '{1}'.",
+                        card_dir,
+                        self.__default_filename,
+                    )
+                if not is_image:
+                    logger.warning(
+                        "The card '{0}' does not have an image file '{1}'.",
+                        card_dir,
+                        self.__default_image,
+                    )
 
     def __load_library(self) -> None:
         """Load all cards in the library."""
