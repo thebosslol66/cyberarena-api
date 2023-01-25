@@ -1,0 +1,21 @@
+{
+  "id": 0,
+  "name": "Cyber-Heisenberg",
+  "description": "A long description for the lore... #NotImplemented",
+  "ap": 13,
+  "dp": 12,
+  "hp": 11,
+  "cost": 10,
+  "race": "robot",
+  "rarity": "legendary",
+  "card_type": "character",
+  "abilities": {
+    "text": "A description for the ability in the card #NotImplemented",
+    "base_clases": {
+      "DecoratorTemporaryTurnDefenseBoost": {
+        "defense_boost": 2,
+        "turns": 2
+      }
+    }
+  }
+}

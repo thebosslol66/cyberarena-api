@@ -38,5 +38,11 @@ async def test_card_library_list_files() -> None:
     assert len(library) == len(os.listdir(CARD_PATH))
 
 
+@pytest.mark.anyio
+async def test_card_library_get_card_path() -> None:
+    library = LibraryCard(CARD_PATH)
+    assert library.get_card_path(0) == os.path.join(CARD_PATH, "hiesenberg", "card.png")
+
+
 # TODO: make test (ex: if type is not written, file not exist etc.)
 # TDOD: test if 2 cards have the same id

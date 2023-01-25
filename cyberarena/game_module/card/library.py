@@ -56,6 +56,7 @@ class Library(object):
 
         :param path_name: The path to the library.
         :param default_filename: The default filename of the card.
+        :param default_image: The default image of the card.
         :raises LibraryFileNotFoundError:
             If the library path not Exist.
         """
@@ -144,6 +145,7 @@ class Library(object):
         Return the path of the card image.
 
         :param card_id: The id of the card.
+        :raises KeyError: If the card is not in the library.
         :return: The path of the card image.
         """
         if card_id not in self.__library_card_path:
