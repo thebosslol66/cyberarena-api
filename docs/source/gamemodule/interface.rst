@@ -25,37 +25,20 @@ Design Patterns to be used
 
 Methods to Implement
 =====================
-- createGame(gameDAO):
+- __init__(gameDAO):
 
-  - Creates a new game and registers it in the database.
-  - Returns the game's ID.
+  - creates a list of Games
+  - creates a list of Players
 
-- addPlayer(gameId, gameDAO, playerId):
+- create_game(p1id, p2id, deck1, deck2):
+  creates a game with the given players's id and decks
+  returns the game
 
-  - Adds a player to the game.
-  - Returns true if the player was added, false otherwise.
-  - Logs any errors to the console.
+- __contains(idgame, idplayer):
+  returns True if the player is in the game
 
-- removePlayer(gameId, gameDAO, playerId):
+- get_game(idgame):
+  returns the game
 
-  - Removes a player from the game.
-  - Returns true if the player was removed, false otherwise.
-  - Logs any errors to the console.
-
-- startGame(gameId, gameDAO):
-
-  - Starts the game.
-  - Returns true if the game was started, false otherwise.
-  - Logs any errors to the console.
-
-- isGameStarted(gameId, gameDAO):
-
-  - Returns true if the game has started, false otherwise.
-
-- isGameFinished(gameId, gameDAO):
-
-  - Returns true if the game has finished, false otherwise.
-
-- getCurrentPlayer(gameId, gameDAO):
-
-  - Returns the ID of the current player for the specified game.
+- end_game(idgame):
+  ends the game
