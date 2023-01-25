@@ -22,7 +22,8 @@ class Player:
         self.__deck = Deck()
         self.__hand = Hand(self.__deck)
         self.life = 20
-        self.mana = 0
+        self.mana = 1
+        self.mana_max_turn = 1
         self.mana_max = 10
         self.idcardcurr = 0
 
@@ -123,3 +124,11 @@ class Player:
         """
         self.__deck = deck
         self.__hand = Hand(self.__deck)
+
+    def next_turn(self) -> None:
+        """Next turn."""
+        if self.mana_max_turn == self.mana_max:
+            self.mana = self.mana_max_turn
+            return
+        self.mana_max_turn += 1
+        self.mana = self.mana_max_turn
