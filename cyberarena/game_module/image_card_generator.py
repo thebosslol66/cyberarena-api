@@ -129,24 +129,13 @@ class ImageCardGeneratorResources(object):
     )
 
     DESCRIPTION_WIDTH = MAIN_IMAGE_WIDTH
-    DESCRIPTION_HEIGHT = 200
+    DESCRIPTION_HEIGHT = 230
     DESCRIPTION_BACKGROUND = Image.new(
         "RGBA",
         (DESCRIPTION_WIDTH, DESCRIPTION_HEIGHT),
         (255, 255, 255, 0),
     )
     DESCRIPTION_PADDING = 25
-
-    RARITY_POSITION = (
-        int((WIDTH - MAIN_IMAGE_WIDTH) / 2),
-        MAIN_IMAGE_POSITION_Y
-        + MAIN_IMAGE_HEIGHT
-        + 50
-        + STATS_HEIGHT
-        + 50
-        + DESCRIPTION_HEIGHT
-        + 50,
-    )
 
     RARITY_SYMBOL_SIZE = 50
     RARITY_SYMBOL_BORDER_WIDTH = 2
