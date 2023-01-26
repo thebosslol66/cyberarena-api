@@ -1,18 +1,22 @@
 # pragma: no cover
 # flake8: noqa
 import logging
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 from cyberarena.game_module.card.card_info import InfoCard
-from cyberarena.game_module.card.enums import ObjectCardRace, ObjectCardType
+from cyberarena.game_module.card.enums import (
+    ObjectCardRace,
+    ObjectCardRarity,
+    ObjectCardType,
+)
 
 logger = logging.getLogger("cyberarena.game_module.image_generator")
 
 
 def get_text_list_fit_width(
-    text: str,
+    text: Union[str, List[str]],
     width: int,
     font: ImageFont.ImageFont,
 ) -> List[str]:
@@ -27,6 +31,14 @@ def get_text_list_fit_width(
     :return: A list of text that fit the width.
     """
     text_list = []
+    if isinstance(text, list):
+        for i, line in enumerate(text):
+            text_list.extend(get_text_list_fit_width(line, width, font))
+        return text_list
+    text = text.split("\n")
+    if len(text) > 1:
+        return get_text_list_fit_width(text, width, font)
+    text = text[0]
     text_list.append("")
     for word in text.split(" "):
         if font.getsize(text_list[-1] + " " + word)[0] <= width:
@@ -136,6 +148,42 @@ class ImageCardGeneratorResources(object):
         + 50,
     )
 
+    RARITY_SYMBOL_SIZE = 50
+    RARITY_SYMBOL_BORDER_WIDTH = 2
+    RARITY_SYMBOL_BORDER_COLOR = (0, 0, 0)
+    RARITY_SYMBOL_POSITION = (
+        WIDTH - int((WIDTH - MAIN_IMAGE_WIDTH) / 2) - RARITY_SYMBOL_SIZE,
+        HEIGHT - RARITY_SYMBOL_SIZE - 20,
+    )
+
+    RARITY_SYMBOL_GOLD_HEXAGON = Image.new(
+        "RGBA",
+        (RARITY_SYMBOL_SIZE, RARITY_SYMBOL_SIZE),
+        (255, 255, 255, 0),
+    )
+    RARITY_SYMBOL_VIOLET_SQUARE = Image.new(
+        "RGBA",
+        (RARITY_SYMBOL_SIZE, RARITY_SYMBOL_SIZE),
+        (255, 255, 255, 0),
+    )
+    RARITY_SYMBOL_GREEN_TRIANGLE = Image.new(
+        "RGBA",
+        (RARITY_SYMBOL_SIZE, RARITY_SYMBOL_SIZE),
+        (255, 255, 255, 0),
+    )
+    RARITY_SYMBOL_GREY_CIRCLE = Image.new(
+        "RGBA",
+        (RARITY_SYMBOL_SIZE, RARITY_SYMBOL_SIZE),
+        (255, 255, 255, 0),
+    )
+
+    SYMBOL_BY_RARITY = {
+        ObjectCardRarity.COMMON: RARITY_SYMBOL_GREY_CIRCLE,
+        ObjectCardRarity.RARE: RARITY_SYMBOL_GREEN_TRIANGLE,
+        ObjectCardRarity.EPIC: RARITY_SYMBOL_VIOLET_SQUARE,
+        ObjectCardRarity.LEGENDARY: RARITY_SYMBOL_GOLD_HEXAGON,
+    }
+
     def __init__(self) -> None:
         """Init the ImageCardGeneratorResources class."""
         image_base_rounded_corners_draw = ImageDraw.Draw(
@@ -180,6 +228,92 @@ class ImageCardGeneratorResources(object):
         )
 
         self.STATS_BACKGROUND = ImageCardGeneratorResources.generate_stats_background()
+
+        # Draw the rarity symbols
+        draw = ImageDraw.Draw(self.RARITY_SYMBOL_GOLD_HEXAGON)
+        draw.polygon(
+            (
+                (self.RARITY_SYMBOL_SIZE / 2, 0),
+                (self.RARITY_SYMBOL_SIZE, self.RARITY_SYMBOL_SIZE / 4),
+                (self.RARITY_SYMBOL_SIZE, self.RARITY_SYMBOL_SIZE * 3 / 4),
+                (self.RARITY_SYMBOL_SIZE / 2, self.RARITY_SYMBOL_SIZE),
+                (0, self.RARITY_SYMBOL_SIZE * 3 / 4),
+                (0, self.RARITY_SYMBOL_SIZE / 4),
+            ),
+            fill=(255, 215, 0, 255),
+        )
+        draw.polygon(
+            (
+                (self.RARITY_SYMBOL_SIZE / 2, 0),
+                (self.RARITY_SYMBOL_SIZE, self.RARITY_SYMBOL_SIZE / 4),
+                (self.RARITY_SYMBOL_SIZE, self.RARITY_SYMBOL_SIZE * 3 / 4),
+                (self.RARITY_SYMBOL_SIZE / 2, self.RARITY_SYMBOL_SIZE),
+                (0, self.RARITY_SYMBOL_SIZE * 3 / 4),
+                (0, self.RARITY_SYMBOL_SIZE / 4),
+            ),
+            outline=self.RARITY_SYMBOL_BORDER_COLOR,
+            width=self.RARITY_SYMBOL_BORDER_WIDTH,
+        )
+
+        draw = ImageDraw.Draw(self.RARITY_SYMBOL_VIOLET_SQUARE)
+        draw.rectangle(
+            (0, 0, self.RARITY_SYMBOL_SIZE, self.RARITY_SYMBOL_SIZE),
+            fill=(138, 43, 226, 255),
+        )
+        draw.rectangle(
+            (
+                self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+                self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+                self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+                self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+            ),
+            outline=self.RARITY_SYMBOL_BORDER_COLOR,
+            width=self.RARITY_SYMBOL_BORDER_WIDTH,
+        )
+
+        draw = ImageDraw.Draw(self.RARITY_SYMBOL_GREEN_TRIANGLE)
+        draw.polygon(
+            [
+                (0, self.RARITY_SYMBOL_SIZE),
+                (self.RARITY_SYMBOL_SIZE, self.RARITY_SYMBOL_SIZE),
+                (self.RARITY_SYMBOL_SIZE, 0),
+            ],
+            fill=(0, 128, 0, 255),
+        )
+        draw.polygon(
+            [
+                (
+                    self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+                    self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+                ),
+                (
+                    self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+                    self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+                ),
+                (
+                    self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+                    self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+                ),
+            ],
+            outline=self.RARITY_SYMBOL_BORDER_COLOR,
+            width=self.RARITY_SYMBOL_BORDER_WIDTH,
+        )
+
+        draw = ImageDraw.Draw(self.RARITY_SYMBOL_GREY_CIRCLE)
+        draw.ellipse(
+            (0, 0, self.RARITY_SYMBOL_SIZE, self.RARITY_SYMBOL_SIZE),
+            fill=(128, 128, 128, 255),
+        )
+        draw.ellipse(
+            (
+                self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+                self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+                self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+                self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+            ),
+            outline=self.RARITY_SYMBOL_BORDER_COLOR,
+            width=self.RARITY_SYMBOL_BORDER_WIDTH,
+        )
 
     @classmethod
     def generate_stats_background(cls) -> Image.Image:
@@ -321,8 +455,10 @@ class ImageCardGenerator(object):
         """
         self._place_main_image()
         self._place_card_name()
-        self._place_stats()
+        if self._card.type == ObjectCardType.CHARACTER:
+            self._place_stats()
         self._place_card_description()
+        self._place_card_rarity()
         return self._image
 
     def _generate_base_image(self) -> Tuple[Image.Image, ImageDraw.ImageDraw]:
@@ -551,4 +687,19 @@ class ImageCardGenerator(object):
             image,
             self.resources.DESCRIPTION_POSITION,
             image,
+        )
+
+    def _place_card_rarity(self) -> None:
+        """
+        Place the rarity of the card on the image.
+
+        Add a specific symbol and color on the card depending on the rarity.
+        It must be aestic and not too much intrusive.
+        It can be place in the bottom right corner of the card or top right.
+        """
+        rarity_symbol = self.resources.SYMBOL_BY_RARITY[self._card.rarity]
+        self._image.paste(
+            rarity_symbol,
+            self.resources.RARITY_SYMBOL_POSITION,
+            rarity_symbol,
         )
