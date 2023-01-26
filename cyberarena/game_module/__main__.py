@@ -54,7 +54,7 @@ def create_image(folder: str) -> None:
     logger_generator.disabled = False
 
     logger_validator.disabled = True
-    lib = Library(folder, is_image_info=True)
+    lib = Library(folder)
 
     logger_generator.warning(
         "WARNING: Don't forget to verify data"

@@ -3,8 +3,7 @@ import logging
 from typing import Any, Dict, List, Optional, Tuple
 
 from .base import AbstractCard
-from .card_info import InfoCard
-from .enums import ObjectCardRace, ObjectCardRarity, ObjectCardType
+from .enums import ObjectCardRace, ObjectCardRarity
 from .playable_character import PlayableCharacterCard
 
 logger = logging.getLogger("cyberarena.game_module.card_validator")
@@ -209,64 +208,20 @@ class ConstructorPlayableCharacterCard(ConstructorAbstract):
         hp = self.json_data["hp"]
         ap = self.json_data["ap"]
         dp = self.json_data["dp"]
-        self._card = PlayableCharacterCard(name, cost, hp, ap, dp)
-        return True
-
-    def _verify_race(self) -> bool:
-        try:
-            ObjectCardRace(self.json_data["race"])
-            return True
-        except ValueError:
-            self._error_message(f'race is not valid \'{self.json_data["race"]}\'')
-        return False
-
-
-class ConstructorInfoCard(ConstructorAbstract):
-    """CardConstructor class."""
-
-    OPTIONAL_ATTRIBUTES = [
-        "hp",
-        "ap",
-        "dp",
-        "cost",
-        "race",
-    ] + ConstructorAbstract.OPTIONAL_ATTRIBUTES
-
-    def construct(self, json_data: Dict[str, Any]) -> bool:  # noqa: WPS210
-        """
-        Generate a card from a json file.
-
-        Generate all info for cards
-
-        :param json_data: The content of a json file card.
-        :return: True if the card is correctly generated.
-        """
-        if not super().construct(json_data) and not self._verify_type():
-            return False
-        name = self.json_data["name"]
         description = self.json_data["description"]
-        logger.fatal(self.json_data)
-        card_type = ObjectCardType(self.json_data["card_type"])
-        card_rarity = ObjectCardRarity(self.json_data["rarity"])
-        cost = self.json_data["cost"]
-        self._card = InfoCard(name, description, cost, card_type, card_rarity)
-        if card_type == ObjectCardType.CHARACTER:
-            if not self._verify_race():
-                self._card = None
-                return False
-            self._card.ap = self.json_data["ap"]
-            self._card.dp = self.json_data["dp"]
-            self._card.hp = self.json_data["hp"]
-            self._card.race = ObjectCardRace(self.json_data["race"])
+        rarity = ObjectCardRarity(self.json_data["rarity"])
+        race = ObjectCardRace(self.json_data["race"])
+        self._card = PlayableCharacterCard(
+            name=name,
+            cost=cost,
+            hp=hp,
+            ap=ap,
+            dp=dp,
+            description=description,
+            rarity=rarity,
+            race=race,
+        )
         return True
-
-    def _verify_type(self) -> bool:
-        try:
-            ObjectCardType(self.json_data["card_type"])
-            return True
-        except ValueError:
-            self._error_message(f'type is not valid \'{self.json_data["type"]}\'')
-        return False
 
     def _verify_race(self) -> bool:
         try:
@@ -278,4 +233,3 @@ class ConstructorInfoCard(ConstructorAbstract):
 
 
 playable_character_card = ConstructorPlayableCharacterCard()
-info_card_constructor = ConstructorInfoCard()

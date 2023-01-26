@@ -5,12 +5,8 @@ from typing import List, Tuple, Union
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-from cyberarena.game_module.card.card_info import InfoCard
-from cyberarena.game_module.card.enums import (
-    ObjectCardRace,
-    ObjectCardRarity,
-    ObjectCardType,
-)
+from cyberarena.game_module.card.base import AbstractCard, AbstractCharacterCard
+from cyberarena.game_module.card.enums import ObjectCardRace, ObjectCardRarity
 
 logger = logging.getLogger("cyberarena.game_module.image_generator")
 
@@ -423,7 +419,7 @@ class ImageCardGeneratorResources(object):
 class ImageCardGenerator(object):
     resources = ImageCardGeneratorResources()
 
-    def __init__(self, card: InfoCard, image_path: str) -> None:
+    def __init__(self, card: AbstractCard, image_path: str) -> None:
         """
         Constructor.
 
@@ -431,7 +427,7 @@ class ImageCardGenerator(object):
         :param image_path: The path to the image of the card.
         """
 
-        self._card: InfoCard = card
+        self._card: AbstractCard = card
         self._card_img: Image = Image.open(image_path)
 
         (self._image, self._image_draw) = self._generate_base_image()
@@ -444,7 +440,7 @@ class ImageCardGenerator(object):
         """
         self._place_main_image()
         self._place_card_name()
-        if self._card.type == ObjectCardType.CHARACTER:
+        if isinstance(self._card, AbstractCharacterCard):
             self._place_stats()
         self._place_card_description()
         self._place_card_rarity()
@@ -476,7 +472,7 @@ class ImageCardGenerator(object):
         It generate a linear gradient with 2 colors depending on the type of the card.
         :return: The background image with the gradient.
         """
-        if self._card.type == ObjectCardType.CHARACTER:
+        if isinstance(self._card, AbstractCharacterCard):
             return self._generate_random_gradient_two_color(
                 *self.resources.COLORS_BY_RACE[self._card.race]  # type: ignore
             )
