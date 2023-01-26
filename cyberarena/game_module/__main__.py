@@ -62,7 +62,14 @@ def create_image(folder: str) -> None:
         "\nUse 'python -m game_module verify'.",
     )
 
+    image_nb = 0
     for index in lib.keys():
+        image_nb += 1
+        logger_generator.info(
+            "Generate image for card {0}, {1}/{2}".format(
+                lib[index].name, image_nb, len(lib)
+            )
+        )
         generator = ImageCardGenerator(
             lib[index],  # type: ignore
             lib.get_img_path(index),

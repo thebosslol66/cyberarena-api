@@ -1,7 +1,7 @@
 # pragma: no cover
 # flake8: noqa
 import logging
-from typing import Tuple
+from typing import Tuple, List
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
@@ -14,6 +14,26 @@ ROBOT_COLORS = ((54, 137, 158), (47, 44, 41))  # Blue and grey
 ALIEN_COLORS = ((29, 229, 2), (35, 207, 203))  # Green and cyan
 MUTANT_COLORS = ((67, 22, 246), (146, 93, 215))  # Purple and violet
 
+
+def get_text_list_fit_width(text: str, width: int, font: ImageFont.ImageFont) -> List[str]:
+    """
+    Get a list of text that fit the width.
+
+    Each element of the list is a line of text that fit the width.
+
+    :param text: The text to split.
+    :param font: The font used to draw the text.
+    :param width: The width of the text.
+    :return: A list of text that fit the width.
+    """
+    text_list = []
+    text_list.append("")
+    for word in text.split(" "):
+        if font.getsize(text_list[-1] + " " + word)[0] <= width:
+            text_list[-1] += " " + word
+        else:
+            text_list.append(word)
+    return text_list
 
 class ImageCardGeneratorResources(object):
     """
@@ -90,6 +110,7 @@ class ImageCardGeneratorResources(object):
         (DESCRIPTION_WIDTH, DESCRIPTION_HEIGHT),
         (255, 255, 255, 0),
     )
+    DESCRIPTION_PADDING = 25
 
     RARITY_POSITION = (
         int((WIDTH - MAIN_IMAGE_WIDTH) / 2),
@@ -142,7 +163,7 @@ class ImageCardGeneratorResources(object):
         background_description_encart_draw.rounded_rectangle(
             (0, 0, self.DESCRIPTION_WIDTH, self.DESCRIPTION_HEIGHT),
             self.MAIN_IMAGE_RADIUS_CORNER,
-            fill=(0, 0, 0, 5),
+            fill=(0, 0, 0, 50),
         )
 
         self.STATS_BACKGROUND = ImageCardGeneratorResources.generate_stats_background()
@@ -261,6 +282,7 @@ class ImageCardGeneratorResources(object):
         )
 
         return stats_image
+
 
 
 class ImageCardGenerator(object):
@@ -486,17 +508,27 @@ class ImageCardGenerator(object):
 
         It add a shadow behind the description and paste it to the actual image.
         """
-        draw = ImageDraw.Draw(self._image)
+        image = self.resources.DESCRIPTION_BACKGROUND.copy()
+        draw = ImageDraw.Draw(image)
         # Draw the description
         font = self.resources.MEDIUM_TEXT_FONT
-        logger.debug("Description: %s", self._card.description)
-        logger.debug("Description font: %s", font)
-        w, h = draw.textsize(self._card.description, font=font)
-        draw.text(
-            self.resources.DESCRIPTION_POSITION,
+        text_list = get_text_list_fit_width(
             self._card.description,
-            font=font,
-            fill=self.resources.TEXT_COLOR,
-            stroke_width=2,
-            stroke_fill=self.resources.TEXT_STROKE_COLOR,
+            self.resources.DESCRIPTION_WIDTH-2*self.resources.DESCRIPTION_PADDING,
+            font,
         )
+        for i, text in enumerate(text_list):
+            draw.text(
+                (self.resources.DESCRIPTION_PADDING, self.resources.DESCRIPTION_PADDING+i * self.resources.TEXT_NORMAL_SIZE),
+                text,
+                font=font,
+                fill=self.resources.TEXT_COLOR,
+                stroke_width=1,
+                stroke_fill=self.resources.TEXT_STROKE_COLOR,
+            )
+        self._image.paste(
+            image,
+            self.resources.DESCRIPTION_POSITION,
+            image,
+        )
+
