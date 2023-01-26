@@ -1,21 +1,21 @@
 # pragma: no cover
 # flake8: noqa
 import logging
-from typing import Tuple, List
+from typing import List, Tuple
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 from cyberarena.game_module.card.card_info import InfoCard
+from cyberarena.game_module.card.enums import ObjectCardRace, ObjectCardType
 
 logger = logging.getLogger("cyberarena.game_module.image_generator")
 
-HUMAN_COLORS = ((218, 171, 102), (250, 119, 254))  # Beige and pink
-ROBOT_COLORS = ((54, 137, 158), (47, 44, 41))  # Blue and grey
-ALIEN_COLORS = ((29, 229, 2), (35, 207, 203))  # Green and cyan
-MUTANT_COLORS = ((67, 22, 246), (146, 93, 215))  # Purple and violet
 
-
-def get_text_list_fit_width(text: str, width: int, font: ImageFont.ImageFont) -> List[str]:
+def get_text_list_fit_width(
+    text: str,
+    width: int,
+    font: ImageFont.ImageFont,
+) -> List[str]:
     """
     Get a list of text that fit the width.
 
@@ -35,12 +35,25 @@ def get_text_list_fit_width(text: str, width: int, font: ImageFont.ImageFont) ->
             text_list.append(word)
     return text_list
 
+
 class ImageCardGeneratorResources(object):
     """
     ImageCardGeneratorResources class.
 
     It contains all ressources used by all images to save memory.
     """
+
+    HUMAN_COLORS = ((218, 171, 102), (250, 119, 254))  # Beige and pink
+    ROBOT_COLORS = ((54, 137, 158), (47, 44, 41))  # Blue and grey
+    ALIEN_COLORS = ((29, 229, 2), (35, 207, 203))  # Green and cyan
+    MUTANT_COLORS = ((67, 22, 246), (146, 93, 215))  # Purple and violet
+
+    COLORS_BY_RACE = {
+        ObjectCardRace.HUMAN: HUMAN_COLORS,
+        ObjectCardRace.ROBOT: ROBOT_COLORS,
+        ObjectCardRace.ALIEN: ALIEN_COLORS,
+        ObjectCardRace.MUTANT: MUTANT_COLORS,
+    }
 
     WIDTH = 734
     HEIGHT = 1024
@@ -284,7 +297,6 @@ class ImageCardGeneratorResources(object):
         return stats_image
 
 
-
 class ImageCardGenerator(object):
     resources = ImageCardGeneratorResources()
 
@@ -339,7 +351,12 @@ class ImageCardGenerator(object):
         It generate a linear gradient with 2 colors depending on the type of the card.
         :return: The background image with the gradient.
         """
-        return self._generate_random_gradient_two_color(*HUMAN_COLORS)
+        if self._card.type == ObjectCardType.CHARACTER:
+            return self._generate_random_gradient_two_color(
+                *self.resources.COLORS_BY_RACE[self._card.race]  # type: ignore
+            )
+
+        return self._generate_random_gradient_two_color(*self.resources.HUMAN_COLORS)
 
     def _generate_random_gradient_two_color(
         self,
@@ -514,12 +531,16 @@ class ImageCardGenerator(object):
         font = self.resources.MEDIUM_TEXT_FONT
         text_list = get_text_list_fit_width(
             self._card.description,
-            self.resources.DESCRIPTION_WIDTH-2*self.resources.DESCRIPTION_PADDING,
+            self.resources.DESCRIPTION_WIDTH - 2 * self.resources.DESCRIPTION_PADDING,
             font,
         )
         for i, text in enumerate(text_list):
             draw.text(
-                (self.resources.DESCRIPTION_PADDING, self.resources.DESCRIPTION_PADDING+i * self.resources.TEXT_NORMAL_SIZE),
+                (
+                    self.resources.DESCRIPTION_PADDING,
+                    self.resources.DESCRIPTION_PADDING
+                    + i * self.resources.TEXT_NORMAL_SIZE,
+                ),
                 text,
                 font=font,
                 fill=self.resources.TEXT_COLOR,
@@ -531,4 +552,3 @@ class ImageCardGenerator(object):
             self.resources.DESCRIPTION_POSITION,
             image,
         )
-

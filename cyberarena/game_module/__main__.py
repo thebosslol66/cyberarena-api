@@ -67,8 +67,10 @@ def create_image(folder: str) -> None:
         image_nb += 1
         logger_generator.info(
             "Generate image for card {0}, {1}/{2}".format(
-                lib[index].name, image_nb, len(lib)
-            )
+                lib[index].name,
+                image_nb,
+                len(lib),
+            ),
         )
         generator = ImageCardGenerator(
             lib[index],  # type: ignore

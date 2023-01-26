@@ -1,7 +1,7 @@
 from typing import Optional
 
 from .base import AbstractCard
-from .enums import ObjectCardRarity, ObjectCardType
+from .enums import ObjectCardRace, ObjectCardRarity, ObjectCardType
 
 
 class InfoCard(AbstractCard):
@@ -26,6 +26,7 @@ class InfoCard(AbstractCard):
 
         """
         super().__init__(name, description, cost)
+        self._race: Optional[ObjectCardRace] = None
         self._hp: Optional[int] = None
         self._dp: Optional[int] = None
         self._ap: Optional[int] = None
@@ -152,7 +153,7 @@ class InfoCard(AbstractCard):
         return self._name
 
     @property
-    def type(self) -> str:
+    def type(self) -> ObjectCardType:
         """
         Return the type of the card.
 
@@ -161,10 +162,28 @@ class InfoCard(AbstractCard):
         return self._card_type
 
     @property
-    def rarity(self) -> str:
+    def rarity(self) -> ObjectCardRarity:
         """
         Return the rarity of the card.
 
         :return: The rarity of the card.
         """
         return self._card_rarity
+
+    @property
+    def race(self) -> Optional[ObjectCardRace]:
+        """
+        Return the race of the card.
+
+        :return: The race of the card if it is a creature card.
+        """
+        return self._race
+
+    @race.setter
+    def race(self, race: ObjectCardRace) -> None:
+        """
+        Set the race of the card.
+
+        :param race: The new race of the card
+        """
+        self._race = race

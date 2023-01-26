@@ -257,6 +257,7 @@ class ConstructorInfoCard(ConstructorAbstract):
             self._card.ap = self.json_data["ap"]
             self._card.dp = self.json_data["dp"]
             self._card.hp = self.json_data["hp"]
+            self._card.race = ObjectCardRace(self.json_data["race"])
         return True
 
     def _verify_type(self) -> bool:
