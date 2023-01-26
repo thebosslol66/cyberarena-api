@@ -27,7 +27,7 @@ class FactoryCard(object):
         :return: The index of the card and the card constructed from the json file.
         """
         self.json_data = None
-        if not self._load_json(filename) or self.json_data is None:
+        if not self.load_json(filename) or self.json_data is None:
             return -1, None  # pragma: no cover
         constructor: Optional[ConstructorAbstract] = self._return_constructor()
         self.json_data.pop("card_type", None)
@@ -37,7 +37,7 @@ class FactoryCard(object):
             return -1, None  # pragma: no cover
         return constructor.get_card()
 
-    def _load_json(self, filename: str) -> bool:
+    def load_json(self, filename: str) -> bool:
         """
         Load a json file.
 

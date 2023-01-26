@@ -4,6 +4,7 @@ import typing
 
 from ..exceptions import LibraryFileNotFoundError
 from .base import AbstractCard
+from .constructor import info_card_constructor
 from .factory import factory_card
 
 logger = logging.getLogger("cyberarena.game_module.card_validator")
@@ -50,6 +51,7 @@ class Library(object):
         path_name: str = "",
         default_filename: str = "data.json",
         default_image: str = "card.png",
+        is_image_info: bool = False,
     ) -> None:
         """Virtually private constructor.
 
@@ -58,6 +60,7 @@ class Library(object):
         :param path_name: The path to the library.
         :param default_filename: The default filename of the card.
         :param default_image: The default image of the card.
+        :param is_image_info: If True, construrct card only for create image info.
         :raises LibraryFileNotFoundError:
             If the library path not Exist.
         """
@@ -68,6 +71,7 @@ class Library(object):
         self.__library_path = path_name
         self.__default_filename = default_filename
         self.__default_image = default_image
+        self.__is_image_info = is_image_info
         if not os.path.isdir(self.__library_path):
             logger.error(
                 "The path to the library is not a directory: {0}".format(
@@ -219,7 +223,29 @@ class Library(object):
     def __load_library(self) -> None:
         """Load all cards in the library."""
         for (card_data, card_img) in self.__get_cards_path():
-            (card_id, card) = factory_card.create_card_from_file(card_data)
+            (card_id, card) = self.__get_card_from_path(card_data, card_img)
             if card is not None:
                 self.__library[card_id] = card
                 self.__library_card_path[card_id] = card_img
+
+    def __get_card_from_path(
+        self,
+        card_data: str,
+        card_img: str,
+    ) -> typing.Tuple[int, typing.Optional[AbstractCard]]:
+        """
+        Get a card with his ID from a data file path and image path.
+
+        :param card_data: The path of the card data file.
+        :param card_img: The path of the card image file.
+
+        :return: The card ID and the card in a tuple.
+        """
+        (card_id, card) = (-1, None)
+        if self.__is_image_info:
+            if factory_card.load_json(card_data) and factory_card.json_data:
+                if info_card_constructor.construct(factory_card.json_data):
+                    (card_id, card) = info_card_constructor.get_card()
+        else:
+            (card_id, card) = factory_card.create_card_from_file(card_data)
+        return card_id, card

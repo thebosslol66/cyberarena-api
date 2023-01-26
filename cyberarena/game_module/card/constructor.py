@@ -3,7 +3,8 @@ import logging
 from typing import Any, Dict, List, Optional, Tuple
 
 from .base import AbstractCard
-from .enums import ObjectCardRace, ObjectCardRarity
+from .card_info import InfoCard
+from .enums import ObjectCardRace, ObjectCardRarity, ObjectCardType
 from .playable_character import PlayableCharacterCard
 
 logger = logging.getLogger("cyberarena.game_module.card_validator")
@@ -17,7 +18,7 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
     It is use for construct card on plate and character.
     """
 
-    OBLIGATORY_ATTRIBUTES: List[str] = ["name"]
+    OBLIGATORY_ATTRIBUTES: List[str] = ["name", "rarity"]
     NUMERICAL_ATTRIBUTES: List[str] = ["id"]
     OPTIONAL_ATTRIBUTES: List[str] = ["description", "abilities"]
 
@@ -39,7 +40,7 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
         self._reset()
         self.json_data = json_data
         self._card_index = self.json_data.get("id", -1)
-        return self.check_json()
+        return self.check_json() and self._verify_rarity()
 
     def check_json(self) -> bool:
         """
@@ -162,6 +163,14 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
                     f" The attribute '{attribute}' is not recognized.",
                 )
 
+    def _verify_rarity(self) -> bool:
+        try:
+            ObjectCardRarity(self.json_data["rarity"])
+            return True
+        except ValueError:
+            self._error_message(f'rarity is not valid \'{self.json_data["rarity"]}\'')
+        return False
+
 
 class ConstructorPlayableCharacterCard(ConstructorAbstract):
     """CardConstructor class.
@@ -178,7 +187,6 @@ class ConstructorPlayableCharacterCard(ConstructorAbstract):
     ] + ConstructorAbstract.NUMERICAL_ATTRIBUTES
     OBLIGATORY_ATTRIBUTES = [
         "race",
-        "rarity",
     ] + ConstructorAbstract.OBLIGATORY_ATTRIBUTES
 
     def construct(self, json_data: Dict[str, Any]) -> bool:  # noqa: WPS210
@@ -212,13 +220,61 @@ class ConstructorPlayableCharacterCard(ConstructorAbstract):
             self._error_message(f'race is not valid \'{self.json_data["race"]}\'')
         return False
 
-    def _verify_rarity(self) -> bool:
+
+class ConstructorInfoCard(ConstructorAbstract):
+    """CardConstructor class."""
+
+    OPTIONAL_ATTRIBUTES = [
+        "hp",
+        "ap",
+        "dp",
+        "cost",
+        "race",
+    ] + ConstructorAbstract.OPTIONAL_ATTRIBUTES
+
+    def construct(self, json_data: Dict[str, Any]) -> bool:  # noqa: WPS210
+        """
+        Generate a card from a json file.
+
+        Generate all info for cards
+
+        :param json_data: The content of a json file card.
+        :return: True if the card is correctly generated.
+        """
+        if not super().construct(json_data) and not self._verify_type():
+            return False
+        name = self.json_data["name"]
+        description = self.json_data["description"]
+        logger.fatal(self.json_data)
+        card_type = ObjectCardType(self.json_data["card_type"])
+        card_rarity = ObjectCardRarity(self.json_data["rarity"])
+        cost = self.json_data["cost"]
+        self._card = InfoCard(name, description, cost, card_type, card_rarity)
+        if card_type == ObjectCardType.CHARACTER:
+            if not self._verify_race():
+                self._card = None
+                return False
+            self._card.ap = self.json_data["ap"]
+            self._card.dp = self.json_data["dp"]
+            self._card.hp = self.json_data["hp"]
+        return True
+
+    def _verify_type(self) -> bool:
         try:
-            ObjectCardRarity(self.json_data["rarity"])
+            ObjectCardType(self.json_data["card_type"])
             return True
         except ValueError:
-            self._error_message(f'rarity is not valid \'{self.json_data["rarity"]}\'')
+            self._error_message(f'type is not valid \'{self.json_data["type"]}\'')
+        return False
+
+    def _verify_race(self) -> bool:
+        try:
+            ObjectCardRace(self.json_data["race"])
+            return True
+        except ValueError:
+            self._error_message(f'race is not valid \'{self.json_data["race"]}\'')
         return False
 
 
 playable_character_card = ConstructorPlayableCharacterCard()
+info_card_constructor = ConstructorInfoCard()
