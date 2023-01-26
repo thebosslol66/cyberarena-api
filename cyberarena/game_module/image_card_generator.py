@@ -1,6 +1,7 @@
 # pragma: no cover
 # flake8: noqa
 import logging
+import os
 from typing import List, Tuple, Union
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -171,6 +172,7 @@ class ImageCardGeneratorResources(object):
 
     def __init__(self) -> None:
         """Init the ImageCardGeneratorResources class."""
+        self._output_folder: str = ""
         image_base_rounded_corners_draw = ImageDraw.Draw(
             self.BASE_CARD_SHAPE,
         )
@@ -299,6 +301,30 @@ class ImageCardGeneratorResources(object):
             outline=self.RARITY_SYMBOL_BORDER_COLOR,
             width=self.RARITY_SYMBOL_BORDER_WIDTH,
         )
+
+    @property
+    def output_folder(self) -> str:
+        """
+        Get the output folder.
+
+        :return: The output folder.
+        """
+        return self._output_folder
+
+    @output_folder.setter
+    def output_folder(self, output_folder: str) -> None:
+        """
+        Set the output folder.
+
+        The output folder must exist.
+
+        :param output_folder: The output folder.
+        :raise ValueError: If the output folder does not exist.
+        """
+        if not os.path.exists(output_folder):
+            raise ValueError("The output folder does not exist.")
+
+        self._output_folder = output_folder
 
     @classmethod
     def generate_stats_background(cls) -> Image.Image:
@@ -445,6 +471,27 @@ class ImageCardGenerator(object):
         self._place_card_description()
         self._place_card_rarity()
         return self._image
+
+    def save_image(self, filename: str) -> None:
+        """
+        Seve the previously generated image into the directory with the filename.
+
+        The directory mus be configure like this:
+            ImageCardGenerator.resources.output_folder = output
+        Then all files will be name with the filename and saved in the output folder.
+
+        :param filename: The name of the file to save the image.
+        """
+        if not self._image:
+            logger.error(
+                "The image is not generated yet and will not be saved."
+                "\nPlease call the generate_card() "
+                "method before saving the image.",
+            )
+            return
+        path = os.path.join(ImageCardGenerator.resources.output_folder, filename)
+        self._image.save(path)
+        logger.info(f"Image saved at {path}")
 
     def _generate_base_image(self) -> Tuple[Image.Image, ImageDraw.ImageDraw]:
         """

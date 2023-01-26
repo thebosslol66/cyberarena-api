@@ -1,5 +1,8 @@
+# pragma: no cover
+
 import argparse
 import logging
+import os
 
 from cyberarena.game_module.card.library import Library
 from cyberarena.game_module.image_card_generator import ImageCardGenerator
@@ -21,6 +24,8 @@ def verify_library(folder: str) -> None:
     """
     Verify the syntax of the cards.
 
+    It will check every card in the folder and will print the result of the validation.
+
     :param folder: The folder containing all the different cards.
     """
     # Remove the default handler of the logger
@@ -37,11 +42,12 @@ def verify_library(folder: str) -> None:
         logger.info("Card {0} is valid".format(index))
 
 
-def create_image(folder: str) -> None:
+def set_logger_for_generation() -> None:
     """
-    Create the image of the cards.
+    Set the logger for the generation of the images.
 
-    :param folder: The folder containing all the different cards.
+    It will inactivate the logger for the validation of the cards.
+    And it will activate the logger for the generation of the images.
     """
     # Remove the default handler of the logger
     logger_generator.handlers = []
@@ -54,6 +60,23 @@ def create_image(folder: str) -> None:
     logger_generator.disabled = False
 
     logger_validator.disabled = True
+
+
+def create_image(folder: str, output: str) -> None:  # noqa: WPS210
+    """
+    Create the image of cards.
+
+    Will create the image of the card from input folder to the output folder.
+    It will verify the validity of the output directory, if not exist ask the
+    user if he want to create it.
+    **Warning**: This function will stop the execution if the output folder
+    doesn't exist and wait the user confirmation to create it.
+    **Warning**: It will overwrite every older card image with the same name.
+
+    :param folder: The folder containing all the different cards.
+    :param output: The folder where the images will be saved.
+    """
+    set_logger_for_generation()
     lib = Library(folder)
 
     logger_generator.warning(
@@ -61,6 +84,20 @@ def create_image(folder: str) -> None:
         " before generate image."
         "\nUse 'python -m game_module verify'.",
     )
+
+    if not os.path.isdir(output):
+        validation = None
+        while validation != "y":
+            validation = input(  # noqa: WPS421
+                "Do you want to create the folder ?[{0}] (y/n) ".format(output),
+            )
+            if validation == "n":
+                return
+        os.mkdir(output)
+
+    logger_generator.info("Output folder: {0}".format(output))
+
+    ImageCardGenerator.resources.output_folder = output
 
     image_nb = 0
     for index in lib.keys():
@@ -73,10 +110,11 @@ def create_image(folder: str) -> None:
             ),
         )
         generator = ImageCardGenerator(
-            lib[index],  # type: ignore
+            lib[index],
             lib.get_img_path(index),
         )
-        generator.generate_card().show()
+        generator.generate_card()
+        generator.save_image("{0}.png".format(index))
 
 
 if __name__ == "__main__":
@@ -130,9 +168,19 @@ if __name__ == "__main__":
         default="./cyberarena/tests_data/cards",
     )
 
+    construct_parser.add_argument(
+        "-o",
+        "--output",
+        help="The folder where to put the generated images.",
+        type=str,
+        required=False,
+        dest="output",
+        default="./cyberarena/tests_data/images",
+    )
+
     args = parser.parse_args()
 
     if args.subcommand == "verify":
         verify_library(args.directory)
     elif args.subcommand == "create":
-        create_image(args.directory)
+        create_image(args.directory, args.output)
