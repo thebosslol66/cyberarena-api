@@ -1,0 +1,17 @@
+{
+  "id": 3,
+  "name": "Globuzor Bloubix",
+  "description": "When he dies, he explodes, dealing 2 damage to all enemies.",
+  "ap": 3,
+  "dp": 2,
+  "hp": 4,
+  "cost": 6,
+  "race": "alien",
+  "rarity": "legendary",
+  "card_type": "character",
+  "ability": {
+    "base_clases": [
+      "Cyber"
+    ]
+  }
+}
