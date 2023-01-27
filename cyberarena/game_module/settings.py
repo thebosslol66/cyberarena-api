@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     deck_size: int = 20
     board_size: int = 5
 
+    card_data_filename: str = "data.json"
+    card_image_filename: str = "card.png"
+
     class Config:
         env_file = ".env"
         env_prefix = "GAME_MODULE_"

@@ -45,6 +45,32 @@ def get_text_list_fit_width(
     return text_list
 
 
+def is_data_or_image_newer_than_builded_card(
+    data_filename: str,
+    image_filename: str,
+    builded_card_filename: str,
+) -> bool:
+    """
+    Check if the data or the image is newer than the builded card.
+
+    :param data_filename: The data filename.
+    :param image_filename: The image filename.
+    :param builded_card_filename: The builded card filename.
+    :return: True if the data or the image is newer than the builded card, False otherwise.
+    :raises FileNotFoundError: If the data or the image file is not found.
+    """
+    if not os.path.exists(builded_card_filename):
+        return True
+    try:
+        data_time = os.path.getmtime(data_filename)
+        image_time = os.path.getmtime(image_filename)
+        builded_card_time = os.path.getmtime(builded_card_filename)
+    except FileNotFoundError as error:
+        logger.error(error)
+        raise error
+    return data_time > builded_card_time or image_time > builded_card_time
+
+
 class ImageCardGeneratorResources(object):
     """
     ImageCardGeneratorResources class.

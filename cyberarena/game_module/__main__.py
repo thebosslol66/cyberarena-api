@@ -5,7 +5,11 @@ import logging
 import os
 
 from cyberarena.game_module.card.library import Library
-from cyberarena.game_module.image_card_generator import ImageCardGenerator
+from cyberarena.game_module.image_card_generator import (
+    ImageCardGenerator,
+    is_data_or_image_newer_than_builded_card,
+)
+from cyberarena.game_module.settings import settings
 
 logger = logging.getLogger("cyberarena.game_module")
 FORMAT = (
@@ -37,7 +41,11 @@ def verify_library(folder: str) -> None:
     logger_validator.setLevel(logging.DEBUG)
     logger_validator.propagate = False
 
-    lib = Library(folder)
+    lib = Library(
+        folder,
+        default_filename=settings.card_data_filename,
+        default_image=settings.card_image_filename,
+    )
     for index in lib:
         logger.info("Card {0} is valid".format(index))
 
@@ -62,6 +70,29 @@ def set_logger_for_generation() -> None:
     logger_validator.disabled = True
 
 
+def is_card_must_be_generated(image_file_path: str, output: str) -> bool:
+    """
+    Check if the card must be generated.
+
+    It will check if the card is already generated and if the card is
+    modified since the last generation.
+
+    :param image_file_path: The path to the image file of the card.
+    :param output: The folder where the image is save.
+    :return: True if the card must be generated, False otherwise.
+    """
+    data_file_path = image_file_path.replace(
+        settings.card_image_filename,
+        settings.card_data_filename,
+    )
+
+    return is_data_or_image_newer_than_builded_card(
+        data_file_path,
+        image_file_path,
+        output,
+    )
+
+
 def create_image(folder: str, output: str) -> None:  # noqa: WPS210
     """
     Create the image of cards.
@@ -71,18 +102,23 @@ def create_image(folder: str, output: str) -> None:  # noqa: WPS210
     user if he want to create it.
     **Warning**: This function will stop the execution if the output folder
     doesn't exist and wait the user confirmation to create it.
-    **Warning**: It will overwrite every older card image with the same name.
+    **Warning**: It will overwrite every older card image with the same name if data or
+    image is newer than the image card.
 
     :param folder: The folder containing all the different cards.
     :param output: The folder where the images will be saved.
     """
     set_logger_for_generation()
-    lib = Library(folder)
+    lib = Library(
+        folder,
+        default_filename=settings.card_data_filename,
+        default_image=settings.card_image_filename,
+    )
 
     logger_generator.warning(
         "WARNING: Don't forget to verify data"
         " before generate image."
-        "\nUse 'python -m game_module verify'.",
+        "\nUse 'python -m cyberarena.game_module verify'.",
     )
 
     if not os.path.isdir(output):
@@ -102,6 +138,15 @@ def create_image(folder: str, output: str) -> None:  # noqa: WPS210
     image_nb = 0
     for index in lib.keys():
         image_nb += 1
+        if not is_card_must_be_generated(lib.get_img_path(index), output):
+            logger_generator.info(
+                "Skip image for card {0}, {1}/{2}".format(
+                    lib[index].name,
+                    image_nb,
+                    len(lib),
+                ),
+            )
+            continue
         logger_generator.info(
             "Generate image for card {0}, {1}/{2}".format(
                 lib[index].name,
