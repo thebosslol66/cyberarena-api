@@ -9,9 +9,9 @@ from cyberarena.web.api.connection.utils import get_current_user
 from cyberarena.web.api.game.schema import CardModel, TicketModel, TicketStatus
 from cyberarena.web.api.game.utils import ticket_manager
 
-router = APIRouter()
 ticket_router = APIRouter()
-router.include_router(ticket_router, prefix="/ticket", tags=["ticket"])
+router = APIRouter()
+router.include_router(ticket_router, prefix="/ticket")
 
 
 @ticket_router.get("/open", response_model=TicketModel)
@@ -143,3 +143,6 @@ async def get_card_image(card_id: int) -> FileResponse:
     :return: The image of the card
     """
     return FileResponse("cyberarena/tests_data/imgs/test_avatar_good_512x512.png")
+
+
+router.include_router(ticket_router, prefix="/ticket", tags=["ticket"])
