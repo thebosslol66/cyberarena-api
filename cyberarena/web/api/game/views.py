@@ -102,7 +102,10 @@ async def get_ticket_status(
     )
 
 
-@router.get("/card/{card_id}/data")
+@router.get(
+    "/card/{card_id}/data",
+    response_model=CardModel,
+)
 async def get_card(card_id: int) -> CardModel:
     """
     Get a card.
@@ -128,7 +131,10 @@ async def get_card(card_id: int) -> CardModel:
     return card
 
 
-@router.get("/card/{card_id}/image")
+@router.get(
+    "/card/{card_id}/image",
+    response_class=FileResponse,
+)
 async def get_card_image(card_id: int) -> FileResponse:
     """
     Get the image of a card.
