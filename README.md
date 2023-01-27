@@ -203,10 +203,48 @@ To run tests with coverage you should run:
 docker-compose -f deploy/docker-compose.yml --project-directory . build; docker-compose -f deploy/docker-compose.yml  --project-directory . run -v "$PWD/cov:/app/src/cov" --rm api pytest --cov=cyberarena/ --cov-report term-missing:skip-covered --cov-report html:cov/cov_html -vv .; docker-compose -f deploy/docker-compose.yml --project-directory . down
 ```
 
+## The card image generator
 
-## Some data to check
+Adding a class for generate the final card from a card data and an image path.
 
-https://able.bio/drenther/building-a-drag-and-drop-game-with-react-beautiful-dnd--094r3g8#start%2C-loop-and-reset
-https://www.geeksforgeeks.org/elo-rating-algorithm/
-https://www.daysofwonder.com/online/en/play/ranking/
-https://en.wikipedia.org/wiki/Elo_rating_system
+Can be customisable directly in the class variable.
+
+### Command line
+
+It can be use with command line (i don't write the docker command but you can open the docker terminal in the app and launch the command).
+
+ex: ```python -m cyberarena.game_module --help```
+
+Or with docker: ```docker-compose -f deploy/docker-compose.yml --project-directory . run --rm api python -m cyberarena.game_module --help```
+
+#### Verify your new cards
+
+```bash
+$python -m cyberarena.game_module verify -h
+usage: python -m cyberarena.game_module verify [-h] [-d DIRECTORY]
+options:
+  -h, --help            show this help message and exit
+  -d DIRECTORY, --directory DIRECTORY
+                        The folder containing all the different cards.
+```
+
+With this command you will see all errors in your cards. They will be displayed as normal tex but when the app launch, every error will have different level of severity.
+
+If you want to generate images *YOU MUST* execute this command before to avoid generation errors.
+
+#### Generate cards
+
+```bash
+$python -m cyberarena.game_module create  -h
+usage: python -m cyberarena.game_module create [-h] [-d DIRECTORY] [-o OUTPUT] [-f]
+
+options:
+  -h, --help            show this help message and exit
+  -d DIRECTORY, --directory DIRECTORY
+                        The folder containing all the different cards.
+  -o OUTPUT, --output OUTPUT
+                        The folder where to put the generated images.
+  -f, --force           Force the generation of the image.
+```
+
+If you want to generate the card images use this command. It will automatically refresh cards image when their data file or main image are newer.
