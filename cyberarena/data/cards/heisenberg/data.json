@@ -6,8 +6,8 @@
   "dp": 0,
   "hp": 4,
   "cost": 5,
-  "type": "Cyber",
-  "rarity": "Legendary",
+  "race": "human",
+  "rarity": "legendary",
   "card_type": "character",
   "ability": {
     "text": "",

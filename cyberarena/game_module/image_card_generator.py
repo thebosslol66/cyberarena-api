@@ -8,6 +8,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 from cyberarena.game_module.card.base import AbstractCard, AbstractCharacterCard
 from cyberarena.game_module.card.enums import ObjectCardRace, ObjectCardRarity
+from cyberarena.game_module.settings import settings
 
 logger = logging.getLogger("cyberarena.game_module.image_generator")
 
@@ -119,8 +120,8 @@ class ImageCardGeneratorResources(object):
 
     TEXT_COLOR = (255, 255, 255)
     TEXT_STROKE_COLOR = (0, 0, 0)
-    TEXT_BIG_SIZE = 50
-    TEXT_NORMAL_SIZE = 30
+    TEXT_BIG_SIZE = settings.font_big_size
+    TEXT_NORMAL_SIZE = settings.font_normal_size
 
     STATS_WIDTH = MAIN_IMAGE_WIDTH
     STATS_HEIGHT = 160
@@ -154,8 +155,10 @@ class ImageCardGeneratorResources(object):
         (255, 255, 255, 0),
     )
 
-    BIG_TEXT_FONT = ImageFont.truetype("arial.ttf", TEXT_BIG_SIZE)
-    MEDIUM_TEXT_FONT = ImageFont.truetype("arial.ttf", TEXT_NORMAL_SIZE)
+    FONT_PATH = settings.font_card_path
+
+    BIG_TEXT_FONT = ImageFont.truetype(FONT_PATH, TEXT_BIG_SIZE)
+    MEDIUM_TEXT_FONT = ImageFont.truetype(FONT_PATH, TEXT_NORMAL_SIZE)
 
     DESCRIPTION_POSITION = (
         int((WIDTH - MAIN_IMAGE_WIDTH) / 2),
@@ -264,7 +267,7 @@ class ImageCardGeneratorResources(object):
                 (0, self.RARITY_SYMBOL_SIZE * 3 / 4),
                 (0, self.RARITY_SYMBOL_SIZE / 4),
             ),
-            fill=(255, 215, 0, 255),
+            fill=(255, 168, 18, 255),
         )
         draw.polygon(
             (
