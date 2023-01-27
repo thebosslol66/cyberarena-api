@@ -14,7 +14,7 @@ ticket_router = APIRouter()
 router.include_router(ticket_router, prefix="/ticket", tags=["ticket"])
 
 
-@ticket_router.get("/open")
+@ticket_router.get("/open", response_model=TicketModel)
 async def open_ticket(
     current_user: UserModel = Depends(get_current_user),
 ) -> TicketModel:
@@ -48,7 +48,7 @@ async def open_ticket(
     )
 
 
-@ticket_router.get("/cancel")
+@ticket_router.get("/cancel", response_model=TicketModel)
 async def cancel_ticket(
     ticket_id: int,
     current_user: UserModel = Depends(get_current_user),
@@ -73,7 +73,7 @@ async def cancel_ticket(
     )
 
 
-@ticket_router.get("/status")
+@ticket_router.get("/status", response_model=TicketModel)
 async def get_ticket_status(
     ticket_id: int,
     current_user: UserModel = Depends(get_current_user),
