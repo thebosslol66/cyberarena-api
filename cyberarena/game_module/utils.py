@@ -13,22 +13,12 @@ def get_card_from_id(id_card: int) -> AbstractCard:
     return lib[id_card]
 
 
-def generate_card_images() -> None:
-    """
-    Generate card images.
-
-    It will verify all card and create new images if needed.
-    It runs before the application starts.
-
-    :raises NotImplementedError: If the function is not implemented yet.
-    """
-    raise NotImplementedError("This function is not implemented yet.")
-
-
-def get_path_card_image() -> str:
+def get_path_card_image(card_id: int, full_card: bool = False) -> str:
     """
     Get the path of the card image.
 
+    :param card_id: ID of the card.
+    :param full_card: If True, return the path of card with stats completed.
     :raises NotImplementedError: If the function is not implemented yet.
     """
     raise NotImplementedError("This function is not implemented yet.")

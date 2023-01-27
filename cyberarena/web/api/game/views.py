@@ -7,11 +7,10 @@ from starlette.responses import FileResponse
 from cyberarena.db.models.user_model import UserModel
 from cyberarena.web.api.connection.utils import get_current_user
 from cyberarena.web.api.game.schema import CardModel, TicketModel, TicketStatus
-from cyberarena.web.api.game.utils import ticket_manager
+from cyberarena.web.api.game.utils import get_card_data, get_card_path, ticket_manager
 
 ticket_router = APIRouter()
 router = APIRouter()
-router.include_router(ticket_router, prefix="/ticket")
 
 
 @ticket_router.get("/open", response_model=TicketModel)
@@ -110,25 +109,11 @@ async def get_card(card_id: int) -> CardModel:
     """
     Get a card.
 
-    :param card_id: The id of the card to get
+    :param card_id: The id of the card to get  # noqa: DAR003
     :return: The card
-    :raises HTTPException: If the card doesn't exist
+    :raise HTTPException: If the card doesn't exist
     """
-    card = CardModel(
-        id=card_id,
-        name="Card",
-        description="Description",
-        cost=1,
-        damage=1,
-        health=1,
-        defense=1,
-    )
-    if card is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Card doesn't exist.",
-        )
-    return card
+    return get_card_data(card_id)
 
 
 @router.get(
@@ -142,4 +127,21 @@ async def get_card_image(card_id: int) -> FileResponse:
     :param card_id: The id of the card to get the image
     :return: The image of the card
     """
-    return FileResponse("cyberarena/tests_data/imgs/test_avatar_good_512x512.png")
+    return FileResponse(get_card_path(card_id))
+
+
+@router.get(
+    "/card/{card_id}/imagefull",
+    response_class=FileResponse,
+)
+async def get_card_image_fulfilled(card_id: int) -> FileResponse:
+    """
+    Get the image of a card.
+
+    :param card_id: The id of the card to get the image
+    :return: The image of the card
+    """
+    return FileResponse(get_card_path(card_id, full_path=True))
+
+
+router.include_router(ticket_router, prefix="/ticket")

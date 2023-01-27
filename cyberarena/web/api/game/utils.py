@@ -208,3 +208,14 @@ def get_card_data(card_id: int) -> CardModel:
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Card not found",
         )
+
+
+def get_card_path(card_id: int, full_path: bool = False) -> str:
+    """
+    Get the path of a card.
+
+    :param card_id: The id of the card to get the path.
+    :param full_path: If True, get the image with stat filled.
+    :return: The path of the card
+    """
+    return gamem.get_path_card_image(card_id, full_path)
