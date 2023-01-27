@@ -63,7 +63,7 @@ def set_logger_for_generation() -> None:
     handler = logging.StreamHandler()
     handler.setFormatter(logging.Formatter("%(message)s"))  # noqa: WPS323
     logger_generator.addHandler(handler)
-    logger_generator.setLevel(logging.DEBUG)
+    logger_generator.setLevel(logging.INFO)
     logger_generator.propagate = False
     logger_generator.disabled = False
 
@@ -85,7 +85,6 @@ def is_card_must_be_generated(image_file_path: str, output: str) -> bool:
         settings.card_image_filename,
         settings.card_data_filename,
     )
-
     return is_data_or_image_newer_than_builded_card(
         data_file_path,
         image_file_path,
@@ -93,7 +92,51 @@ def is_card_must_be_generated(image_file_path: str, output: str) -> bool:
     )
 
 
-def create_image(folder: str, output: str) -> None:  # noqa: WPS210
+def generate_and_save_card_images(lib: Library, force: bool) -> None:
+    """
+    Generate and save the card images.
+
+    It will generate the card images and save them in the output folder.
+
+    :param lib: The library containing the cards.
+    :param force: Force the generation of the image.
+    """
+    output = ImageCardGenerator.resources.output_folder
+    image_nb = 0
+    for index in lib.keys():
+        image_nb += 1
+        must_be_gnerated = is_card_must_be_generated(
+            lib.get_img_path(index),
+            os.path.join(
+                output,
+                "{0}.png".format(index),
+            ),
+        )
+        if not must_be_gnerated and not force:
+            logger_generator.info(
+                "Skip image for card {0}, {1}/{2}".format(
+                    lib[index].name,
+                    image_nb,
+                    len(lib),
+                ),
+            )
+            continue
+        logger_generator.info(
+            "Generate image for card {0}, {1}/{2}".format(
+                lib[index].name,
+                image_nb,
+                len(lib),
+            ),
+        )
+        generator = ImageCardGenerator(
+            lib[index],
+            lib.get_img_path(index),
+        )
+        generator.generate_card()
+        generator.save_image("{0}.png".format(index))
+
+
+def create_image(folder: str, output: str, force: bool) -> None:  # noqa: WPS210
     """
     Create the image of cards.
 
@@ -107,6 +150,7 @@ def create_image(folder: str, output: str) -> None:  # noqa: WPS210
 
     :param folder: The folder containing all the different cards.
     :param output: The folder where the images will be saved.
+    :param force: Force the generation of the image.
     """
     set_logger_for_generation()
     lib = Library(
@@ -134,32 +178,7 @@ def create_image(folder: str, output: str) -> None:  # noqa: WPS210
     logger_generator.info("Output folder: {0}".format(output))
 
     ImageCardGenerator.resources.output_folder = output
-
-    image_nb = 0
-    for index in lib.keys():
-        image_nb += 1
-        if not is_card_must_be_generated(lib.get_img_path(index), output):
-            logger_generator.info(
-                "Skip image for card {0}, {1}/{2}".format(
-                    lib[index].name,
-                    image_nb,
-                    len(lib),
-                ),
-            )
-            continue
-        logger_generator.info(
-            "Generate image for card {0}, {1}/{2}".format(
-                lib[index].name,
-                image_nb,
-                len(lib),
-            ),
-        )
-        generator = ImageCardGenerator(
-            lib[index],
-            lib.get_img_path(index),
-        )
-        generator.generate_card()
-        generator.save_image("{0}.png".format(index))
+    generate_and_save_card_images(lib, force)
 
 
 if __name__ == "__main__":
@@ -223,9 +242,18 @@ if __name__ == "__main__":
         default="./cyberarena/tests_data/images",
     )
 
+    construct_parser.add_argument(
+        "-f",
+        "--force",
+        help="Force the generation of the image.",
+        required=False,
+        dest="force",
+        action="store_true",
+    )
+
     args = parser.parse_args()
 
     if args.subcommand == "verify":
         verify_library(args.directory)
     elif args.subcommand == "create":
-        create_image(args.directory, args.output)
+        create_image(args.directory, args.output, args.force)

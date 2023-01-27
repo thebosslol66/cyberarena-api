@@ -60,6 +60,10 @@ def is_data_or_image_newer_than_builded_card(
     :raises FileNotFoundError: If the data or the image file is not found.
     """
     if not os.path.exists(builded_card_filename):
+        logger.debug(
+            f"The builded card '{builded_card_filename}' does not exist. "
+            "The card will be builded.",
+        )
         return True
     try:
         data_time = os.path.getmtime(data_filename)
@@ -68,6 +72,13 @@ def is_data_or_image_newer_than_builded_card(
     except FileNotFoundError as error:
         logger.error(error)
         raise error
+    logger.debug(
+        f"Data time: {data_time}, image time: {image_time}, "
+        f"builded card time: {builded_card_time}"
+        "\n"
+        f"Data path: {data_filename}, image path: {image_filename}, "
+        f"builded card path: {builded_card_filename}",
+    )
     return data_time > builded_card_time or image_time > builded_card_time
 
 
