@@ -1,24 +1,15 @@
-import enum
 from typing import Dict, Optional
 
 from fastapi import HTTPException
 from starlette import status
 
 from cyberarena import game_module as gamem
+from cyberarena.web.api.game.enums import TicketStatus
 from cyberarena.web.api.game.schema import CardModel
 
 ##############################################################################
 #                    Ticket system for the game manager                      #
 ##############################################################################
-
-
-class TicketStatus(str, enum.Enum):  # noqa: WPS600
-    """Ticket status."""
-
-    OPEN = "open"
-    CLOSED = "closed"
-    CANCEL = "cancel"
-    DONT_EXIST = "dont_exist"
 
 
 class Ticket(object):

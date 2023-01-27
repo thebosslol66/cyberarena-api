@@ -6,9 +6,9 @@ from typing import List, Tuple, Union
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-from cyberarena.game_module.card.base import AbstractCard, AbstractCharacterCard
-from cyberarena.game_module.card.enums import ObjectCardRace, ObjectCardRarity
-from cyberarena.game_module.settings import settings
+from .card.base import AbstractCard, AbstractCharacterCard
+from .card.enums import ObjectCardRace, ObjectCardRarity
+from .settings import settings
 
 logger = logging.getLogger("cyberarena.game_module.image_generator")
 

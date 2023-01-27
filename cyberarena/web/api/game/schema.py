@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from cyberarena import game_module
-from cyberarena.web.api.game.utils import TicketStatus
+from cyberarena.web.api.game.enums import TicketStatus
 
 
 class TicketModel(BaseModel):
