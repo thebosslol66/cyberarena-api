@@ -1,16 +1,14 @@
-from enum import auto
+import enum
 from typing import Dict, Optional
 
-from strenum import LowercaseStrEnum
 
-
-class TicketStatus(LowercaseStrEnum):
+class TicketStatus(str, enum.Enum):  # noqa: WPS600
     """Ticket status."""
 
-    OPEN = auto()
-    CLOSED = auto()
-    CANCLED = auto()
-    DONT_EXIST = auto()
+    OPEN = "open"
+    CLOSED = "closed"
+    CANCEL = "cancel"
+    DONT_EXIST = "dont_exist"
 
 
 class Ticket(object):
@@ -23,7 +21,7 @@ class Ticket(object):
         :param ticket_id: The id of the new ticket
         :param user_id: the user attached to the ticket
         """
-        self.status: TicketStatus = TicketStatus.OPEN  # type: ignore[assignment]
+        self.status: TicketStatus = TicketStatus.OPEN
         self.ticket_id = ticket_id
         self.user_id = user_id
 
@@ -122,11 +120,11 @@ class TicketManager(object):
         :return: The status of the ticket
         """
         if ticket_id in self.__tickets:
-            return TicketStatus.OPEN  # type: ignore[return-value]
+            return TicketStatus.OPEN
         for ticket in self.__history.values():
             if ticket.ticket_id == ticket_id:
                 return ticket.status
-        return TicketStatus.DONT_EXIST  # type: ignore[return-value]
+        return TicketStatus.DONT_EXIST
 
     def cancel_ticket(self, ticket_id: int) -> Optional[Ticket]:
         """
@@ -138,7 +136,7 @@ class TicketManager(object):
         if ticket_id not in self.__tickets.keys():
             return None
         ticket = self.__tickets[ticket_id]
-        ticket.status = TicketStatus.CANCLED  # type: ignore[assignment]
+        ticket.status = TicketStatus.CANCEL
         self.__history[ticket_id] = ticket
         self.__tickets.pop(ticket_id)
         return ticket
@@ -153,7 +151,7 @@ class TicketManager(object):
         if ticket_id not in self.__tickets.keys():
             return None
         ticket = self.__tickets[ticket_id]
-        ticket.status = TicketStatus.CLOSED  # type: ignore[assignment]
+        ticket.status = TicketStatus.CLOSED
         self.__history[ticket_id] = ticket
         self.__tickets.pop(ticket_id)
         return ticket

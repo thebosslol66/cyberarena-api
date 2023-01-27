@@ -1,4 +1,5 @@
 from .base import AbstractCharacterCard
+from .enums import ObjectCardRace, ObjectCardRarity
 
 
 class PlayableCharacterCard(AbstractCharacterCard):
@@ -12,6 +13,8 @@ class PlayableCharacterCard(AbstractCharacterCard):
         ap: int,
         dp: int = 0,
         description: str = "",
+        rarity: ObjectCardRarity = ObjectCardRarity.COMMON,
+        race: ObjectCardRace = ObjectCardRace.HUMAN,
     ) -> None:
         """
         Constructor for Card.
@@ -22,6 +25,8 @@ class PlayableCharacterCard(AbstractCharacterCard):
         :param ap: Attack points of the card.  # noqa: DAR003
         :param dp: Defense points of the card.
         :param description: Description of the card.
+        :param rarity: Rarity of the card.
+        :param race: Race of the card.
         :raise ValueError: If the cost, hp, ap or dp is negative.
 
         """
@@ -32,6 +37,8 @@ class PlayableCharacterCard(AbstractCharacterCard):
             ap=ap,
             dp=dp,
             cost=cost,
+            rarity=rarity,
+            race=race,
         )
 
     def __str__(self) -> str:
@@ -40,12 +47,14 @@ class PlayableCharacterCard(AbstractCharacterCard):
 
         :return: A string representation of the card.
         """
-        return "Character card: {0} ({1}/{2}/{3}) cost={4}".format(
+        return "Character card: {0} ({1}/{2}/{3}) cost={4} rarity={5} race={6}".format(
             self.name,
             self.hp,
             self.ap,
             self.dp,
             self.cost,
+            self.rarity,
+            self.race,
         )
 
     def __repr__(self) -> str:

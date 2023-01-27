@@ -17,7 +17,7 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
     It is use for construct card on plate and character.
     """
 
-    OBLIGATORY_ATTRIBUTES: List[str] = ["name"]
+    OBLIGATORY_ATTRIBUTES: List[str] = ["name", "rarity"]
     NUMERICAL_ATTRIBUTES: List[str] = ["id"]
     OPTIONAL_ATTRIBUTES: List[str] = ["description", "abilities"]
 
@@ -39,7 +39,7 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
         self._reset()
         self.json_data = json_data
         self._card_index = self.json_data.get("id", -1)
-        return self.check_json()
+        return self.check_json() and self._verify_rarity()
 
     def check_json(self) -> bool:
         """
@@ -162,6 +162,14 @@ class ConstructorAbstract(metaclass=abc.ABCMeta):
                     f" The attribute '{attribute}' is not recognized.",
                 )
 
+    def _verify_rarity(self) -> bool:
+        try:
+            ObjectCardRarity(self.json_data["rarity"])
+            return True
+        except ValueError:
+            self._error_message(f'rarity is not valid \'{self.json_data["rarity"]}\'')
+        return False
+
 
 class ConstructorPlayableCharacterCard(ConstructorAbstract):
     """CardConstructor class.
@@ -178,7 +186,6 @@ class ConstructorPlayableCharacterCard(ConstructorAbstract):
     ] + ConstructorAbstract.NUMERICAL_ATTRIBUTES
     OBLIGATORY_ATTRIBUTES = [
         "race",
-        "rarity",
     ] + ConstructorAbstract.OBLIGATORY_ATTRIBUTES
 
     def construct(self, json_data: Dict[str, Any]) -> bool:  # noqa: WPS210
@@ -201,7 +208,19 @@ class ConstructorPlayableCharacterCard(ConstructorAbstract):
         hp = self.json_data["hp"]
         ap = self.json_data["ap"]
         dp = self.json_data["dp"]
-        self._card = PlayableCharacterCard(name, cost, hp, ap, dp)
+        description = self.json_data["description"]
+        rarity = ObjectCardRarity(self.json_data["rarity"])
+        race = ObjectCardRace(self.json_data["race"])
+        self._card = PlayableCharacterCard(
+            name=name,
+            cost=cost,
+            hp=hp,
+            ap=ap,
+            dp=dp,
+            description=description,
+            rarity=rarity,
+            race=race,
+        )
         return True
 
     def _verify_race(self) -> bool:
@@ -210,14 +229,6 @@ class ConstructorPlayableCharacterCard(ConstructorAbstract):
             return True
         except ValueError:
             self._error_message(f'race is not valid \'{self.json_data["race"]}\'')
-        return False
-
-    def _verify_rarity(self) -> bool:
-        try:
-            ObjectCardRarity(self.json_data["rarity"])
-            return True
-        except ValueError:
-            self._error_message(f'rarity is not valid \'{self.json_data["rarity"]}\'')
         return False
 
 

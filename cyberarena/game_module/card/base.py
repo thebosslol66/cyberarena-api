@@ -1,23 +1,33 @@
 import abc
 
+from cyberarena.game_module.card.enums import ObjectCardRace, ObjectCardRarity
+
 
 class AbstractCard(metaclass=abc.ABCMeta):
     """class AbstractCard."""
 
     id = -1
 
-    def __init__(self, name: str, description: str = "", cost: int = 0) -> None:
+    def __init__(
+        self,
+        name: str,
+        description: str = "",
+        cost: int = 0,
+        rarity: ObjectCardRarity = ObjectCardRarity.COMMON,
+    ) -> None:
         """
         Constructor for AbstractCard.
 
         :param name: Name of the card.
         :param description: Description of the card.
         :param cost: Cost of the card.
+        :param rarity: Rarity of the card.
         :raises ValueError: If the name is negative or if the cost is negative.
         """
         self._name: str = name
         self._description: str = description
         self._cost: int = cost
+        self._rarity: ObjectCardRarity = rarity
         if self._name == "":
             raise ValueError("The name of the card cannot be empty.")
         if self._cost < 0:
@@ -39,10 +49,12 @@ class AbstractCard(metaclass=abc.ABCMeta):
 
         :return: A string representation of the card.
         """
-        return "{0}(name='{1}', description='{2}')".format(
+        return "{0}(name='{1}', description='{2}', cost={3}, rarity={4})".format(
             self.__class__.__name__,
             self.name,
             self.description,
+            self.cost,
+            self.rarity,
         )
 
     @property
@@ -72,6 +84,15 @@ class AbstractCard(metaclass=abc.ABCMeta):
         """
         return self._cost
 
+    @property
+    def rarity(self) -> ObjectCardRarity:
+        """
+        Getter for rarity.
+
+        :return: rarity.
+        """
+        return self._rarity
+
 
 class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
     """class AbstractCharacterCard."""
@@ -84,6 +105,8 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
         dp: int = 0,
         description: str = "",
         cost: int = 0,
+        rarity: ObjectCardRarity = ObjectCardRarity.COMMON,
+        race: ObjectCardRace = ObjectCardRace.HUMAN,
     ) -> None:
         """
         Constructor for AbstractCharacterCard.
@@ -94,16 +117,20 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
         :param dp: Defense points of the card.
         :param description: Description of the card.
         :param cost: Cost of the card.
+        :param rarity: Rarity of the card.
+        :param race: The race of the character.
         :raises ValueError: If the hp, ap or dp is negative.
         """
         super().__init__(
             name=name,
             description=description,
             cost=cost,
+            rarity=rarity,
         )
         self._hp: int = hp
         self._ap: int = ap
         self._dp: int = dp
+        self._race: ObjectCardRace = race
         valuer_error: str = ""
         if self._hp < 0:
             valuer_error = "The hp is negative."
@@ -166,6 +193,15 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
         :return: dp.
         """
         return self._dp
+
+    @property
+    def race(self) -> ObjectCardRace:
+        """
+        Getter for race.
+
+        :return: race.
+        """
+        return self._race
 
     def is_alive(self) -> bool:
         """
