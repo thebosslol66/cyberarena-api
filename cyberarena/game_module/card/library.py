@@ -2,7 +2,7 @@ import logging
 import os
 import typing
 
-from ..exceptions import LibraryFileNotFoundError
+from ..exceptions import LibraryCardNotFoundError, LibraryFileNotFoundError
 from .base import AbstractCard
 from .factory import factory_card
 
@@ -101,9 +101,18 @@ class Library(object):
         Get a card by his name.
 
         :param key: The name of the card.
+        :raises LibraryCardNotFoundError: If the card is not in the library.
         :return: The card if it exist.
         """
-        return self.__library[key]
+        try:
+            return self.__library[key]
+        except KeyError:
+            logger.error(
+                "The card {0} is not in the library.".format(key),
+            )
+            raise LibraryCardNotFoundError(
+                f"The card {key} is not in the library.",
+            )
 
     def __contains__(self, card: typing.Union[int, AbstractCard]) -> bool:
         """
@@ -147,7 +156,7 @@ class Library(object):
         Return the path of the card image.
 
         :param card_id: The id of the card.
-        :raises KeyError: If the card is not in the library.
+        :raises LibraryCardNotFoundError: If the card is not in the library.
         :return: The path of the card image.
         """
         if card_id not in self.__library_card_path:
@@ -156,7 +165,7 @@ class Library(object):
                     card_id,
                 ),
             )
-            raise KeyError(
+            raise LibraryCardNotFoundError(
                 f"The card '{card_id}' is not in the library.",
             )
         return self.__library_card_path[card_id]

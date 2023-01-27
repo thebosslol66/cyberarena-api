@@ -3,6 +3,9 @@ from typing import List, Optional
 from cyberarena.game_module.deck import Deck
 from cyberarena.game_module.game import Game
 from cyberarena.game_module.player import Player
+from settings import settings
+
+from .card import LibraryCard
 
 
 class GameManager:
@@ -13,6 +16,13 @@ class GameManager:
         self.__games: List[Game] = []
         self.__players: List[Player] = []
         self.idgames = 0
+
+        # load the library settings
+        LibraryCard(
+            settings.LIBRARY_CARD_PATH,
+            settings.LIBRARY_CARD_FILENAME,
+            settings.LIBRARY_CARD_IMAGE_FILENAME,
+        )
 
     def create_game(self, p1id: int, p2id: int, d1: Deck, d2: Deck) -> Game:
         """
