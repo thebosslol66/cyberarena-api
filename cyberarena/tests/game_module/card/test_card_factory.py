@@ -45,3 +45,19 @@ async def test_card_constructor_invalid_card_type() -> None:
         os.path.join(cards_path, "invalid", "invalid_card_type.json"),
     )
     assert card is None
+
+
+@pytest.mark.anyio
+async def test_card_constructor_invalid_card_race() -> None:
+    (card_id, card) = factory_card.create_card_from_file(
+        os.path.join(cards_path, "invalid", "invalid_race.json"),
+    )
+    assert card is None
+
+
+@pytest.mark.anyio
+async def test_card_constructor_invalid_card_rarity() -> None:
+    (card_id, card) = factory_card.create_card_from_file(
+        os.path.join(cards_path, "invalid", "invalid_rarity.json"),
+    )
+    assert card is None
