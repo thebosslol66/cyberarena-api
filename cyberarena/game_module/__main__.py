@@ -190,6 +190,7 @@ if __name__ == "__main__":
     )
 
     subparser = parser.add_subparsers(
+        prog="python -m cyberarena.game_module",
         help="Operations to do on elements in the library",
         dest="subcommand",
     )
