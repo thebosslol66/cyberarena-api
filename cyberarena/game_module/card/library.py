@@ -63,6 +63,7 @@ class Library(object):
         """
         if Library.__init_flag:
             return
+        Library.__init_flag = True
         self.__library: typing.Dict[int, AbstractCard] = {}
         self.__library_card_path: typing.Dict[int, str] = {}
         self.__library_path = path_name
@@ -78,7 +79,7 @@ class Library(object):
                 f"The library path is not valid: '{path_name}'",
             )
         self.__load_library()
-        Library.__init_flag = True
+        self.__verify_card_names()
 
     def __iter__(self) -> typing.Iterator[int]:
         """
@@ -232,10 +233,37 @@ class Library(object):
                         ),
                     )
 
+    def __verify_card_names(self) -> None:
+        """Verify that all cards have a unique name."""
+        card_names: typing.Dict[str, str] = {}
+        for card_id, card in self.items():
+            if card.name in card_names.keys():
+                logger.error(
+                    "The card with name '{0}' already exist: "
+                    "See file '{1}' and file '{2}'".format(
+                        card.name,
+                        os.path.dirname(card_names[card.name]),
+                        os.path.dirname(self.__library_card_path[card_id]),
+                    ),
+                )
+            else:
+                logger.debug("Card {0}:{1} is ok.".format(card.name, card_id))
+                card_names[card.name] = self.__library_card_path[card_id]
+
     def __load_library(self) -> None:
         """Load all cards in the library."""
         for (card_data, card_img) in self.__get_cards_path():
             (card_id, card) = factory_card.create_card_from_file(card_data)
             if card is not None:
+                if card_id in self.__library:
+                    logger.error(
+                        "2 cards have the same id {0}: "
+                        "See file '{1}' and file '{2}'".format(
+                            card_id,
+                            os.path.dirname(self.__library_card_path[card_id]),
+                            os.path.dirname(card_data),
+                        ),
+                    )
+                    continue
                 self.__library[card_id] = card
                 self.__library_card_path[card_id] = card_img
