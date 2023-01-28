@@ -109,6 +109,9 @@ class ImageCardGeneratorResources(object):
     MAIN_IMAGE_WIDTH = 640
     MAIN_IMAGE_HEIGHT = 320
 
+    BIG_TEXT_STROKE_WIDTH = 2
+    MEDIUM_TEXT_STROKE_WIDTH = 1
+
     MAIN_IMAGE_POSITION_X = int((WIDTH - MAIN_IMAGE_WIDTH) / 2)
     MAIN_IMAGE_POSITION_Y = 130
     MAIN_IMAGE_RADIUS_CORNER = 45
@@ -472,7 +475,7 @@ class ImageCardGeneratorResources(object):
             "HP",
             font=font,
             fill=cls.TEXT_COLOR,
-            stroke_width=2,
+            stroke_width=cls.BIG_TEXT_STROKE_WIDTH,
             stroke_fill=cls.TEXT_STROKE_COLOR,
         )
         _, _, w, h = draw.textbbox((0, 0), "DP", font=font)
@@ -481,7 +484,7 @@ class ImageCardGeneratorResources(object):
             "DP",
             font=font,
             fill=cls.TEXT_COLOR,
-            stroke_width=2,
+            stroke_width=cls.BIG_TEXT_STROKE_WIDTH,
             stroke_fill=cls.TEXT_STROKE_COLOR,
         )
         _, _, w, h = draw.textbbox((0, 0), "AP", font=font)
@@ -493,7 +496,7 @@ class ImageCardGeneratorResources(object):
             "AP",
             font=font,
             fill=cls.TEXT_COLOR,
-            stroke_width=2,
+            stroke_width=cls.BIG_TEXT_STROKE_WIDTH,
             stroke_fill=cls.TEXT_STROKE_COLOR,
         )
 
@@ -550,6 +553,31 @@ class ImageCardGenerator(object):
         path = os.path.join(ImageCardGenerator.resources.output_folder, filename)
         self._image.save(path)
         logger.info(f"Image saved at {path}")
+
+    def save_image_with_values(self, filename: str) -> None:
+        """
+        Seve the previously generated image into the directory with the filename.
+
+        The directory mus be configure like this:
+            ImageCardGenerator.resources.output_folder = output
+        Then all files will be name with the filename and saved in the output folder.
+        File resulting will containing values added to the card
+
+        :param filename: The name of the file to save the image.
+        """
+        if not self._image:
+            logger.error(
+                "The image is not generated yet and will not be saved."
+                "\nPlease call the generate_card() "
+                "method before saving the image.",
+            )
+            return
+        path = os.path.join(ImageCardGenerator.resources.output_folder, filename)
+        base_image = self._image.copy()
+        self._place_stats_value()  # Only place if it is a character card
+        self._image.save(path)
+        self._image = base_image
+        logger.info(f"Image with stats saved at {path}")
 
     def _generate_base_image(self) -> Tuple[Image.Image, ImageDraw.ImageDraw]:
         """
@@ -728,7 +756,7 @@ class ImageCardGenerator(object):
             name_text,
             font=self.resources.BIG_TEXT_FONT,
             fill=self.resources.TEXT_COLOR,
-            stroke_width=2,
+            stroke_width=self.resources.BIG_TEXT_STROKE_WIDTH,
             stroke_fill=self.resources.TEXT_STROKE_COLOR,
         )
         self._image.paste(
@@ -770,7 +798,7 @@ class ImageCardGenerator(object):
                 text,
                 font=font,
                 fill=self.resources.TEXT_COLOR,
-                stroke_width=1,
+                stroke_width=self.resources.MEDIUM_TEXT_STROKE_WIDTH,
                 stroke_fill=self.resources.TEXT_STROKE_COLOR,
             )
         self._image.paste(
@@ -792,4 +820,55 @@ class ImageCardGenerator(object):
             rarity_symbol,
             self.resources.RARITY_SYMBOL_POSITION,
             rarity_symbol,
+        )
+
+    def _place_stats_value(self) -> None:
+        """Place the stats value of the card on the image."""
+        if not isinstance(self._card, AbstractCharacterCard):
+            return
+        stats_background = self.resources.STATS_BACKGROUND.copy()
+        draw = ImageDraw.Draw(stats_background)
+        # Draw the text
+        font = self.resources.BIG_TEXT_FONT
+        _, _, w, h = draw.textbbox((0, 0), str(self._card.hp), font=font)
+        draw.text(
+            (
+                int(self.resources.STATS_WIDTH * 0.16) - w / 2,
+                int(self.resources.STATS_HEIGHT * 0.6) - h / 2,
+            ),
+            str(self._card.hp),
+            font=font,
+            fill=self.resources.TEXT_COLOR,
+            stroke_width=self.resources.BIG_TEXT_STROKE_WIDTH,
+            stroke_fill=self.resources.TEXT_STROKE_COLOR,
+        )
+        _, _, w, h = draw.textbbox((0, 0), str(self._card.dp), font=font)
+        draw.text(
+            (
+                int(self.resources.STATS_WIDTH * 0.5) - w / 2,
+                int(self.resources.STATS_HEIGHT * 0.6) - h / 2,
+            ),
+            str(self._card.dp),
+            font=font,
+            fill=self.resources.TEXT_COLOR,
+            stroke_width=self.resources.BIG_TEXT_STROKE_WIDTH,
+            stroke_fill=self.resources.TEXT_STROKE_COLOR,
+        )
+        _, _, w, h = draw.textbbox((0, 0), str(self._card.ap), font=font)
+        draw.text(
+            (
+                int(self.resources.STATS_WIDTH * 0.83) - w / 2,
+                int(self.resources.STATS_HEIGHT * 0.6) - h / 2,
+            ),
+            str(self._card.ap),
+            font=font,
+            fill=self.resources.TEXT_COLOR,
+            stroke_width=self.resources.BIG_TEXT_STROKE_WIDTH,
+            stroke_fill=self.resources.TEXT_STROKE_COLOR,
+        )
+
+        self._image.paste(
+            stats_background,
+            self.resources.STATS_POSITION,
+            stats_background,
         )
