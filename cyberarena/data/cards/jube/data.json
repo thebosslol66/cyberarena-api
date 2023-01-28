@@ -1,0 +1,17 @@
+{
+  "id": 10,
+  "name": "Jube",
+  "description": "",
+  "ap": 0,
+  "dp": 0,
+  "hp": 1,
+  "cost": 0,
+  "race": "human",
+  "rarity": "common",
+  "card_type": "character",
+  "ability": {
+    "base_clases": [
+      "Cyber"
+    ]
+  }
+}

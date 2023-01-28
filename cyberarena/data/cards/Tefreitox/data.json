@@ -1,0 +1,17 @@
+{
+  "id": 8,
+  "name": "Tefreitox",
+  "description": "After each turn, earn 2 ap points.",
+  "ap": 2,
+  "dp": 0,
+  "hp": 4,
+  "cost": 4,
+  "race": "alien",
+  "rarity": "epic",
+  "card_type": "character",
+  "ability": {
+    "base_clases": [
+      "Cyber"
+    ]
+  }
+}
