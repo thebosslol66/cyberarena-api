@@ -284,7 +284,12 @@ class ImageCardGeneratorResources(object):
 
         draw = ImageDraw.Draw(self.RARITY_SYMBOL_VIOLET_SQUARE)
         draw.rectangle(
-            (0, 0, self.RARITY_SYMBOL_SIZE, self.RARITY_SYMBOL_SIZE),
+            (
+                self.RARITY_SYMBOL_BORDER_WIDTH,
+                self.RARITY_SYMBOL_BORDER_WIDTH,
+                self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH,
+                self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH,
+            ),
             fill=(138, 43, 226, 255),
         )
         draw.rectangle(
@@ -298,28 +303,39 @@ class ImageCardGeneratorResources(object):
             width=self.RARITY_SYMBOL_BORDER_WIDTH,
         )
 
+        # draw equilateral triangle
+
         draw = ImageDraw.Draw(self.RARITY_SYMBOL_GREEN_TRIANGLE)
         draw.polygon(
             [
-                (0, self.RARITY_SYMBOL_SIZE),
-                (self.RARITY_SYMBOL_SIZE, self.RARITY_SYMBOL_SIZE),
-                (self.RARITY_SYMBOL_SIZE, 0),
+                (
+                    self.RARITY_SYMBOL_BORDER_WIDTH,
+                    self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH,
+                ),
+                (
+                    self.RARITY_SYMBOL_SIZE / 2,
+                    self.RARITY_SYMBOL_SIZE * 0.134 + self.RARITY_SYMBOL_BORDER_WIDTH,
+                ),
+                (
+                    self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH,
+                    self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH,
+                ),
             ],
             fill=(0, 128, 0, 255),
         )
         draw.polygon(
             [
                 (
-                    self.RARITY_SYMBOL_BORDER_WIDTH / 2,
-                    self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+                    self.RARITY_SYMBOL_BORDER_WIDTH,
+                    self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH,
                 ),
                 (
-                    self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH / 2,
-                    self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+                    self.RARITY_SYMBOL_SIZE / 2,
+                    self.RARITY_SYMBOL_SIZE * 0.134 + self.RARITY_SYMBOL_BORDER_WIDTH,
                 ),
                 (
-                    self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH / 2,
-                    self.RARITY_SYMBOL_BORDER_WIDTH / 2,
+                    self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH,
+                    self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH,
                 ),
             ],
             outline=self.RARITY_SYMBOL_BORDER_COLOR,
@@ -328,7 +344,12 @@ class ImageCardGeneratorResources(object):
 
         draw = ImageDraw.Draw(self.RARITY_SYMBOL_GREY_CIRCLE)
         draw.ellipse(
-            (0, 0, self.RARITY_SYMBOL_SIZE, self.RARITY_SYMBOL_SIZE),
+            (
+                self.RARITY_SYMBOL_BORDER_WIDTH,
+                self.RARITY_SYMBOL_BORDER_WIDTH,
+                self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH,
+                self.RARITY_SYMBOL_SIZE - self.RARITY_SYMBOL_BORDER_WIDTH,
+            ),
             fill=(128, 128, 128, 255),
         )
         draw.ellipse(
