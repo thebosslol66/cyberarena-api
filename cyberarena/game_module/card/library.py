@@ -170,6 +170,13 @@ class Library(object):
             )
         return self.__library_card_path[card_id]
 
+    @classmethod
+    def reset(cls) -> None:
+        """Reset the library instance."""
+        logger.warning("You are resetting the library. You should not do that.")
+        cls.__instance = None
+        cls.__init_flag = False
+
     def __get_cards_path(self) -> typing.Generator[typing.Tuple[str, str], None, None]:
         """
         Get each cards in a specific directory.
