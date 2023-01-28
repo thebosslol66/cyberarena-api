@@ -8,10 +8,5 @@
   "cost": 6,
   "race": "robot",
   "rarity": "common",
-  "card_type": "character",
-  "ability": {
-    "base_clases": [
-      "Cyber"
-    ]
-  }
+  "card_type": "character"
 }

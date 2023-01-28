@@ -8,10 +8,5 @@
   "cost": 1,
   "race": "human",
   "rarity": "rare",
-  "card_type": "character",
-  "ability": {
-    "base_clases": [
-      "Cyber"
-    ]
-  }
+  "card_type": "character"
 }
