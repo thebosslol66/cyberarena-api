@@ -3,11 +3,17 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 from starlette.responses import FileResponse
+from starlette.websockets import WebSocket
 
 from cyberarena.db.models.user_model import UserModel
 from cyberarena.web.api.connection.utils import get_current_user
 from cyberarena.web.api.game.schema import CardModel, TicketModel, TicketStatus
-from cyberarena.web.api.game.utils import get_card_data, get_card_path, ticket_manager
+from cyberarena.web.api.game.utils import (
+    get_card_data,
+    get_card_path,
+    ticket_manager,
+    websocket_manager,
+)
 
 ticket_router = APIRouter()
 router = APIRouter()
@@ -142,6 +148,33 @@ async def get_card_image_fulfilled(card_id: int) -> FileResponse:
     :return: The image of the card
     """
     return FileResponse(get_card_path(card_id, full_path=True))
+
+
+@router.websocket("{room_id}/ws")
+async def websocket_endpoint(
+    websocket: WebSocket,
+    room_id: int,
+    current_user: UserModel = Depends(get_current_user),
+) -> None:
+    """
+    Connect to a websocket game.
+
+    :param websocket: The websocket
+    :param room_id: The id of the room to connect to
+    :param current_user: The current user
+    :raises HTTPException: If the user is not active
+    """
+    if current_user.id is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You have to be logged in to connect to a game.",
+        )
+    if not current_user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You have to be active to connect to a game.",
+        )
+    await websocket_manager.connect(websocket, room_id, current_user.id)
 
 
 router.include_router(ticket_router, prefix="/ticket")

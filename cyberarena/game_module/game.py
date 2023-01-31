@@ -23,6 +23,15 @@ class Game:
         self.__board = Board()
         self.id = -1
 
+    def __contains__(self, id_player: int) -> bool:
+        """
+        Check if a player is in the game.
+
+        :param id_player: Id of the player.
+        :return: True if player is in the game, False otherwise.
+        """
+        return id_player in {self.player1.id, self.player2.id}
+
     def deploy_card(self, player: Player, card: AbstractCard) -> None:
         """
         Deploy a card.

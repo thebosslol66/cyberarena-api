@@ -1,5 +1,7 @@
 from typing import List, Optional
 
+from exceptions import GameNotFoundError
+
 from .card import LibraryCard
 from .deck import Deck
 from .game import Game
@@ -62,6 +64,27 @@ class GameManager:
                 return True
         return False
 
+    def __len__(self) -> int:
+        """
+        Get the number of active games.
+
+        :return: The number of active games
+        """
+        return len(self.__games)
+
+    def __getitem__(self, idgame: int) -> Game:
+        """
+        Get a game.
+
+        :param idgame: Id of the game.
+        :return: The game.
+        :raises GameNotFoundError: If the game is not found.
+        """
+        for game in self.__games:
+            if game.id == idgame:
+                return game
+        raise GameNotFoundError("Game not found")
+
     def get_game(self, idgame: int) -> Optional[Game]:
         """
         Get a game.
@@ -69,10 +92,10 @@ class GameManager:
         :param idgame: Id of the game.
         :return: The game.
         """
-        for game in self.__games:
-            if game.id == idgame:
-                return game
-        return None
+        try:
+            return self[idgame]
+        except GameNotFoundError:
+            return None
 
     def end_game(self, idgame: int) -> bool:
         """
@@ -107,10 +130,8 @@ class GameManager:
         :return: The id of the game current played.
         """
         for game in self.__games:
-            if game.player1.id == idplayer:
-                return game.player1.id
-            if game.player2.id == idplayer:
-                return game.player2.id
+            if idplayer in game:
+                return game.id
         return -1
 
     def deploy_card(self, idgame: int, idplayer: int, idcard: int) -> None:

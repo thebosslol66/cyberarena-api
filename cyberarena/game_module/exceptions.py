@@ -2,6 +2,10 @@ class CyberArenaGameModuleError(Exception):
     """Base exception for cyberarena game module."""
 
 
+class GameNotFoundError(CyberArenaGameModuleError):
+    """Exception for game not found."""
+
+
 class LibraryError(CyberArenaGameModuleError):
     """Base exception for library."""
 

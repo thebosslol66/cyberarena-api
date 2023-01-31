@@ -1,7 +1,8 @@
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from fastapi import HTTPException
 from starlette import status
+from starlette.websockets import WebSocket
 
 from cyberarena import game_module as gamem
 from cyberarena.web.api.game.enums import TicketStatus
@@ -219,3 +220,54 @@ def get_card_path(card_id: int, full_path: bool = False) -> str:
     :return: The path of the card
     """
     return gamem.get_path_card_image(card_id, full_path)
+
+
+class WebsocketGameManager(object):
+    """Manage the websocket of the game."""
+
+    def __init__(self) -> None:
+        """Initialize the WebsocketGameManager."""
+        self.__websocket_games: Dict[int, List[WebSocket]] = {}
+
+    async def connect(self, websocket: WebSocket, game_id: int, user_id: int) -> None:
+        """
+        Connect a websocket to a game.
+
+        :param websocket: The websocket to connect
+        :param game_id: The id of the game to connect
+        :param user_id: The id of the user to connect
+        :raises HTTPException: If the user is not in the game
+        """
+        try:
+            if user_id not in gamem.game_manager[game_id]:
+                await websocket.close()
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="User not in this game",
+                )
+        except gamem.exceptions.GameNotFoundError:
+            await websocket.close()
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Game not found",
+            )
+        if game_id not in self.__websocket_games.keys():
+            self.__websocket_games[game_id] = []
+        self.__websocket_games[game_id].append(websocket)
+        await websocket.accept()
+
+    async def disconnect(self, websocket: WebSocket, game_id: int) -> None:
+        """
+        Disconnect a websocket from a game.
+
+        :param websocket: The websocket to disconnect
+        :param game_id: The id of the game to disconnect
+        """
+        if game_id in self.__websocket_games.keys():
+            if websocket in self.__websocket_games[game_id]:
+                self.__websocket_games[game_id].remove(websocket)
+            if not self.__websocket_games[game_id]:
+                self.__websocket_games.pop(game_id)
+
+
+websocket_manager = WebsocketGameManager()
