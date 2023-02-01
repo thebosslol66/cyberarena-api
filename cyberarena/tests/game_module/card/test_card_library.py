@@ -7,6 +7,7 @@ from typing import Any, Dict
 import pytest
 
 from cyberarena.game_module.card import LibraryCard
+from cyberarena.game_module.exceptions import LibraryCardNotFoundError
 
 CARD_PATH = os.path.join("cyberarena", "tests_data", "cards")
 
@@ -94,6 +95,70 @@ async def test_card_have_same_name(
             assert os.path.join(CARD_PATH, "hiesenberg") in record.message
             assert os.path.join(CARD_PATH, "ihiesenberg") in record.message
             assert record.levelname == "WARNING"
+
+
+@pytest.mark.anyio
+async def test_folder_not_exist() -> None:
+    with pytest.raises(FileNotFoundError):
+        library = LibraryCard(os.path.join(CARD_PATH, "not_exist"))
+
+
+@pytest.mark.anyio
+async def test_card_not_exist() -> None:
+    library = LibraryCard(CARD_PATH)
+    with pytest.raises(LibraryCardNotFoundError):
+        var = library[2]
+
+
+@pytest.mark.anyio
+async def test_card_iterator() -> None:
+    library = LibraryCard(CARD_PATH)
+    for card in library:
+        assert card == 0
+
+
+@pytest.mark.anyio
+async def test_contain_true_id() -> None:
+    library = LibraryCard(CARD_PATH)
+    assert 0 in library
+
+
+@pytest.mark.anyio
+async def test_contain_false_id() -> None:
+    library = LibraryCard(CARD_PATH)
+    assert 2 not in library
+
+
+@pytest.mark.anyio
+async def test_contain_true_card() -> None:
+    library = LibraryCard(CARD_PATH)
+    assert library[0] in library
+
+
+@pytest.mark.anyio
+async def test_contain_value_not_understood() -> None:
+    library = LibraryCard(CARD_PATH)
+    assert 1.0 not in library
+
+
+@pytest.mark.anyio
+async def test_values() -> None:
+    library = LibraryCard(CARD_PATH)
+    assert len(library.values()) == len(library)
+    assert library[0] in library.values()
+
+
+@pytest.mark.anyio
+async def test_get_image_path() -> None:
+    library = LibraryCard(CARD_PATH)
+    assert library.get_img_path(0) == os.path.join(CARD_PATH, "hiesenberg", "card.png")
+
+
+@pytest.mark.anyio
+async def test_get_image_path_not_exist() -> None:
+    library = LibraryCard(CARD_PATH)
+    with pytest.raises(LibraryCardNotFoundError):
+        library.get_img_path(2)
 
 
 # TODO: make test (ex: if type is not written, file not exist etc.)
