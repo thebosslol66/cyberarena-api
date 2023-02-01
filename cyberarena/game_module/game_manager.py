@@ -1,9 +1,8 @@
 from typing import List, Optional
 
-from exceptions import GameNotFoundError
-
 from .card import LibraryCard
 from .deck import Deck
+from .exceptions import GameNotFoundError
 from .game import Game
 from .player import Player
 from .settings import settings
