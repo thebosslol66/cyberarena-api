@@ -1,18 +1,12 @@
 {
   "id": 0,
-  "name": "Cyber-Heisenberg",
-  "description": "A long description for the lore... #NotImplemented",
-  "ap": 2,
+  "name": "Cyber Heisenberg",
+  "description": "He throws a fake crystal of meth on the opnent' side dealing 1 damage to all oponents.",
+  "ap": 3,
   "dp": 0,
   "hp": 4,
   "cost": 5,
   "race": "human",
   "rarity": "legendary",
-  "card_type": "character",
-  "abilities": {
-    "text": "",
-    "base_clases": [
-      "Cyber"
-    ]
-  }
+  "card_type": "character"
 }

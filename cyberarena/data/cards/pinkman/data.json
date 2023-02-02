@@ -1,0 +1,12 @@
+{
+  "id": 1,
+  "name": "Cyber Jessie Pinkman",
+  "description": "A long description for the lore... #NotImplemented",
+  "ap": 2,
+  "dp": 0,
+  "hp": 4,
+  "cost": 3,
+  "race": "human",
+  "rarity": "legendary",
+  "card_type": "character"
+}

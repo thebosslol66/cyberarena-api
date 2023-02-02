@@ -1,0 +1,12 @@
+{
+  "id": 5,
+  "name": "The Burner",
+  "description": "The attacked card burn and lose 2 health points durin the next turn.",
+  "ap": 2,
+  "dp": 2,
+  "hp": 3,
+  "cost": 5,
+  "race": "robot",
+  "rarity": "epic",
+  "card_type": "character"
+}
