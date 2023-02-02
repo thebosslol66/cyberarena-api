@@ -11,9 +11,9 @@ async def test_game_manager() -> None:
     game_manager = GameManager()
     deck1 = Deck()
     deck2 = Deck()
+    assert not 0 in game_manager
     game = game_manager.create_game(1, 2, deck1, deck2)
-    assert game_manager.__contains__(game.id, 1)
-    assert game_manager.__contains__(game.id, 2)
+    assert 0 in game_manager
 
 
 @pytest.mark.anyio

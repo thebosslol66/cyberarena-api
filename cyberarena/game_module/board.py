@@ -1,8 +1,8 @@
 import logging
 from typing import List, Optional
 
-from cyberarena.game_module.card import AbstractCard, PlayableCharacterCard
-from cyberarena.game_module.settings import settings
+from .card import AbstractCard, PlayableCharacterCard
+from .settings import settings
 
 logger = logging.getLogger("cyberarena.game_module")
 

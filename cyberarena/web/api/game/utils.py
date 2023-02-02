@@ -1,14 +1,15 @@
-import enum
 from typing import Dict, Optional
 
+from fastapi import HTTPException
+from starlette import status
 
-class TicketStatus(str, enum.Enum):  # noqa: WPS600
-    """Ticket status."""
+from cyberarena import game_module as gamem
+from cyberarena.web.api.game.enums import TicketStatus
+from cyberarena.web.api.game.schema import CardModel
 
-    OPEN = "open"
-    CLOSED = "closed"
-    CANCEL = "cancel"
-    DONT_EXIST = "dont_exist"
+##############################################################################
+#                    Ticket system for the game manager                      #
+##############################################################################
 
 
 class Ticket(object):
@@ -161,10 +162,60 @@ class TicketManager(object):
         while len(self.__tickets) > 1:
             ticket1 = self.__tickets.popitem()
             ticket2 = self.__tickets.popitem()
-            ticket1[1].status = TicketStatus.CLOSED  # type: ignore[assignment]
-            ticket2[1].status = TicketStatus.CLOSED  # type: ignore[assignment]
+            ticket1[1].status = TicketStatus.CLOSED
+            ticket2[1].status = TicketStatus.CLOSED
             self.__history[ticket1[0]] = ticket1[1]
             self.__history[ticket2[0]] = ticket2[1]
 
 
 ticket_manager = TicketManager()
+
+
+##############################################################################
+#                     Card related functions and classes                     #
+##############################################################################
+def get_card_data(card_id: int) -> CardModel:
+    """
+    Get a CardModel from a card id.
+
+    :param card_id: The id of the card to get  # noqa: DAR003
+    :return: The CardModel of the card
+    :raises HTTPException: If the card doesn't exist
+    """
+    try:
+        card = gamem.get_card_from_id(card_id)
+        if isinstance(card, gamem.AbstractCharacterCard):
+            return CardModel(
+                id=card_id,
+                name=card.name,
+                description=card.description,
+                cost=card.cost,
+                attack=card.ap,
+                defense=card.dp,
+                health=card.hp,
+                rarity=card.rarity,
+            )
+        return CardModel(
+            id=card_id,
+            name=card.name,
+            description=card.description,
+            cost=card.cost,
+            rarity=card.rarity,
+        )
+
+    except gamem.exceptions.LibraryCardNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Card not found",
+        )
+
+
+def get_card_path(card_id: int, full_path: bool = False) -> str:
+    """
+    Get the path of a card.
+
+    :param card_id: The id of the card to get the path.
+    :param full_path: If True, get the image with stat filled.
+    :return: The path of the card
+    """
+    return gamem.get_path_card_image(card_id, full_path)

@@ -737,3 +737,22 @@ async def test_game_test_deploy_not_enough_mana_p2_t2() -> None:
     game.player2.draw_card()
     game.deploy_card_id(player2, 102)
     assert game.get_board().get_board_size() == 2
+
+
+@pytest.mark.anyio
+async def test_game_test_reach_max_mana_max_turn() -> None:
+    player1 = Player("Heisenberg")
+    player2 = Player("Jessie")
+    game = Game(player1, player2)
+    for i in range(1, 10):
+        assert i == game.player1.mana_max_turn
+        game.increase_turn_debug()
+        assert i == game.player2.mana_max_turn
+        game.increase_turn_debug()
+    game.increase_turn_debug()
+    assert game.turn == 20
+    assert game.player1.mana_max_turn == 10
+    assert game.player2.mana_max_turn == 10
+    game.increase_turn_debug()
+    assert game.player1.mana_max_turn == 10
+    assert game.player2.mana_max_turn == 10

@@ -1,8 +1,10 @@
 from typing import List, Optional
 
-from cyberarena.game_module.deck import Deck
-from cyberarena.game_module.game import Game
-from cyberarena.game_module.player import Player
+from .card import LibraryCard
+from .deck import Deck
+from .game import Game
+from .player import Player
+from .settings import settings
 
 
 class GameManager:
@@ -13,6 +15,15 @@ class GameManager:
         self.__games: List[Game] = []
         self.__players: List[Player] = []
         self.idgames = 0
+
+    @staticmethod
+    def set_up_library() -> None:
+        """Set up the library."""
+        LibraryCard(
+            settings.card_path,
+            settings.card_data_filename,
+            settings.card_image_filename,
+        )
 
     def create_game(self, p1id: int, p2id: int, d1: Deck, d2: Deck) -> Game:
         """
@@ -38,18 +49,17 @@ class GameManager:
         self.__games.append(game)
         return game
 
-    def __contains__(self, idgame: int, idplayer: int) -> bool:
+    def __contains__(self, idgame: int) -> bool:
         """
         Check if a game and a player are in the game manager.
 
         :param idgame: Id of the game.
-        :param idplayer: Id of the player.
 
         :return: True if player is in the game, False otherwise.
         """
         for game in self.__games:
             if game.id == idgame:
-                return game.player1.id == idplayer or game.player2.id == idplayer
+                return True
         return False
 
     def get_game(self, idgame: int) -> Optional[Game]:
@@ -89,17 +99,19 @@ class GameManager:
                 return game
         return None
 
-    def find_player(self, game: Game, idplayer: int) -> Player:
+    def find_player(self, idplayer: int) -> int:
         """
         Finds a player from its id.
 
-        :param game: Game where the player is.
         :param idplayer: Id of the player.
-        :return: The player.
+        :return: The id of the game current played.
         """
-        if game.player1.id == idplayer:
-            return game.player1
-        return game.player2
+        for game in self.__games:
+            if game.player1.id == idplayer:
+                return game.player1.id
+            if game.player2.id == idplayer:
+                return game.player2.id
+        return -1
 
     def deploy_card(self, idgame: int, idplayer: int, idcard: int) -> None:
         """
@@ -145,3 +157,6 @@ class GameManager:
                 return game.player1.id
             return game.player2.id
         return -1
+
+
+game_manager = GameManager()

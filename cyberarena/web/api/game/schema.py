@@ -2,7 +2,8 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from cyberarena.web.api.game.utils import TicketStatus
+from cyberarena import game_module
+from cyberarena.web.api.game.enums import TicketStatus
 
 
 class TicketModel(BaseModel):
@@ -19,7 +20,8 @@ class CardModel(BaseModel):
     id: int
     name: str
     description: str
-    cost: int
-    damage: int
-    health: int
-    defense: int
+    cost: Optional[int] = None
+    damage: Optional[int] = None
+    health: Optional[int] = None
+    defense: Optional[int] = None
+    rarity: game_module.enums.ObjectCardRarity

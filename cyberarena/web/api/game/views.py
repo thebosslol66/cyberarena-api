@@ -7,14 +7,26 @@ from starlette.responses import FileResponse
 from cyberarena.db.models.user_model import UserModel
 from cyberarena.web.api.connection.utils import get_current_user
 from cyberarena.web.api.game.schema import CardModel, TicketModel, TicketStatus
-from cyberarena.web.api.game.utils import ticket_manager
+from cyberarena.web.api.game.utils import get_card_data, get_card_path, ticket_manager
 
-router = APIRouter()
 ticket_router = APIRouter()
-router.include_router(ticket_router, prefix="/ticket", tags=["ticket"])
+router = APIRouter()
 
 
-@ticket_router.get("/open")
+@ticket_router.get(
+    "/open",
+    response_model=TicketModel,
+    summary="Open a ticket for the matchmaker.",
+    description="Ask the matchmaker to find a game for you.\n"
+    "\nIf you already have an open ticket, "
+    "you will have a status code of 400.\n"
+    "\nIf you are not active, "
+    "you will have a status code of 400.\n"
+    "\nIf you are not logged in, "
+    "you will have a status code of 401.\n"
+    "\nIf you are in a game, "
+    "you will have a status code of 400.\n",
+)
 async def open_ticket(
     current_user: UserModel = Depends(get_current_user),
 ) -> TicketModel:
@@ -48,7 +60,12 @@ async def open_ticket(
     )
 
 
-@ticket_router.get("/cancel")
+@ticket_router.get(
+    "/cancel",
+    response_model=TicketModel,
+    summary="Cancel an open ticket.",
+    description="Cancel an open ticket.\n" "So you will not be matched anymore.\n",
+)
 async def cancel_ticket(
     ticket_id: int,
     current_user: UserModel = Depends(get_current_user),
@@ -73,7 +90,17 @@ async def cancel_ticket(
     )
 
 
-@ticket_router.get("/status")
+@ticket_router.get(
+    "/status",
+    response_model=TicketModel,
+    summary="Get the status of a ticket.",
+    description="Get the status of a ticket.\n"
+    "If the ticket is closed, you will get the room id.\n"
+    "\nIf the ticket doesn't exist, "
+    "you will have a status code of 400.\n"
+    "\nIf the ticket is canceled,"
+    "you will receive a tickey with status canceled.\n",
+)
 async def get_ticket_status(
     ticket_id: int,
     current_user: UserModel = Depends(get_current_user),
@@ -102,33 +129,36 @@ async def get_ticket_status(
     )
 
 
-@router.get("/card/{card_id}/data")
+@router.get(
+    "/card/{card_id}/data",
+    response_model=CardModel,
+    summary="Get the data of a card.",
+    description="Get the data of a card.\n"
+    "This include the name, the description, the cost, the type, "
+    "the rarity, the attack, the health, the defense.\n"
+    "\nIf the card doesn't exist, "
+    "you will have a status code of 400.\n",
+)
 async def get_card(card_id: int) -> CardModel:
     """
     Get a card.
 
-    :param card_id: The id of the card to get
+    :param card_id: The id of the card to get  # noqa: DAR003
     :return: The card
-    :raises HTTPException: If the card doesn't exist
+    :raise HTTPException: If the card doesn't exist
     """
-    card = CardModel(
-        id=card_id,
-        name="Card",
-        description="Description",
-        cost=1,
-        damage=1,
-        health=1,
-        defense=1,
-    )
-    if card is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Card doesn't exist.",
-        )
-    return card
+    return get_card_data(card_id)
 
 
-@router.get("/card/{card_id}/image")
+@router.get(
+    "/card/{card_id}/image",
+    response_class=FileResponse,
+    summary="Get the image of a card.",
+    description="Get the image of a card.\n"
+    "Return the image file orf the card in a png format.\n"
+    "\n**WARNING** : This card have not "
+    "the number coreresponding to it stats.\n",
+)
 async def get_card_image(card_id: int) -> FileResponse:
     """
     Get the image of a card.
@@ -136,4 +166,26 @@ async def get_card_image(card_id: int) -> FileResponse:
     :param card_id: The id of the card to get the image
     :return: The image of the card
     """
-    return FileResponse("cyberarena/tests_data/imgs/test_avatar_good_512x512.png")
+    return FileResponse(get_card_path(card_id))
+
+
+@router.get(
+    "/card/{card_id}/imagefull",
+    response_class=FileResponse,
+    summary="Get the image of a card.",
+    description="Get the image of a card.\n"
+    "Return the image file orf the card in a png format.\n"
+    "\nThis card is fully completed with card base stats.\n"
+    "\nYou can't add number on it yourself.\n",
+)
+async def get_card_image_fulfilled(card_id: int) -> FileResponse:
+    """
+    Get the image of a card.
+
+    :param card_id: The id of the card to get the image
+    :return: The image of the card
+    """
+    return FileResponse(get_card_path(card_id, full_path=True))
+
+
+router.include_router(ticket_router, prefix="/ticket")

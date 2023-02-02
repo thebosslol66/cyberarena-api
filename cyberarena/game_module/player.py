@@ -1,9 +1,9 @@
 import logging
 from typing import Optional
 
-from cyberarena.game_module.card import AbstractCard
-from cyberarena.game_module.deck import Deck
-from cyberarena.game_module.hand import Hand
+from .card import AbstractCard
+from .deck import Deck
+from .hand import Hand
 
 logger = logging.getLogger("cyberarena.game_module")
 
