@@ -1,4 +1,12 @@
-from .card import AbstractCard, LibraryCard
+import os
+
+from .card import AbstractCard
+from .card.library import Library
+from .image_card_generator import (
+    ImageCardGenerator,
+    is_data_or_image_newer_than_builded_card,
+)
+from .settings import settings
 
 
 def get_card_from_id(id_card: int) -> AbstractCard:
@@ -9,16 +17,37 @@ def get_card_from_id(id_card: int) -> AbstractCard:
     :return: The card.
     :raise LibraryCardNotFoundError: If the card is not in the library.
     """
-    lib = LibraryCard()
+    lib = Library()
     return lib[id_card]
 
 
-def get_path_card_image(card_id: int, full_card: bool = False) -> str:
+def get_path_card_image(card_id: int, static: bool = False) -> str:
     """
     Get the path of the card image.
 
     :param card_id: ID of the card.
-    :param full_card: If True, return the path of card with stats completed.
-    :raises NotImplementedError: If the function is not implemented yet.
+    :param static: If True, return the path of card with static stats.
+    :return: The path of the card image.
     """
-    raise NotImplementedError("This function is not implemented yet.")
+    if static:
+        return os.path.join(
+            settings.card_image_path,
+            settings.static_image.format(card_id),
+        )
+    return os.path.join(
+        settings.card_image_path,
+        settings.dynamic_image.format(card_id),
+    )
+
+
+def update_card_image(card_id: int) -> None:
+    """
+    Update the image of a card.
+
+    :param card_id: ID of the card.
+    """
+    card = get_card_from_id(card_id)
+    if is_data_or_image_newer_than_builded_card("data.json", "0.png", "heisenberg"):
+        icg = ImageCardGenerator(card, settings.card_image_path)
+        icg.generate_card()
+        icg.save_image(settings.static_image.format(card_id))

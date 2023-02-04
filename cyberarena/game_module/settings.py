@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     deck_size: int = 20
     board_size: int = 5
 
+    card_image_path: str = "cyberarena/static/img/cards"
+    static_image: str = "{0}_static.png"
+    dynamic_image: str = "{0}_dynamic.png"
     card_path: str = "./cyberarena/data/cards"
     card_data_filename: str = "data.json"
     card_image_filename: str = "card.png"
