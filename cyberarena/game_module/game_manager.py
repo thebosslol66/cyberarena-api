@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+from . import AbstractCard
 from .card import LibraryCard
 from .deck import Deck
 from .exceptions import GameNotFoundError
@@ -133,6 +134,22 @@ class GameManager:
                 return game.id
         return -1
 
+    def draw_card(self, idgame: int, idplayer: int) -> Optional[AbstractCard]:
+        """
+        Draw a card.
+
+        :param idgame: Id of the game.
+        :param idplayer: Id of the player.
+        :return: The card drawn.
+        """
+        game = self.find_game(idgame)
+        if game:
+            if game.player1.id == idplayer:
+                return game.draw_card(game.player1)
+            if game.player2.id == idplayer:
+                return game.draw_card(game.player2)
+        return None
+
     def deploy_card(self, idgame: int, idplayer: int, idcard: int) -> None:
         """
         Deploy a card.
@@ -177,6 +194,35 @@ class GameManager:
                 return game.player1.id
             return game.player2.id
         return -1
+
+    def connect(self, idgame: int, idplayer: int) -> bool:
+        """
+        Connect a player to a game.
+
+        :param idgame: Id of the game.
+        :param idplayer: Id of the player.
+        :return: True if both players are connected, False otherwise.
+        """
+        game = self.find_game(idgame)
+        if game:
+            if game.player1.id == idplayer:
+                game.p1connected = True
+            if game.player2.id == idplayer:
+                game.p2connected = True
+            if game.p1connected and game.p2connected:
+                return True
+        return False
+
+    def next_turn(self, idgame: int, idplayer: int) -> None:
+        """
+        Go to the next turn.
+
+        :param idgame: Id of the game.
+        :param idplayer: Id of the player.
+        """
+        game = self.find_game(idgame)
+        if game:
+            game.increase_turn(idplayer)
 
 
 game_manager = GameManager()

@@ -1,4 +1,6 @@
 from .card import AbstractCard, LibraryCard
+from .deck import Deck
+from .settings import settings
 
 
 def get_card_from_id(id_card: int) -> AbstractCard:
@@ -22,3 +24,21 @@ def get_path_card_image(card_id: int, full_card: bool = False) -> str:
     :raises NotImplementedError: If the function is not implemented yet.
     """
     raise NotImplementedError("This function is not implemented yet.")
+
+
+def create_deck() -> Deck:
+    """
+    Create a deck.
+
+    :return: The deck created.
+    """
+    return Deck()
+
+
+def get_starting_cards_amount() -> int:
+    """
+    Get the amount of cards in a deck.
+
+    :return: The amount of cards in a deck.
+    """
+    return settings.starting_cards_in_deck

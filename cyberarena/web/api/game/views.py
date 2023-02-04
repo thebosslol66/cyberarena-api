@@ -175,6 +175,11 @@ async def websocket_endpoint(
             detail="You have to be active to connect to a game.",
         )
     await websocket_manager.connect(websocket, room_id, current_user.id)
+    while True:
+        data = await websocket.receive_json()
+        await websocket_manager.receive(websocket, data, room_id, current_user.id)
+        if data["type"] == "close":
+            break
 
 
 router.include_router(ticket_router, prefix="/ticket")
