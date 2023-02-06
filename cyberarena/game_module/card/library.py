@@ -238,7 +238,7 @@ class Library(object):
         card_names: typing.Dict[str, str] = {}
         for card_id, card in self.items():
             if card.name in card_names.keys():
-                logger.error(
+                logger.warning(
                     "The card with name '{0}' already exist: "
                     "See file '{1}' and file '{2}'".format(
                         card.name,
