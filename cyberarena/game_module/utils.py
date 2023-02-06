@@ -1,6 +1,6 @@
 import os
 
-from .card import AbstractCard
+from .card import AbstractCard, LibraryCard
 from .card.library import Library
 from .image_card_generator import (
     ImageCardGenerator,
@@ -51,3 +51,32 @@ def update_card_image(card_id: int) -> None:
         icg = ImageCardGenerator(card, settings.card_image_path)
         icg.generate_card()
         icg.save_image(settings.static_image.format(card_id))
+
+
+def setup_library() -> None:
+    """Set up the library."""
+    LibraryCard(
+        settings.card_path,
+        settings.card_data_filename,
+        settings.card_image_filename,
+    )
+
+
+def setup_card_images() -> None:
+    """
+    Set up the card images.
+
+    It generates the card images from the card data.
+    :raises NotImplementedError: If the function is not implemented.
+    """
+    raise NotImplementedError("Create the function to generate all cards images.")
+
+
+def setup_game_module() -> None:
+    """
+    Initialize the game module.
+
+    It load the cards in the library and it generates cards images from it.
+    """
+    setup_library()
+    setup_card_images()

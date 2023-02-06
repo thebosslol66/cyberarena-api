@@ -1,10 +1,8 @@
 from typing import List, Optional
 
-from .card import LibraryCard
 from .deck import Deck
 from .game import Game
 from .player import Player
-from .settings import settings
 
 
 class GameManager:
@@ -15,15 +13,6 @@ class GameManager:
         self.__games: List[Game] = []
         self.__players: List[Player] = []
         self.idgames = 0
-
-    @staticmethod
-    def set_up_library() -> None:
-        """Set up the library."""
-        LibraryCard(
-            settings.card_path,
-            settings.card_data_filename,
-            settings.card_image_filename,
-        )
 
     def create_game(self, p1id: int, p2id: int, d1: Deck, d2: Deck) -> Game:
         """
@@ -49,84 +38,84 @@ class GameManager:
         self.__games.append(game)
         return game
 
-    def __contains__(self, idgame: int) -> bool:
+    def __contains__(self, id_game: int) -> bool:
         """
         Check if a game and a player are in the game manager.
 
-        :param idgame: Id of the game.
+        :param id_game: Id of the game.
 
         :return: True if player is in the game, False otherwise.
         """
         for game in self.__games:
-            if game.id == idgame:
+            if game.id == id_game:
                 return True
         return False
 
-    def get_game(self, idgame: int) -> Optional[Game]:
+    def get_game(self, id_game: int) -> Optional[Game]:
         """
         Get a game.
 
-        :param idgame: Id of the game.
+        :param id_game: Id of the game.
         :return: The game.
         """
         for game in self.__games:
-            if game.id == idgame:
+            if game.id == id_game:
                 return game
         return None
 
-    def end_game(self, idgame: int) -> bool:
+    def end_game(self, id_game: int) -> bool:
         """
         End a game.
 
-        :param idgame: Id of the game.
+        :param id_game: Id of the game.
         :return: True if the game has been ended, False otherwise.
         """
         for game in self.__games:
-            if game.id == idgame:
+            if game.id == id_game:
                 self.__games.remove(game)
                 return True
         return False
 
-    def find_game(self, idgame: int) -> Optional[Game]:
+    def find_game(self, id_game: int) -> Optional[Game]:
         """
         Finds a game from its id.
 
-        :param idgame: Id of the game.
+        :param id_game: Id of the game.
         :return: The game.
         """
         for game in self.__games:
-            if game.id == idgame:
+            if game.id == id_game:
                 return game
         return None
 
-    def find_player(self, idplayer: int) -> int:
+    def find_player(self, id_player: int) -> int:
         """
         Finds a player from its id.
 
-        :param idplayer: Id of the player.
+        :param id_player: Id of the player.
         :return: The id of the game current played.
         """
         for game in self.__games:
-            if game.player1.id == idplayer:
+            if game.player1.id == id_player:
                 return game.player1.id
-            if game.player2.id == idplayer:
+            if game.player2.id == id_player:
                 return game.player2.id
         return -1
 
-    def deploy_card(self, idgame: int, idplayer: int, idcard: int) -> None:
+    def deploy_card(self, id_game: int, id_player: int, id_card: int) -> None:
         """
         Deploy a card.
 
-        :param idgame: Id of the game.
-        :param idplayer: Id of the player.
-        :param idcard: Id of the card.
+        :param id_game: Id of the game.
+        :param id_player: Id of the player.
+        :param id_card: Id of the card.
         """
-        game = self.find_game(idgame)
+        game = self.find_game(id_game)
         if game:
-            if game.player1.id == idplayer:
-                game.deploy_card_id(game.player1, idcard)
-            if game.player2.id == idplayer:
-                game.deploy_card_id(game.player2, idcard)
+            if game.player1.id == id_player:
+                game.deploy_card_id(game.player1, id_card)
+            if game.player2.id == id_player:
+                game.deploy_card_id(game.player2, id_card)
 
     def attack_card(self, idgame: int, idplayer: int, idatt: int, idrecv: int) -> None:
         """
@@ -144,14 +133,14 @@ class GameManager:
             if game.player2.id == idplayer:
                 game.attack_card_id(game.player2, idatt, idrecv)
 
-    def get_turn(self, idgame: int) -> int:
+    def get_turn(self, id_game: int) -> int:
         """
         Get the turn of a game.
 
-        :param idgame: Id of the game.
+        :param id_game: Id of the game.
         :return: The turn of the game.
         """
-        game = self.find_game(idgame)
+        game = self.find_game(id_game)
         if game:
             if game.check_turn(game.player1):
                 return game.player1.id
