@@ -71,7 +71,7 @@ async def test_card_have_same_id(
     assert library.get_img_path(0) == os.path.join(CARD_PATH, "hiesenberg", "card.png")
     assert "2 cards have the same id" in caplog.text
     for record in caplog.records:
-        if record.message == "2 cards have the same id":
+        if "2 cards have the same id" in record.message:
             assert os.path.join(CARD_PATH, "hiesenberg") in record.message
             assert os.path.join(CARD_PATH, "ihiesenberg") in record.message
             assert record.levelname == "ERROR"
@@ -91,7 +91,7 @@ async def test_card_have_same_name(
     assert library[1].name == "Cyber-Heisenberg"
     assert "The card with name 'Cyber-Heisenberg' already exist" in caplog.text
     for record in caplog.records:
-        if record.message == "The card with name 'Cyber-Heisenberg' already exist":
+        if "The card with name 'Cyber-Heisenberg' already exist" in record.message:
             assert os.path.join(CARD_PATH, "hiesenberg") in record.message
             assert os.path.join(CARD_PATH, "ihiesenberg") in record.message
             assert record.levelname == "WARNING"
