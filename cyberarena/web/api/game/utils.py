@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from fastapi import HTTPException
 from loguru import logger
@@ -8,6 +8,10 @@ from starlette.websockets import WebSocket, WebSocketDisconnect
 from cyberarena import game_module as gamem
 from cyberarena.web.api.game.enums import TicketStatus
 from cyberarena.web.api.game.schema import CardModel
+
+UnionIntStr = Union[int, str]
+DictStrUnionIntStr = Dict[str, UnionIntStr]
+UnionStrDictStr = Union[str, DictStrUnionIntStr]
 
 
 class YourDaroneNotImplemented(NotImplementedError):
@@ -293,17 +297,18 @@ class WebsocketGameManager(object):
         :param game_id: The id of the game
         :param data: The data to send
         """
-        if game_id in self.__websocket_games:
-            for websocket in self.__websocket_games[game_id]:
-                try:
-                    await websocket.send_json(data)
-                except WebSocketDisconnect:
-                    await self.disconnect(websocket, game_id)
+        if game_id not in self.__websocket_games:
+            return
+        for websocket in self.__websocket_games[game_id]:
+            try:
+                await websocket.send_json(data)
+            except WebSocketDisconnect:
+                await self.disconnect(websocket, game_id)
 
     async def game_private_broadcast(
         self,
         game_id: int,
-        data: Dict[str, str | Dict[str, str | int]],
+        data: Dict[str, UnionStrDictStr],  # noqa: WPS221
         target: WebSocket,
         data_for_other: Dict[str, str],
     ) -> None:
@@ -315,15 +320,16 @@ class WebsocketGameManager(object):
         :param data_for_other: The data to send to the other players
         :param target: The target of the data
         """
-        if game_id in self.__websocket_games:
-            for websocket in self.__websocket_games[game_id]:
-                try:
-                    if websocket == target:
-                        await websocket.send_json(data)
-                    else:
-                        await websocket.send_json(data_for_other)
-                except WebSocketDisconnect:
-                    await self.disconnect(websocket, game_id)
+        if game_id not in self.__websocket_games:
+            return
+        for websocket in self.__websocket_games[game_id]:
+            try:
+                if websocket == target:
+                    await websocket.send_json(data)
+                else:
+                    await websocket.send_json(data_for_other)
+            except WebSocketDisconnect:
+                await self.disconnect(websocket, game_id)
 
     async def receive(
         self,
@@ -366,20 +372,21 @@ class WebsocketGameManager(object):
 
         :param game_id: The id of the game
         """
-        if game_id in self.__websocket_games:
-            for websocket in self.__websocket_games[game_id]:
-                try:
-                    await websocket.send_json(
-                        {
-                            "type": "set_turn",
-                            "is_turn": gamem.game_manager.get_turn(
-                                game_id,
-                            )
-                            == self.__websocket_to_player[websocket],
-                        },
-                    )
-                except WebSocketDisconnect:
-                    await self.disconnect(websocket, game_id)
+        if game_id not in self.__websocket_games:
+            return
+        for websocket in self.__websocket_games[game_id]:
+            try:
+                await websocket.send_json(
+                    {
+                        "type": "set_turn",
+                        "is_turn": gamem.game_manager.get_turn(
+                            game_id,
+                        )
+                        == self.__websocket_to_player[websocket],
+                    },
+                )
+            except WebSocketDisconnect:
+                await self.disconnect(websocket, game_id)
 
     async def draw_card(self, game_id: int, websocket: WebSocket) -> None:
         """

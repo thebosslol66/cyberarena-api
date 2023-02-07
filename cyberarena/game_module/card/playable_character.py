@@ -70,7 +70,7 @@ class PlayableCharacterCard(AbstractCharacterCard):
             self.cost,
         )
 
-    def to_dict(self) -> typing.Dict[str, str | int]:
+    def to_dict(self) -> typing.Dict[str, typing.Union[str, int]]:
         """
         Return a dictionary representation of the card.
 

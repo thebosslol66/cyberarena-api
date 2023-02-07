@@ -1,5 +1,5 @@
 import abc
-from typing import Dict
+from typing import Dict, Union
 
 from cyberarena.game_module.card.enums import ObjectCardRace, ObjectCardRarity
 
@@ -95,7 +95,7 @@ class AbstractCard(metaclass=abc.ABCMeta):
         return self._rarity
 
     @abc.abstractmethod
-    def to_dict(self) -> Dict[str, str | int]:
+    def to_dict(self) -> Dict[str, Union[str, int]]:
         """Getter for json of the card."""
 
 
