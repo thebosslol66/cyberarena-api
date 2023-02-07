@@ -81,6 +81,8 @@ def setup_card_images() -> None:
 
     It generates the card images from the card data.
     """
+    if not os.path.exists(settings.card_image_path):
+        os.makedirs(settings.card_image_path)
     lib = Library()
     for card_id in Library().keys():
         card = get_card_from_id(card_id)
