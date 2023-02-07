@@ -54,7 +54,7 @@ def update_card_image(card_id: int) -> None:
     )
     builded_card_filename = os.path.join(
         settings.card_image_path,
-        "{0}_static.png".format(card_id),
+        settings.static_image.format(card_id),
     )
     if is_data_or_image_newer_than_builded_card(  # noqa: WPS337
         data_file_path,
@@ -92,7 +92,7 @@ def setup_card_images() -> None:  # noqa: WPS210
         )
         builded_card_filename = os.path.join(
             settings.card_image_path,
-            "{0}_static.png".format(card_id),
+            settings.static_image.format(card_id),
         )
         if os.path.exists(builded_card_filename):
             continue
