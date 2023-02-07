@@ -60,7 +60,7 @@ def update_card_image(card_id: int) -> None:
         data_file_path,
         lib.get_img_path(card_id),
         builded_card_filename,
-    ):
+    ):  # noqa: WPS337
         icg = ImageCardGenerator(card, lib.get_img_path(card_id))
         icg.generate_card()
         icg.save_image_with_values(settings.dynamic_image.format(card_id))
@@ -75,7 +75,7 @@ def setup_library() -> None:
     )
 
 
-def setup_card_images() -> None:
+def setup_card_images() -> None:  # noqa: WPS210
     """
     Set up the card images.
 
@@ -103,7 +103,7 @@ def setup_card_images() -> None:
             data_file_path,
             lib.get_img_path(card_id),
             builded_card_filename,
-        ):
+        ):  # noqa: WPS337
             icg.save_image_with_values(settings.static_image.format(card_id))
             icg.save_image(settings.dynamic_image.format(card_id))
 
