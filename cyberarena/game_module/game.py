@@ -1,8 +1,10 @@
-from loguru import logger
+import logging
 
-from cyberarena.game_module.board import Board
-from cyberarena.game_module.card import AbstractCard, PlayableCharacterCard
-from cyberarena.game_module.player import Player
+from .board import Board
+from .card import AbstractCard, PlayableCharacterCard
+from .player import Player
+
+logger = logging.getLogger("cyberarena.game_module")
 
 
 class Game:
@@ -28,6 +30,9 @@ class Game:
         :param player: Player deploying the card.
         :param card: Card to deploy.
         """
+        if not self.check_turn(player):
+            logger.debug("It's not your turn!")
+            return
         cardrcv = player.use_card(card)
         if cardrcv is None:
             logger.debug("cost too high")
@@ -131,6 +136,15 @@ class Game:
             return
         self.attack_card(player, cardatt, cardrecv)
 
+    def draw_card(self, player: Player) -> None:
+        """
+        Draw a card.
+
+        :param player: Player drawing the card.
+        """
+        if self.check_turn(player):
+            player.draw_card()
+
     def get_board(self) -> Board:
         """
         Get the board.
@@ -152,8 +166,12 @@ class Game:
 
     def increase_turn_debug(self) -> None:
         """Debug increase turn."""
-        self.turn += 1
         player = 2 if self.turn % 2 == 0 else 1
+        if player == 1:
+            self.player1.next_turn()
+        else:
+            self.player2.next_turn()
+        self.turn += 1
         self.__board.end_turn(player)
 
     def get_id(self) -> int:

@@ -1,0 +1,12 @@
+{
+  "id": 7,
+  "name": "The Rebel",
+  "description": "",
+  "ap": 1,
+  "dp": 0,
+  "hp": 2,
+  "cost": 1,
+  "race": "human",
+  "rarity": "rare",
+  "card_type": "character"
+}

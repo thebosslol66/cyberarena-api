@@ -1,11 +1,12 @@
+import logging
 import os
 import typing
 
-from loguru import logger
-
-from ..exceptions import LibraryFileNotFoundError
+from ..exceptions import LibraryCardNotFoundError, LibraryFileNotFoundError
 from .base import AbstractCard
 from .factory import factory_card
+
+logger = logging.getLogger("cyberarena.game_module.card_validator")
 
 
 class Library(object):
@@ -48,6 +49,7 @@ class Library(object):
         self,
         path_name: str = "",
         default_filename: str = "data.json",
+        default_image: str = "card.png",
     ) -> None:
         """Virtually private constructor.
 
@@ -55,26 +57,31 @@ class Library(object):
 
         :param path_name: The path to the library.
         :param default_filename: The default filename of the card.
+        :param default_image: The default image of the card.
         :raises LibraryFileNotFoundError:
             If the library path not Exist.
         """
         if Library.__init_flag:
             return
-        self.__library: typing.Dict[str, AbstractCard] = {}
+        Library.__init_flag = True
+        self.__library: typing.Dict[int, AbstractCard] = {}
+        self.__library_card_path: typing.Dict[int, str] = {}
         self.__library_path = path_name
         self.__default_filename = default_filename
+        self.__default_image = default_image
         if not os.path.isdir(self.__library_path):
             logger.error(
-                "The path to the library is not a directory: {0}",
-                self.__library_path,
+                "The path to the library is not a directory: {0}".format(
+                    self.__library_path,
+                ),
             )
             raise LibraryFileNotFoundError(
                 f"The library path is not valid: '{path_name}'",
             )
         self.__load_library()
-        Library.__init_flag = True
+        self.__verify_card_names()
 
-    def __iter__(self) -> typing.Iterator[str]:
+    def __iter__(self) -> typing.Iterator[int]:
         """
         Iterate over the library.
 
@@ -90,29 +97,38 @@ class Library(object):
         """
         return len(self.keys())
 
-    def __getitem__(self, key: str) -> AbstractCard:
+    def __getitem__(self, key: int) -> AbstractCard:
         """
         Get a card by his name.
 
         :param key: The name of the card.
+        :raises LibraryCardNotFoundError: If the card is not in the library.
         :return: The card if it exist.
         """
-        return self.__library[key]
+        try:
+            return self.__library[key]
+        except KeyError:
+            logger.error(
+                "The card {0} is not in the library.".format(key),
+            )
+            raise LibraryCardNotFoundError(
+                f"The card {key} is not in the library.",
+            )
 
-    def __contains__(self, card: typing.Union[str, AbstractCard]) -> bool:
+    def __contains__(self, card: typing.Union[int, AbstractCard]) -> bool:
         """
         Check if the card is in the library.
 
         :param card: The card to check or his name.
         :return: True if the card is in the library.
         """
-        if isinstance(card, str):
+        if isinstance(card, int):
             return card in self.__library.keys()
         elif isinstance(card, AbstractCard):
             return card in self.__library.values()
         return False
 
-    def keys(self) -> typing.KeysView[str]:
+    def keys(self) -> typing.KeysView[int]:
         """
         Return the list of cards in the library.
 
@@ -128,7 +144,7 @@ class Library(object):
         """
         return self.__library.values()
 
-    def items(self) -> typing.ItemsView[str, AbstractCard]:
+    def items(self) -> typing.ItemsView[int, AbstractCard]:
         """
         Return the list of cards in the library.
 
@@ -136,7 +152,33 @@ class Library(object):
         """
         return self.__library.items()
 
-    def __get_cards_path(self) -> typing.Generator[str, None, None]:
+    def get_img_path(self, card_id: int) -> str:
+        """
+        Return the path of the card image.
+
+        :param card_id: The id of the card.
+        :raises LibraryCardNotFoundError: If the card is not in the library.
+        :return: The path of the card image.
+        """
+        if card_id not in self.__library_card_path:
+            logger.error(
+                "The card '{0}' is not in the library.".format(
+                    card_id,
+                ),
+            )
+            raise LibraryCardNotFoundError(
+                f"The card '{card_id}' is not in the library.",
+            )
+        return self.__library_card_path[card_id]
+
+    @classmethod
+    def reset(cls) -> None:
+        """Reset the library instance."""
+        logger.warning("You are resetting the library. You should not do that.")
+        cls.__instance = None
+        cls.__init_flag = False
+
+    def __get_cards_path(self) -> typing.Generator[typing.Tuple[str, str], None, None]:
         """
         Get each cards in a specific directory.
 
@@ -152,22 +194,76 @@ class Library(object):
                     self.__default_filename,
                 ),
             )
-            if is_file:
+            is_image = os.path.isfile(
+                os.path.join(
+                    self.__library_path,
+                    card_dir,
+                    self.__default_image,
+                ),
+            )
+            if is_file and is_image:
                 yield os.path.join(
                     self.__library_path,
                     card_dir,
                     self.__default_filename,
+                ), os.path.join(
+                    self.__library_path,
+                    card_dir,
+                    self.__default_image,
                 )
             else:
+                if not is_file:
+                    logger.warning(
+                        "The folder '{0}' does not have a data file '{1}'.".format(
+                            os.path.join(
+                                self.__library_path,
+                                card_dir,
+                            ),
+                            self.__default_filename,
+                        ),
+                    )
+                if not is_image:
+                    logger.warning(
+                        "The folder '{0}' does not have an image file '{1}'.".format(
+                            os.path.join(
+                                self.__library_path,
+                                card_dir,
+                            ),
+                            self.__default_image,
+                        ),
+                    )
+
+    def __verify_card_names(self) -> None:
+        """Verify that all cards have a unique name."""
+        card_names: typing.Dict[str, str] = {}
+        for card_id, card in self.items():
+            if card.name in card_names.keys():
                 logger.warning(
-                    "The card '{0}' does not have a data file '{1}'.",
-                    card_dir,
-                    self.__default_filename,
+                    "The card with name '{0}' already exist: "
+                    "See file '{1}' and file '{2}'".format(
+                        card.name,
+                        os.path.dirname(card_names[card.name]),
+                        os.path.dirname(self.__library_card_path[card_id]),
+                    ),
                 )
+            else:
+                logger.debug("Card {0}:{1} is ok.".format(card.name, card_id))
+                card_names[card.name] = self.__library_card_path[card_id]
 
     def __load_library(self) -> None:
         """Load all cards in the library."""
-        for card_data in self.__get_cards_path():
-            card = factory_card.create_card_from_file(card_data)
+        for (card_data, card_img) in self.__get_cards_path():
+            (card_id, card) = factory_card.create_card_from_file(card_data)
             if card is not None:
-                self.__library[card.name] = card
+                if card_id in self.__library:
+                    logger.error(
+                        "2 cards have the same id {0}: "
+                        "See file '{1}' and file '{2}'".format(
+                            card_id,
+                            os.path.dirname(self.__library_card_path[card_id]),
+                            os.path.dirname(card_data),
+                        ),
+                    )
+                    continue
+                self.__library[card_id] = card
+                self.__library_card_path[card_id] = card_img

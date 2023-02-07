@@ -219,7 +219,7 @@ async def change_avatar(
         error = "The image is too big"
     avatar_img.file.seek(0, 0)
 
-    if user.id is None:
+    if user.id is None:  # pragma: no cover
         error = "User not found"
 
     if error:

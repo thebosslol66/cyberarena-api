@@ -1,15 +1,16 @@
 {
+  "id": 0,
   "name": "Cyber-Hisenberg",
   "description": "A long description for the lore... #NotImplemented",
   "ap": 13,
   "dp": 12,
   "hp": 11,
   "cost": 10,
-  "type": "Cyber",
-  "rarity": "Legendary",
-  "ability": {
+  "race": "robot",
+  "rarity": "legendary",
+  "abilities": {
     "text": "A description for the ability in the card #NotImplemented",
     "base_clases": [
       "Cyber"
     ]
-  }
+  },

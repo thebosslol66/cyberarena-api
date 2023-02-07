@@ -1,0 +1,12 @@
+{
+  "id": 6,
+  "name": "The Collector",
+  "description": "",
+  "ap": 4,
+  "dp": 1,
+  "hp": 2,
+  "cost": 6,
+  "race": "robot",
+  "rarity": "common",
+  "card_type": "character"
+}

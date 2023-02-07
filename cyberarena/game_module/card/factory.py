@@ -1,11 +1,12 @@
 import json
-from typing import Any, Dict, Optional
-
-from loguru import logger
+import logging
+from typing import Any, Dict, Optional, Tuple
 
 from .base import AbstractCard
 from .constructor import ConstructorAbstract, playable_character_card
 from .enums import ObjectCardType
+
+logger = logging.getLogger("cyberarena.game_module.card_validator")
 
 
 class FactoryCard(object):
@@ -15,25 +16,22 @@ class FactoryCard(object):
         """Constructor."""
         self.json_data: Optional[Dict[str, Any]] = {}
 
-    def create_card_from_file(self, filename: str) -> Optional[AbstractCard]:
+    def create_card_from_file(
+        self,
+        filename: str,
+    ) -> Tuple[int, Optional[AbstractCard]]:
         """
         Create a card from a json file.
 
         :param filename: The json file to load.
-        :return: The card constructed from the json file.
+        :return: The index of the card and the card constructed from the json file.
         """
-        self.json_data = None
-        if not self._load_json(filename) or self.json_data is None:
-            return None  # pragma: no cover
-        constructor: Optional[ConstructorAbstract] = self._return_constructor()
-        self.json_data.pop("card_type", None)
-        if constructor is None:
-            return None
-        if not constructor.construct(self.json_data):
-            return None  # pragma: no cover
-        return constructor.get_card()
+        (card_id, card) = self._create_card_from_file(filename)
+        if card is None:
+            logger.error(f"The card in the folder '{filename}' is not valid.")
+        return card_id, card
 
-    def _load_json(self, filename: str) -> bool:
+    def load_json(self, filename: str) -> bool:
         """
         Load a json file.
 
@@ -53,6 +51,27 @@ class FactoryCard(object):
             logger.error(f"The file '{filename}' is not a valid json.")
             raise error
         return True
+
+    def _create_card_from_file(
+        self,
+        filename: str,
+    ) -> Tuple[int, Optional[AbstractCard]]:
+        """
+        Create a card from a json file.
+
+        :param filename: The json file to load.
+        :return: The index of the card and the card constructed from the json file.
+        """
+        self.json_data = None
+        if not self.load_json(filename) or self.json_data is None:
+            return -1, None  # pragma: no cover
+        constructor: Optional[ConstructorAbstract] = self._return_constructor()
+        self.json_data.pop("card_type", None)
+        if constructor is None:
+            return -1, None
+        if not constructor.construct(self.json_data):
+            return -1, None  # pragma: no cover
+        return constructor.get_card()
 
     def _return_constructor(self) -> Optional[ConstructorAbstract]:
         """
@@ -78,7 +97,7 @@ class FactoryCard(object):
             ObjectCardType.PLAYER: playable_character_card,
         }
         for key, value in possible_return.items():
-            if card_type == str(key):
+            if card_type == key:
                 return value
         card_name = self.json_data.get("name", "Unknown")
         logger.error(

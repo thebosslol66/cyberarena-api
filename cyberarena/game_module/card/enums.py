@@ -1,9 +1,7 @@
-from enum import auto
-
-from strenum import LowercaseStrEnum
+import enum
 
 
-class ObjectCardType(LowercaseStrEnum):
+class ObjectCardType(str, enum.Enum):  # noqa: WPS600
     """
     Enum for listing different type of cards.
 
@@ -11,6 +9,24 @@ class ObjectCardType(LowercaseStrEnum):
     and player card.
     """
 
-    OBJECT = auto()
-    CHARACTER = auto()
-    PLAYER = auto()
+    OBJECT = "object"
+    CHARACTER = "character"
+    PLAYER = "player"
+
+
+class ObjectCardRace(str, enum.Enum):  # noqa: WPS600
+    """Enum for listing different race of cards."""
+
+    HUMAN = "human"
+    ROBOT = "robot"
+    ALIEN = "alien"
+    MUTANT = "mutant"
+
+
+class ObjectCardRarity(str, enum.Enum):  # noqa: WPS600
+    """Enum for listing different rarity of cards."""
+
+    COMMON = "common"
+    RARE = "rare"
+    EPIC = "epic"
+    LEGENDARY = "legendary"

@@ -1,0 +1,12 @@
+{
+  "id": 12,
+  "name": "The RAM",
+  "description": "Due to the big damage it can make, it need 2 turn to attack.",
+  "ap": 6,
+  "dp": 4,
+  "hp": 4,
+  "cost": 8,
+  "race": "robot",
+  "rarity": "rare",
+  "card_type": "character"
+}

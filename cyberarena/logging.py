@@ -91,6 +91,22 @@ def configure_logging() -> None:  # pragma: no cover
     logging.getLogger("uvicorn").handlers = [intercept_handler]
     logging.getLogger("uvicorn.access").handlers = [intercept_handler]
 
+    # Change handler for cyberarena loggera
+    loggers = (
+        logging.getLogger(name)
+        for name in logging.root.manager.loggerDict
+        if name.startswith("cyberarena.")
+    )
+    for cyberarena_logger in loggers:
+        cyberarena_logger.handlers = []
+
+    logging.getLogger("cyberarena").handlers = [intercept_handler]
+
+    # change handler for default uvicorn logger
+    intercept_handler = InterceptHandler()
+    logging.getLogger("uvicorn").handlers = [intercept_handler]
+    logging.getLogger("uvicorn.access").handlers = [intercept_handler]
+
     # set logs output, level and format
     logger.remove()
     logger.add(
