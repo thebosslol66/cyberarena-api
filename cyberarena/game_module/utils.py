@@ -56,11 +56,11 @@ def update_card_image(card_id: int) -> None:
         settings.card_image_path,
         "{0}_static.png".format(card_id),
     )
-    if is_data_or_image_newer_than_builded_card(
+    if is_data_or_image_newer_than_builded_card(  # noqa: WPS337
         data_file_path,
         lib.get_img_path(card_id),
         builded_card_filename,
-    ):  # noqa: WPS337
+    ):
         icg = ImageCardGenerator(card, lib.get_img_path(card_id))
         icg.generate_card()
         icg.save_image_with_values(settings.dynamic_image.format(card_id))
@@ -99,11 +99,11 @@ def setup_card_images() -> None:  # noqa: WPS210
         icg = ImageCardGenerator(card, lib.get_img_path(card_id))
         icg.resources.output_folder = settings.card_image_path
         icg.generate_card()
-        if is_data_or_image_newer_than_builded_card(
+        if is_data_or_image_newer_than_builded_card(  # noqa: WPS337
             data_file_path,
             lib.get_img_path(card_id),
             builded_card_filename,
-        ):  # noqa: WPS337
+        ):
             icg.save_image_with_values(settings.static_image.format(card_id))
             icg.save_image(settings.dynamic_image.format(card_id))
 
