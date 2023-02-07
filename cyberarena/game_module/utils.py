@@ -46,11 +46,24 @@ def update_card_image(card_id: int) -> None:
 
     :param card_id: ID of the card.
     """
+    lib = Library()
     card = get_card_from_id(card_id)
-    if is_data_or_image_newer_than_builded_card("data.json", "0.png", "heisenberg"):
-        icg = ImageCardGenerator(card, settings.card_image_path)
+    data_file_path = lib.get_img_path(card_id).replace(
+        settings.card_image_filename,
+        settings.card_data_filename,
+    )
+    builded_card_filename = os.path.join(
+        settings.card_image_path,
+        "{0}_static.png".format(card_id),
+    )
+    if is_data_or_image_newer_than_builded_card(
+        data_file_path,
+        lib.get_img_path(card_id),
+        builded_card_filename,
+    ):
+        icg = ImageCardGenerator(card, lib.get_img_path(card_id))
         icg.generate_card()
-        icg.save_image(settings.static_image.format(card_id))
+        icg.save_image_with_values(settings.dynamic_image.format(card_id))
 
 
 def setup_library() -> None:
@@ -67,9 +80,28 @@ def setup_card_images() -> None:
     Set up the card images.
 
     It generates the card images from the card data.
-    :raises NotImplementedError: If the function is not implemented.
     """
-    raise NotImplementedError("Create the function to generate all cards images.")
+    lib = Library()
+    for card_id in Library().keys():
+        card = get_card_from_id(card_id)
+        data_file_path = lib.get_img_path(card_id).replace(
+            settings.card_image_filename,
+            settings.card_data_filename,
+        )
+        builded_card_filename = os.path.join(
+            settings.card_image_path,
+            "{0}_static.png".format(card_id),
+        )
+        icg = ImageCardGenerator(card, lib.get_img_path(card_id))
+        icg.resources.output_folder = settings.card_image_path
+        icg.generate_card()
+        if is_data_or_image_newer_than_builded_card(
+            data_file_path,
+            lib.get_img_path(card_id),
+            builded_card_filename,
+        ):
+            icg.save_image_with_values(settings.static_image.format(card_id))
+        icg.save_image(settings.dynamic_image.format(card_id))
 
 
 def setup_game_module() -> None:
