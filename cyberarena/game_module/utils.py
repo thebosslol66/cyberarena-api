@@ -94,6 +94,8 @@ def setup_card_images() -> None:
             settings.card_image_path,
             "{0}_static.png".format(card_id),
         )
+        if os.path.exists(builded_card_filename):
+            continue
         icg = ImageCardGenerator(card, lib.get_img_path(card_id))
         icg.resources.output_folder = settings.card_image_path
         icg.generate_card()
@@ -103,7 +105,7 @@ def setup_card_images() -> None:
             builded_card_filename,
         ):
             icg.save_image_with_values(settings.static_image.format(card_id))
-        icg.save_image(settings.dynamic_image.format(card_id))
+            icg.save_image(settings.dynamic_image.format(card_id))
 
 
 def setup_game_module() -> None:
