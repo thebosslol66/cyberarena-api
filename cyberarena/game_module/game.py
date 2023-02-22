@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from .board import Board
 from .card import AbstractCard, PlayableCharacterCard
@@ -22,6 +23,17 @@ class Game:
         self.turn = 1
         self.__board = Board()
         self.id = -1
+        self.p1connected = False
+        self.p2connected = False
+
+    def __contains__(self, id_player: int) -> bool:
+        """
+        Check if a player is in the game.
+
+        :param id_player: Id of the player.
+        :return: True if player is in the game, False otherwise.
+        """
+        return id_player in {self.player1.id, self.player2.id}
 
     def deploy_card(self, player: Player, card: AbstractCard) -> None:
         """
@@ -136,14 +148,16 @@ class Game:
             return
         self.attack_card(player, cardatt, cardrecv)
 
-    def draw_card(self, player: Player) -> None:
+    def draw_card(self, player: Player) -> Optional[AbstractCard]:
         """
         Draw a card.
 
         :param player: Player drawing the card.
+        :return: The card drawn.
         """
         if self.check_turn(player):
-            player.draw_card()
+            return player.draw_card()
+        return None
 
     def get_board(self) -> Board:
         """
@@ -173,6 +187,20 @@ class Game:
             self.player2.next_turn()
         self.turn += 1
         self.__board.end_turn(player)
+
+    def increase_turn(self, idplayer: int) -> None:
+        """
+        Increase turn.
+
+        :param idplayer: id of the player.
+        """
+        if idplayer == self.player1.id:
+            if not self.check_turn(self.player1):
+                return
+        if idplayer == self.player2.id:
+            if not self.check_turn(self.player2):
+                return
+        self.increase_turn_debug()
 
     def get_id(self) -> int:
         """

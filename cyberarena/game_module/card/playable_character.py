@@ -1,3 +1,5 @@
+import typing
+
 from .base import AbstractCharacterCard
 from .enums import ObjectCardRace, ObjectCardRarity
 
@@ -67,3 +69,11 @@ class PlayableCharacterCard(AbstractCharacterCard):
             repr(super())[:-1],
             self.cost,
         )
+
+    def to_dict(self) -> typing.Dict[str, typing.Union[str, int]]:
+        """
+        Return a dictionary representation of the card.
+
+        :raises NotImplementedError: Your darone is not implemented
+        """
+        raise NotImplementedError()

@@ -36,10 +36,15 @@ class Player:
         """
         return self.mana
 
-    def draw_card(self) -> None:
-        """Draw a card."""
-        self.__hand.get_random_card(self.idcardcurr)
+    def draw_card(self) -> Optional[AbstractCard]:
+        """
+        Draw a card.
+
+        :return: The card drawn.
+        """
+        card = self.__hand.get_random_card(self.idcardcurr)
         self.idcardcurr += 1
+        return card
 
     def use_card(self, card: AbstractCard) -> Optional[AbstractCard]:
         """

@@ -1,11 +1,22 @@
-from typing import Dict, Optional
+from typing import Dict, List, Optional, Union
 
 from fastapi import HTTPException
+from loguru import logger
 from starlette import status
+from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from cyberarena import game_module as gamem
 from cyberarena.web.api.game.enums import TicketStatus
 from cyberarena.web.api.game.schema import CardModel
+
+UnionIntStr = Union[int, str]
+DictStrUnionIntStr = Dict[str, UnionIntStr]
+UnionStrDictStr = Union[str, DictStrUnionIntStr]
+
+
+class YourDaroneNotImplemented(NotImplementedError):
+    """An error raised by your darone when don't make your homework or your methods."""
+
 
 ##############################################################################
 #                    Ticket system for the game manager                      #
@@ -166,6 +177,12 @@ class TicketManager(object):
             ticket2[1].status = TicketStatus.CLOSED
             self.__history[ticket1[0]] = ticket1[1]
             self.__history[ticket2[0]] = ticket2[1]
+            gamem.game_manager.create_game(
+                ticket1[1].user_id,
+                ticket2[1].user_id,
+                gamem.create_deck(),
+                gamem.create_deck(),
+            )
 
 
 ticket_manager = TicketManager()
@@ -219,3 +236,224 @@ def get_card_path(card_id: int, full_path: bool = False) -> str:
     :return: The path of the card
     """
     return gamem.get_path_card_image(card_id, full_path)
+
+
+class WebsocketGameManager(object):
+    """Manage the websocket of the game."""
+
+    def __init__(self) -> None:
+        """Initialize the WebsocketGameManager."""
+        self.__websocket_games: Dict[int, List[WebSocket]] = {}
+        self.__websocket_to_player: Dict[WebSocket, int] = {}
+
+    async def connect(self, websocket: WebSocket, game_id: int, user_id: int) -> None:
+        """
+        Connect a websocket to a game.
+
+        :param websocket: The websocket to connect
+        :param game_id: The id of the game to connect
+        :param user_id: The id of the user to connect
+        :raises HTTPException: If the user is not in the game
+        """
+        try:
+            if user_id not in gamem.game_manager[game_id]:
+                await websocket.close()
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="User not in this game",
+                )
+        except gamem.exceptions.GameNotFoundError:
+            await websocket.close()
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Game not found",
+            )
+        if game_id not in self.__websocket_games.keys():
+            self.__websocket_games[game_id] = []
+        self.__websocket_games[game_id].append(websocket)
+        self.__websocket_to_player[websocket] = user_id
+        await websocket.accept()
+        if gamem.game_manager.connect(game_id, user_id):
+            await self.begin_game(game_id)
+
+    async def disconnect(self, websocket: WebSocket, game_id: int) -> None:
+        """
+        Disconnect a websocket from a game.
+
+        :param websocket: The websocket to disconnect
+        :param game_id: The id of the game to disconnect
+        """
+        if game_id in self.__websocket_games.keys():
+            if websocket in self.__websocket_games[game_id]:
+                self.__websocket_games[game_id].remove(websocket)
+                self.__websocket_to_player.pop(websocket)
+            if not self.__websocket_games[game_id]:
+                self.__websocket_games.pop(game_id)
+
+    async def game_broadcast(self, game_id: int, data: Dict[str, str]) -> None:
+        """
+        Send a message to all players in a game.
+
+        :param game_id: The id of the game
+        :param data: The data to send
+        """
+        if game_id not in self.__websocket_games:
+            return
+        for websocket in self.__websocket_games[game_id]:
+            try:
+                await websocket.send_json(data)
+            except WebSocketDisconnect:
+                await self.disconnect(websocket, game_id)
+
+    async def game_private_broadcast(
+        self,
+        game_id: int,
+        data: Dict[str, UnionStrDictStr],  # noqa: WPS221
+        target: WebSocket,
+        data_for_other: Dict[str, str],
+    ) -> None:
+        """
+        Send a message to one player while sending another one to the other player.
+
+        :param game_id: The id of the game
+        :param data: The data to send to the target
+        :param data_for_other: The data to send to the other players
+        :param target: The target of the data
+        """
+        if game_id not in self.__websocket_games:
+            return
+        for websocket in self.__websocket_games[game_id]:
+            try:
+                if websocket == target:
+                    await websocket.send_json(data)
+                else:
+                    await websocket.send_json(data_for_other)
+            except WebSocketDisconnect:
+                await self.disconnect(websocket, game_id)
+
+    async def receive(
+        self,
+        websocket: WebSocket,
+        data: Dict[str, str],
+        room_id: int,
+        user_id: int,
+    ) -> None:
+        """
+        Recieve messages from players' websockets.
+
+        :param websocket: The websocket to recieve from
+        :param data: The data to recieve
+        :param room_id: The id of the room of the player
+        :param user_id: The id of the player
+        """
+        if data["type"] == "play_card":
+            await self.deploy_card(room_id, websocket, data)
+        elif data["type"] == "draw_card":
+            await self.draw_card(room_id, websocket)
+        elif data["type"] == "end_turn":
+            await self.next_turn(room_id, websocket)
+        elif data["type"] == "attack":
+            await self.attack(room_id, websocket, data)
+
+    async def begin_game(self, game_id: int) -> None:
+        """
+        Begin the game.
+
+        :param game_id: The id of the game to begin
+        """
+        await self.game_broadcast(game_id, {"type": "begin_game"})
+        for _ in range(gamem.get_starting_cards_amount()):
+            for websocket in self.__websocket_games[game_id]:
+                await self.draw_card(game_id, websocket)
+
+    async def set_websocket_turn(self, game_id: int) -> None:
+        """
+        Get the turn of the game.
+
+        :param game_id: The id of the game
+        """
+        if game_id not in self.__websocket_games:
+            return
+        for websocket in self.__websocket_games[game_id]:
+            try:
+                await websocket.send_json(
+                    {
+                        "type": "set_turn",
+                        "is_turn": gamem.game_manager.get_turn(
+                            game_id,
+                        )
+                        == self.__websocket_to_player[websocket],
+                    },
+                )
+            except WebSocketDisconnect:
+                await self.disconnect(websocket, game_id)
+
+    async def draw_card(self, game_id: int, websocket: WebSocket) -> None:
+        """
+        Draw a card.
+
+        :param game_id: The id of the game
+        :param websocket: The socket of the user
+        """
+        user_id = self.__websocket_to_player[websocket]
+        card = gamem.game_manager.draw_card(game_id, user_id)
+        if card is None:
+            logger.error("No card to draw")
+            return
+        await self.game_private_broadcast(
+            game_id,
+            {
+                "type": "draw_card",
+                "card": card.to_dict(),
+            },
+            websocket,
+            {"type": "draw_card_private"},
+        )
+
+    async def next_turn(self, game_id: int, websocket: WebSocket) -> None:
+        """
+        End the turn.
+
+        :param game_id: The id of the game
+        :param websocket: The socket of the user
+        :raises YourDaroneNotImplemented: Your darone is not implemented
+        """
+        # TODO: finir
+        raise YourDaroneNotImplemented()
+
+    async def deploy_card(
+        self,
+        game_id: int,
+        websocket: WebSocket,
+        data: Dict[str, str],
+    ) -> None:
+        """
+        Deploy a card.
+
+        :param game_id: The id of the game
+        :param websocket: The socket of the user
+        :param data: json with the card
+        :raises YourDaroneNotImplemented: Your darone is not implemented
+        """
+        # TODO finir
+        raise YourDaroneNotImplemented()
+
+    async def attack(
+        self,
+        game_id: int,
+        websocket: WebSocket,
+        data: Dict[str, str],
+    ) -> None:
+        """
+        Play a card.
+
+        :param game_id: The id of the game
+        :param websocket: The socket of the user
+        :param data: json with both cards
+        :raises YourDaroneNotImplemented: Your darone is not implemented
+        """
+        # TODO finir
+        raise YourDaroneNotImplemented()
+
+
+websocket_manager = WebsocketGameManager()

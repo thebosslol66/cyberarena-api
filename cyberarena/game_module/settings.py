@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     with environment variables.
     """
 
+    starting_cards_in_deck: int = 3
     deck_size: int = 20
     board_size: int = 5
 

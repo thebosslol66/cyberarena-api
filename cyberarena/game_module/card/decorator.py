@@ -1,5 +1,5 @@
 import abc
-from typing import Any
+from typing import Any, Dict, Union
 
 from .base import AbstractCharacterCard
 
@@ -118,6 +118,14 @@ class AbstractDecorator(AbstractCharacterCard, metaclass=abc.ABCMeta):
         :param damage: The damage to receive.
         """
         self._card._receive_damage(damage)
+
+    def to_dict(self) -> Dict[str, Union[str, int]]:
+        """
+        Return a dict representation of the card.
+
+        :return: A dict representation of the card.
+        """
+        return self._card.to_dict()
 
 
 class _AbstractTurnDecorator(AbstractDecorator):

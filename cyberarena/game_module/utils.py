@@ -2,6 +2,7 @@ import os
 
 from .card import AbstractCard, LibraryCard
 from .card.library import Library
+from .deck import Deck
 from .image_card_generator import (
     ImageCardGenerator,
     is_data_or_image_newer_than_builded_card,
@@ -116,3 +117,21 @@ def setup_game_module() -> None:
     """
     setup_library()
     setup_card_images()
+
+
+def create_deck() -> Deck:
+    """
+    Create a deck.
+
+    :return: The deck created.
+    """
+    return Deck()
+
+
+def get_starting_cards_amount() -> int:
+    """
+    Get the amount of cards in a deck.
+
+    :return: The amount of cards in a deck.
+    """
+    return settings.starting_cards_in_deck

@@ -1,8 +1,12 @@
 from typing import List, Optional
 
+from . import AbstractCard
+from .card import LibraryCard
 from .deck import Deck
+from .exceptions import GameNotFoundError
 from .game import Game
 from .player import Player
+from .settings import settings
 
 
 class GameManager:
@@ -13,6 +17,15 @@ class GameManager:
         self.__games: List[Game] = []
         self.__players: List[Player] = []
         self.idgames = 0
+
+    @staticmethod
+    def set_up_library() -> None:
+        """Set up the library."""
+        LibraryCard(
+            settings.card_path,
+            settings.card_data_filename,
+            settings.card_image_filename,
+        )
 
     def create_game(self, p1id: int, p2id: int, d1: Deck, d2: Deck) -> Game:
         """
@@ -51,6 +64,27 @@ class GameManager:
                 return True
         return False
 
+    def __len__(self) -> int:
+        """
+        Get the number of active games.
+
+        :return: The number of active games
+        """
+        return len(self.__games)
+
+    def __getitem__(self, id_game: int) -> Game:
+        """
+        Get a game.
+
+        :param id_game: Id of the game.
+        :return: The game.
+        :raises GameNotFoundError: If the game is not found.
+        """
+        for game in self.__games:
+            if game.id == id_game:
+                return game
+        raise GameNotFoundError("Game not found")
+
     def get_game(self, id_game: int) -> Optional[Game]:
         """
         Get a game.
@@ -58,10 +92,10 @@ class GameManager:
         :param id_game: Id of the game.
         :return: The game.
         """
-        for game in self.__games:
-            if game.id == id_game:
-                return game
-        return None
+        try:
+            return self[id_game]
+        except GameNotFoundError:
+            return None
 
     def end_game(self, id_game: int) -> bool:
         """
@@ -101,6 +135,22 @@ class GameManager:
             if game.player2.id == id_player:
                 return game.player2.id
         return -1
+
+    def draw_card(self, idgame: int, idplayer: int) -> Optional[AbstractCard]:
+        """
+        Draw a card.
+
+        :param idgame: Id of the game.
+        :param idplayer: Id of the player.
+        :return: The card drawn.
+        """
+        game = self.find_game(idgame)
+        if game:
+            if game.player1.id == idplayer:
+                return game.draw_card(game.player1)
+            if game.player2.id == idplayer:
+                return game.draw_card(game.player2)
+        return None
 
     def deploy_card(self, id_game: int, id_player: int, id_card: int) -> None:
         """
@@ -146,6 +196,35 @@ class GameManager:
                 return game.player1.id
             return game.player2.id
         return -1
+
+    def connect(self, idgame: int, idplayer: int) -> bool:
+        """
+        Connect a player to a game.
+
+        :param idgame: Id of the game.
+        :param idplayer: Id of the player.
+        :return: True if both players are connected, False otherwise.
+        """
+        game = self.find_game(idgame)
+        if game:
+            if game.player1.id == idplayer:
+                game.p1connected = True
+            if game.player2.id == idplayer:
+                game.p2connected = True
+            if game.p1connected and game.p2connected:
+                return True
+        return False
+
+    def next_turn(self, idgame: int, idplayer: int) -> None:
+        """
+        Go to the next turn.
+
+        :param idgame: Id of the game.
+        :param idplayer: Id of the player.
+        """
+        game = self.find_game(idgame)
+        if game:
+            game.increase_turn(idplayer)
 
 
 game_manager = GameManager()
