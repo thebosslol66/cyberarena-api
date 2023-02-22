@@ -1,0 +1,12 @@
+{
+  "id": 9,
+  "name": "RocketMan",
+  "description": "",
+  "ap": 2,
+  "dp": 0,
+  "hp": 3,
+  "cost": 4,
+  "race": "human",
+  "rarity": "common",
+  "card_type": "character"
+}

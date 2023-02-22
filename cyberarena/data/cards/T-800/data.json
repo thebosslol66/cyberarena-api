@@ -1,0 +1,12 @@
+{
+  "id": 2,
+  "name": "T-800",
+  "description": "A long description for the lore... #NotImplemented",
+  "ap": 5,
+  "dp": 3,
+  "hp": 5,
+  "cost": 8,
+  "race": "robot",
+  "rarity": "legendary",
+  "card_type": "character"
+}

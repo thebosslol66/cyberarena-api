@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import UJSONResponse
 from fastapi.staticfiles import StaticFiles
 
+from cyberarena.game_module import setup_game_module
 from cyberarena.logging import configure_logging
 from cyberarena.web.api.router import api_router
 from cyberarena.web.lifetime import register_shutdown_event, register_startup_event
@@ -60,5 +61,7 @@ def get_app() -> FastAPI:
         StaticFiles(directory=APP_ROOT / "static"),
         name="static",
     )
+
+    setup_game_module()
 
     return app

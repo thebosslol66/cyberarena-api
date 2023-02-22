@@ -7,6 +7,7 @@ from .utils import (
     get_card_from_id,
     get_path_card_image,
     get_starting_cards_amount,
+    setup_game_module,
 )
 
 __all__ = [  # noqa: WPS410
@@ -20,4 +21,5 @@ __all__ = [  # noqa: WPS410
     "deck",
     "create_deck",
     "get_starting_cards_amount",
+    "setup_game_module",
 ]

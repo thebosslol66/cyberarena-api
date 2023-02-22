@@ -1,0 +1,12 @@
+{
+  "id": 4,
+  "name": "Lisa",
+  "description": "",
+  "ap": 1,
+  "dp": 0,
+  "hp": 3,
+  "cost": 1,
+  "race": "human",
+  "rarity": "rare",
+  "card_type": "character"
+}

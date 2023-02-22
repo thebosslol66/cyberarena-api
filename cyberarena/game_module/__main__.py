@@ -134,6 +134,7 @@ def generate_and_save_card_images(lib: Library, force: bool) -> None:
         )
         generator.generate_card()
         generator.save_image("{0}.png".format(index))
+        generator.save_image_with_values("{0}_full.png".format(index))
 
 
 def create_image(folder: str, output: str, force: bool) -> None:  # noqa: WPS210
