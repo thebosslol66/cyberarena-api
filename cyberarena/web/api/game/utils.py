@@ -346,8 +346,8 @@ class WebsocketGameManager(object):
         :param room_id: The id of the room of the player
         :param user_id: The id of the player
         """
-        if data["type"] == "play_card":
-            await self.deploy_card(room_id, websocket, data)
+        if data["type"] == "deploy_card":
+            await self.deploy_card(room_id, websocket, data["id_card"], data)
         elif data["type"] == "draw_card":
             await self.draw_card(room_id, websocket)
         elif data["type"] == "end_turn":
@@ -364,7 +364,7 @@ class WebsocketGameManager(object):
         await self.game_broadcast(game_id, {"type": "begin_game"})
         for _ in range(gamem.get_starting_cards_amount()):
             for websocket in self.__websocket_games[game_id]:
-                await self.draw_card(game_id, websocket)
+                await self.draw_card(game_id, websocket, True)
 
     async def set_websocket_turn(self, game_id: int) -> None:
         """
@@ -388,15 +388,21 @@ class WebsocketGameManager(object):
             except WebSocketDisconnect:
                 await self.disconnect(websocket, game_id)
 
-    async def draw_card(self, game_id: int, websocket: WebSocket) -> None:
+    async def draw_card(
+        self,
+        game_id: int,
+        websocket: WebSocket,
+        force: bool = False,
+    ) -> None:
         """
         Draw a card.
 
         :param game_id: The id of the game
         :param websocket: The socket of the user
+        :param force: force the draw despite the turn
         """
         user_id = self.__websocket_to_player[websocket]
-        card = gamem.game_manager.draw_card(game_id, user_id)
+        card = gamem.game_manager.draw_card(game_id, user_id, force)
         if card is None:
             logger.error("No card to draw")
             return
@@ -416,15 +422,18 @@ class WebsocketGameManager(object):
 
         :param game_id: The id of the game
         :param websocket: The socket of the user
-        :raises YourDaroneNotImplemented: Your darone is not implemented
         """
-        # TODO: finir
-        raise YourDaroneNotImplemented()
+        gamem.game_manager.next_turn(
+            game_id,
+            self.__websocket_to_player[websocket],
+        )
+        await self.set_websocket_turn(game_id)
 
     async def deploy_card(
         self,
         game_id: int,
         websocket: WebSocket,
+        id_card: int | str,
         data: Dict[str, str],
     ) -> None:
         """
@@ -432,11 +441,33 @@ class WebsocketGameManager(object):
 
         :param game_id: The id of the game
         :param websocket: The socket of the user
-        :param data: json with the card
-        :raises YourDaroneNotImplemented: Your darone is not implemented
+        :param id_card: id of the card to deploy
+        :param data: json desc of the card
         """
-        # TODO finir
-        raise YourDaroneNotImplemented()
+        if isinstance(id_card, str):
+            id_card = int(id_card)
+
+        res = gamem.game_manager.deploy_card(
+            game_id,
+            self.__websocket_to_player[websocket],
+            id_card,
+        )
+
+        if res == -3:
+            await websocket.send_json({"type": "error", "data": "Card doesn't exist?!"})
+            logger.error("Card doesn't exist?!")
+        elif res == -2:
+            await websocket.send_json({"type": "error", "data": "Not enough mana"})
+
+            await self.game_broadcast(
+                game_id,
+                {
+                    "type": "deploy_card",
+                    "id": str(id_card),
+                },
+            )
+        else:
+            await websocket.send_json({"type": "error", "data": "invalid move"})
 
     async def attack(
         self,
@@ -450,10 +481,14 @@ class WebsocketGameManager(object):
         :param game_id: The id of the game
         :param websocket: The socket of the user
         :param data: json with both cards
-        :raises YourDaroneNotImplemented: Your darone is not implemented
         """
-        # TODO finir
-        raise YourDaroneNotImplemented()
+        gamem.game_manager.attack_card(
+            game_id,
+            self.__websocket_to_player[websocket],
+            int(data["id_card"]),
+            int(data["id_card2"]),
+        )
+        await self.game_broadcast(game_id, {"type": "attack", "data": "data"})
 
 
 websocket_manager = WebsocketGameManager()

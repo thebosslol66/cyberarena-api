@@ -131,41 +131,49 @@ class GameManager:
         """
         for game in self.__games:
             if game.player1.id == id_player:
-                return game.player1.id
+                return game.id
             if game.player2.id == id_player:
-                return game.player2.id
+                return game.id
         return -1
 
-    def draw_card(self, idgame: int, idplayer: int) -> Optional[AbstractCard]:
+    def draw_card(
+        self,
+        idgame: int,
+        idplayer: int,
+        force: bool = False,
+    ) -> Optional[AbstractCard]:
         """
         Draw a card.
 
         :param idgame: Id of the game.
         :param idplayer: Id of the player.
+        :param force: Force the draw.
         :return: The card drawn.
         """
         game = self.find_game(idgame)
         if game:
             if game.player1.id == idplayer:
-                return game.draw_card(game.player1)
+                return game.draw_card(game.player1, force)
             if game.player2.id == idplayer:
-                return game.draw_card(game.player2)
+                return game.draw_card(game.player2, force)
         return None
 
-    def deploy_card(self, id_game: int, id_player: int, id_card: int) -> None:
+    def deploy_card(self, id_game: int, id_player: int, id_card: int) -> int:
         """
         Deploy a card.
 
         :param id_game: Id of the game.
         :param id_player: Id of the player.
         :param id_card: Id of the card.
+        :return: Status of the deployment.
         """
         game = self.find_game(id_game)
         if game:
             if game.player1.id == id_player:
-                game.deploy_card_id(game.player1, id_card)
+                return game.deploy_card_id(game.player1, id_card)
             if game.player2.id == id_player:
-                game.deploy_card_id(game.player2, id_card)
+                return game.deploy_card_id(game.player2, id_card)
+        return -4
 
     def attack_card(self, idgame: int, idplayer: int, idatt: int, idrecv: int) -> None:
         """
