@@ -433,7 +433,7 @@ class WebsocketGameManager(object):
         self,
         game_id: int,
         websocket: WebSocket,
-        id_card: int | str,
+        id_card: Union[int, str],
         data: Dict[str, str],
     ) -> None:
         """
