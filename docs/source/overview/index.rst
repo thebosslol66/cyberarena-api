@@ -33,7 +33,7 @@ Here an example of a card:
 
 .. image:: ./0_static.png
     :width: 734px
-    :height: 124px
+    :height: 1024px
     :alt: Example of a card
 
 
