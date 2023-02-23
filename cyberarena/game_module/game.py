@@ -40,11 +40,11 @@ class Game:
         Deploy a card.
 
         :param player: Player deploying the card.
-        :param card: Card to deploy.
+        :param card: Card to deploy. # noqa: DAR003
         :return: 0 if the card was deployed,
          -1 if it's not the player's turn,
          -2 if the cost is too high.
-        """  # noqa DAR003
+        """
         if not self.check_turn(player):
             logger.debug("It's not your turn!")
             return -1
@@ -55,9 +55,8 @@ class Game:
         if player == self.player1:
             self.__board.deploy_card(cardrcv, 1)
             return 0
-        else:
-            self.__board.deploy_card(cardrcv, 2)
-            return 0
+        self.__board.deploy_card(cardrcv, 2)
+        return 0
 
     def deploy_card_debug(self, player: Player, index: int) -> None:
         """

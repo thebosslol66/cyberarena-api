@@ -1,5 +1,3 @@
-import uuid
-
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 from starlette.responses import FileResponse
@@ -59,9 +57,9 @@ async def open_ticket(
             detail="You already have an open ticket.",
         )
     # TODO: verify if in game
-    ticket_manager.create_ticket(current_user.id)
+    ticket = ticket_manager.create_ticket(current_user.id)
     return TicketModel(
-        id=uuid.uuid4(),
+        id=ticket.ticket_id,
         status=TicketStatus.OPEN,
     )
 
@@ -119,7 +117,8 @@ async def get_ticket_status(
     :return: The status of the ticket
     :raises HTTPException: If the ticket doesn't exist or is closed
     """
-    ticket_manager.find_match()
+    ticket_manager.find_match()  # TODO: replace to call it only one time every 5 secs
+    # in the background
     statu: TicketStatus = ticket_manager.get_ticket_status(ticket_id)
     if statu == TicketStatus.DONT_EXIST:
         raise HTTPException(

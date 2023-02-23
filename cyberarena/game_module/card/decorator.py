@@ -128,8 +128,6 @@ class AbstractDecorator(AbstractCharacterCard, metaclass=abc.ABCMeta):
         self._card._receive_damage(damage)
 
 
-
-
 class _AbstractTurnDecorator(AbstractDecorator):
     """class AbstractTurnDecorator."""
 

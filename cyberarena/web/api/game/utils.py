@@ -364,7 +364,7 @@ class WebsocketGameManager(object):
         await self.game_broadcast(game_id, {"type": "begin_game"})
         for _ in range(gamem.get_starting_cards_amount()):
             for websocket in self.__websocket_games[game_id]:
-                await self.draw_card(game_id, websocket, True)
+                await self.draw_card(game_id, websocket, force=True)
 
     async def set_websocket_turn(self, game_id: int) -> None:
         """
