@@ -84,6 +84,9 @@ class TicketManager(object):
         :return: The created ticket
         """
         ticket_id = len(self.__tickets) + len(self.__history)
+        logger.debug(f"Creating ticket for user {user_id} with id {ticket_id}")
+        logger.debug(f"Active tickets: {self.__tickets}")
+        logger.debug(f"Archived tickets: {self.__history}")
         ticket = Ticket(ticket_id, user_id)
         self.__tickets[ticket_id] = ticket
         return ticket

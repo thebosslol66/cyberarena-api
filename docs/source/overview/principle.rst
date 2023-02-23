@@ -1,4 +1,4 @@
-Principles of <html_title>
+Principles of CyberArena
 ==========================
 
 Paragraphe Principle
@@ -10,6 +10,7 @@ health points hits zero, or if a player forfeits the win.
 Paragraphe Arena
 """"""""""""""""
 The Arena consists of a board on which the player can summon cards from his hand
+It contains 2 sides, one for each player, where they can summon their minions
 
 Paragraphe Hand
 """""""""""""""

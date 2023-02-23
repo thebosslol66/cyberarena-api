@@ -1,6 +1,8 @@
-# cyberarena
+# cyberarena (backend)
 
 This project was generated using fastapi_template.
+
+This project is a card game like Hearthstone where you can fight opponents
 
 ## Poetry
 
@@ -52,6 +54,9 @@ docker-compose -f deploy/docker-compose.yml --project-directory . build
 $ tree "cyberarena"
 cyberarena
 ├── conftest.py  # Fixtures for all tests.
+├── data  # Folder containing all data tha must be preprocess before launching the app.
+├── game_module # Package containing all the game logic aswell as the cards
+|   └── card  # Module containing class for manipulating cards.
 ├── db  # module contains db configurations
 │   ├── dao  # Data Access Objects. Contains different classes to inteact with database.
 │   └── models  # Package contains different models for ORMs.
@@ -60,6 +65,8 @@ cyberarena
 ├── settings.py  # Main configuration settings for project.
 ├── static  # Static content.
 ├── tests  # Tests for project.
+├── test_data # Folder containing all the data needed for the test concerning
+              # the creation of cards and validation of profile pictures
 └── web  # Package contains web server. Handlers, startup config.
     ├── api  # Package with all handlers.
     │   └── router.py  # Main router.
@@ -92,26 +99,6 @@ CYBERARENA_ENVIRONMENT="dev"
 
 You can read more about BaseSettings class
 here: https://pydantic-docs.helpmanual.io/usage/settings/
-
-## Opentelemetry
-
-If you want to start your project with opentelemetry collector
-you can add `-f ./deploy/docker-compose.otlp.yml` to your docker command.
-
-Like this:
-
-```bash
-docker-compose -f deploy/docker-compose.yml -f deploy/docker-compose.otlp.yml --project-directory . up
-```
-
-This command will start opentelemetry collector and jaeger.
-After sending a requests you can see traces in jaeger's UI
-at http://localhost:16686/.
-
-This docker configuration is not supposed to be used in production.
-It's only for demo purpose.
-
-You can read more about opentelemetry here: https://opentelemetry.io/
 
 ## Pre-commit
 
