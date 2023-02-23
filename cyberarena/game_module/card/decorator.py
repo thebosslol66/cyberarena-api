@@ -25,6 +25,17 @@ class AbstractDecorator(AbstractCharacterCard, metaclass=abc.ABCMeta):
         """
         return "{0}(card={1})".format(self.__class__.__name__, repr(self._card))
 
+    @abc.abstractmethod
+    def refresh_card_reference(self) -> AbstractCharacterCard:
+        """
+        Return self or self._card if the decorator is useless or use.
+
+        This function must be called after each action and after a turn
+
+        :return: self or self._card.
+        """
+        return self
+
     @property
     def name(self) -> str:
         """
@@ -96,20 +107,17 @@ class AbstractDecorator(AbstractCharacterCard, metaclass=abc.ABCMeta):
         """
         return self._card.is_alive()
 
-    @abc.abstractmethod
-    def refresh_card_reference(self) -> AbstractCharacterCard:
-        """
-        Return self or self._card if the decorator is useless or use.
-
-        This function must be called after each action and after a turn
-
-        :return: self or self._card.
-        """
-        return self
-
     def end_turn(self) -> None:
         """End the turn."""
         self._card.end_turn()
+
+    def to_dict(self) -> Dict[str, Union[str, int]]:
+        """
+        Return a dict representation of the card.
+
+        :return: A dict representation of the card.
+        """
+        return self._card.to_dict()
 
     def _receive_damage(self, damage: int) -> None:  # pragma: no cover
         """
@@ -119,13 +127,7 @@ class AbstractDecorator(AbstractCharacterCard, metaclass=abc.ABCMeta):
         """
         self._card._receive_damage(damage)
 
-    def to_dict(self) -> Dict[str, Union[str, int]]:
-        """
-        Return a dict representation of the card.
 
-        :return: A dict representation of the card.
-        """
-        return self._card.to_dict()
 
 
 class _AbstractTurnDecorator(AbstractDecorator):
