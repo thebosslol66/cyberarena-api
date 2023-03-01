@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.security import SecurityScopes
+from fastapi.websockets import WebSocket
 from starlette import status
 from starlette.responses import FileResponse
-from starlette.websockets import WebSocket
 
 from cyberarena.db.models.user_model import UserModel
 from cyberarena.web.api.connection.utils import get_current_user
@@ -197,20 +198,26 @@ async def get_card_image_fulfilled(card_id: int) -> FileResponse:
     return FileResponse(get_card_path(card_id, full_path=True))
 
 
-@router.websocket("{room_id}/ws")
+@router.websocket("/{room_id}/ws")
 async def websocket_endpoint(
     websocket: WebSocket,
     room_id: int,
-    current_user: UserModel = Depends(get_current_user),
+    token: str = Query("token"),
 ) -> None:
     """
     Connect to a websocket game.
 
     :param websocket: The websocket
     :param room_id: The id of the room to connect to
-    :param current_user: The current user
+    :param token: The oauth token of the user to authorize playing
     :raises HTTPException: If the user is not active
     """
+    if token is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You have to be logged in to connect to a game.",
+        )
+    current_user = await get_current_user(security_scopes=SecurityScopes(), token=token)
     if current_user.id is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
