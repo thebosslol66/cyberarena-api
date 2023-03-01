@@ -171,8 +171,12 @@ class TicketManager(object):
         self.__tickets.pop(ticket_id)
         return ticket
 
-    def find_match(self) -> None:
-        """Find a match."""
+    def find_match(self) -> int:
+        """
+        Find a match.
+
+        :return: The id of the game created.
+        """
         while len(self.__tickets) > 1:
             ticket1 = self.__tickets.popitem()
             ticket2 = self.__tickets.popitem()
@@ -180,12 +184,13 @@ class TicketManager(object):
             ticket2[1].status = TicketStatus.CLOSED
             self.__history[ticket1[0]] = ticket1[1]
             self.__history[ticket2[0]] = ticket2[1]
-            gamem.game_manager.create_game(
+            return gamem.game_manager.create_game(
                 ticket1[1].user_id,
                 ticket2[1].user_id,
                 gamem.create_deck(),
                 gamem.create_deck(),
-            )
+            ).id
+        return -1
 
 
 ticket_manager = TicketManager()

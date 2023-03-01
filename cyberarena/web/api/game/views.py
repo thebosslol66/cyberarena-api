@@ -117,7 +117,7 @@ async def get_ticket_status(
     :return: The status of the ticket
     :raises HTTPException: If the ticket doesn't exist or is closed
     """
-    ticket_manager.find_match()  # TODO: replace to call it only one time every 5 secs
+    id_game = ticket_manager.find_match()
     # in the background
     statu: TicketStatus = ticket_manager.get_ticket_status(ticket_id)
     if statu == TicketStatus.DONT_EXIST:
@@ -131,6 +131,7 @@ async def get_ticket_status(
     return TicketModel(
         id=ticket_id,
         status=statu,
+        room_id=id_game,
     )
 
 
