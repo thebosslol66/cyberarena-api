@@ -199,6 +199,18 @@ ticket_manager = TicketManager()
 ##############################################################################
 #                     Card related functions and classes                     #
 ##############################################################################
+
+
+def get_game_id(ticket: int) -> int:
+    """
+    Get the id of the game of a ticket.
+
+    :param ticket: The id of the ticket to get the game id
+    :return: The id of the game
+    """
+    return gamem.game_manager.find_player(ticket)
+
+
 def get_card_data(card_id: int) -> CardModel:
     """
     Get a CardModel from a card id.
