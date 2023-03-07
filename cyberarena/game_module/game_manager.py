@@ -7,7 +7,7 @@ from .exceptions import GameNotFoundError
 from .game import Game
 from .player import Player
 from .settings import settings
-
+from loguru import logger
 
 class GameManager:
     """Game Manager Class."""
@@ -129,7 +129,7 @@ class GameManager:
         :param id_player: Id of the player.
         :return: The id of the game current played.
         """
-        for game in self.__games:
+        for game in reversed(self.__games):
             if game.player1.id == id_player:
                 return game.id
             if game.player2.id == id_player:
