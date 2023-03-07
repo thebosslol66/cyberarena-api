@@ -58,3 +58,16 @@ async def test_board_attack_card_dead_p2p1() -> None:
     assert board.get_board_size() == 2
     board.attack_card(card2, card1, 1)
     assert board.get_board_size() == 1
+
+
+@pytest.mark.anyio
+async def test_attack_nexus() -> None:
+    """Test board attack card."""
+    board = Board()
+    card1 = PlayableCharacterCard("Cyber-Heisenberg", 3, 3, 3, 0, "test")
+    card1.id = 0
+    board.deploy_card(card1, 1)
+    assert board.get_board_size() == 1
+    board.attack_nexus(0, 2)
+    assert board.get_board_size() == 1
+    assert board.get_nexus_health(2) == 97

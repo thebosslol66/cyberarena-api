@@ -191,6 +191,21 @@ class GameManager:
             if game.player2.id == idplayer:
                 game.attack_card_id(game.player2, idatt, idrecv)
 
+    def attack_nexus(self, idgame: int, idplayer: int, idatt: int) -> None:
+        """
+        Attack the nexus.
+
+        :param idgame: Id of the game
+        :param idplayer: Id of the player
+        :param idatt: ID of the card that attacks
+        """
+        game = self.find_game(idgame)
+        if game:
+            if game.player1.id == idplayer:
+                game.attack_nexus(game.player1, idatt)
+            if game.player2.id == idplayer:
+                game.attack_nexus(game.player2, idatt)
+
     def get_turn(self, id_game: int) -> int:
         """
         Get the turn of a game.

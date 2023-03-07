@@ -156,6 +156,28 @@ class Game:
             return
         self.attack_card(player, cardatt, cardrecv)
 
+    def attack_nexus(self, player: Player, idatt: int) -> None:
+        """
+        Attack the nexus.
+
+        :param player: Player attacking the nexus.
+        :param idatt: Card attacking.
+        """
+        if not self.check_turn(player):
+            logger.debug("It's not your turn!")
+            return
+        if player == self.player1:
+            cardatt = self.__board.get_card_id(1, idatt)
+        if player == self.player2:
+            cardatt = self.__board.get_card_id(2, idatt)
+        if cardatt is None:
+            logger.debug("cardatt doesnt exist")
+            return
+        if player == self.player1:
+            self.__board.attack_nexus(idatt, 2)
+        else:
+            self.__board.attack_nexus(idatt, 1)
+
     def draw_card(self, player: Player, force: bool = False) -> Optional[AbstractCard]:
         """
         Draw a card.
