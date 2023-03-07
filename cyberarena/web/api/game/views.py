@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi.security import SecurityScopes
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.websockets import WebSocket
+from loguru import logger
 from starlette import status
 from starlette.responses import FileResponse
-from loguru import logger
+
 from cyberarena.db.models.user_model import UserModel
 from cyberarena.web.api.connection.utils import get_current_user
 from cyberarena.web.api.game.schema import CardModel, TicketModel, TicketStatus
@@ -127,7 +127,7 @@ async def get_ticket_status(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Ticket doesn't exist.",
         )
-    if statu == TicketStatus.CLOSED:
+    if statu == TicketStatus.CLOSED and current_user.id:
         id_game = get_game_id(current_user.id)
 
     elif statu == TicketStatus.OPEN:
@@ -209,16 +209,15 @@ async def websocket_endpoint(
     room_id: int,
     user_id: int,
 ) -> None:
-    logger.error("room_id : " + str(room_id))
-    logger.error("user_id : " + str(user_id))
     """
     Connect to a websocket game.
 
     :param websocket: The websocket
     :param room_id: The id of the room to connect to
-    :param token: The oauth token of the user to authorize playing
-    :raises HTTPException: If the user is not active
+    :param user_id: The id of the user trying to connect
     """
+    logger.error("room_id : " + str(room_id))
+    logger.error("user_id : " + str(user_id))
     await websocket_manager.connect(websocket, room_id, user_id)
     while True:
         data = await websocket.receive_json()

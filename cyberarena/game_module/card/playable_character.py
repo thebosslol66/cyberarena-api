@@ -86,4 +86,3 @@ class PlayableCharacterCard(AbstractCharacterCard):
             "defense": self.dp,
             "rarity": self.rarity,
         }
-

@@ -7,7 +7,7 @@ from .exceptions import GameNotFoundError
 from .game import Game
 from .player import Player
 from .settings import settings
-from loguru import logger
+
 
 class GameManager:
     """Game Manager Class."""
