@@ -129,15 +129,18 @@ async def get_ticket_status(
         )
     if statu == TicketStatus.CLOSED:
         id_game = get_game_id(current_user.id)
+
     elif statu == TicketStatus.OPEN:
         id_game = ticket_manager.find_match()
     else:
         id_game = -1
     statu = ticket_manager.get_ticket_status(ticket_id)
+    id_player = current_user.id
     return TicketModel(
         id=ticket_id,
         status=statu,
         room_id=id_game,
+        player_id=id_player,
     )
 
 
@@ -204,7 +207,7 @@ async def get_card_image_fulfilled(card_id: int) -> FileResponse:
 async def websocket_endpoint(
     websocket: WebSocket,
     room_id: int,
-    token: str = Query("token"),
+    user_id: int,
 ) -> None:
     """
     Connect to a websocket game.
@@ -233,7 +236,7 @@ async def websocket_endpoint(
     await websocket_manager.connect(websocket, room_id, current_user.id)
     while True:
         data = await websocket.receive_json()
-        await websocket_manager.receive(websocket, data, room_id, current_user.id)
+        await websocket_manager.receive(websocket, data, room_id, user_id)
         if data["type"] == "close":
             break
 

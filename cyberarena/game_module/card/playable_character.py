@@ -76,4 +76,14 @@ class PlayableCharacterCard(AbstractCharacterCard):
 
         :raises NotImplementedError: Your darone is not implemented
         """
-        raise NotImplementedError()
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "cost": self.cost,
+            "damage": self.ap,
+            "health": self.hp,
+            "defense": self.dp,
+            "rarity": self.rarity,
+        }
+
