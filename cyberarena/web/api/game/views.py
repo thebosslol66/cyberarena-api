@@ -203,12 +203,14 @@ async def get_card_image_fulfilled(card_id: int) -> FileResponse:
     return FileResponse(get_card_path(card_id, full_path=True))
 
 
-@router.websocket("/{room_id}/ws")
+@router.websocket("/{room_id}/ws/{user_id}")
 async def websocket_endpoint(
     websocket: WebSocket,
     room_id: int,
     user_id: int,
 ) -> None:
+    logger.error("room_id : " + str(room_id))
+    logger.error("user_id : " + str(user_id))
     """
     Connect to a websocket game.
 
@@ -217,23 +219,7 @@ async def websocket_endpoint(
     :param token: The oauth token of the user to authorize playing
     :raises HTTPException: If the user is not active
     """
-    if token is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="You have to be logged in to connect to a game.",
-        )
-    current_user = await get_current_user(security_scopes=SecurityScopes(), token=token)
-    if current_user.id is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="You have to be logged in to connect to a game.",
-        )
-    if not current_user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="You have to be active to connect to a game.",
-        )
-    await websocket_manager.connect(websocket, room_id, current_user.id)
+    await websocket_manager.connect(websocket, room_id, user_id)
     while True:
         data = await websocket.receive_json()
         await websocket_manager.receive(websocket, data, room_id, user_id)

@@ -74,7 +74,7 @@ class PlayableCharacterCard(AbstractCharacterCard):
         """
         Return a dictionary representation of the card.
 
-        :raises NotImplementedError: Your darone is not implemented
+        :return: A dict representaiton of the card
         """
         return {
             "id": self.id,
