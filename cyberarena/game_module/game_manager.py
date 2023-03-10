@@ -27,7 +27,7 @@ class GameManager:
             settings.card_image_filename,
         )
 
-    def create_game(self, p1id: int, p2id: int, d1: Deck, d2: Deck) -> Game:
+    def create_game(self, p1id: int, p2id: int) -> Game:
         """
         Create a game.
 

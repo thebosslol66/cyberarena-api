@@ -209,8 +209,6 @@ async def websocket_endpoint(
     room_id: int,
     user_id: int,
 ) -> None:
-    logger.error("room_id : " + str(room_id))
-    logger.error("user_id : " + str(user_id))
     """
     Connect to a websocket game.
 
@@ -222,9 +220,10 @@ async def websocket_endpoint(
     await websocket_manager.connect(websocket, room_id, user_id)
     while True:
         data = await websocket.receive_json()
-        await websocket_manager.receive(websocket, data, room_id, user_id)
         if data["type"] == "close":
             break
+        await websocket_manager.receive(websocket, data, room_id, user_id)
+
 
 
 router.include_router(ticket_router, prefix="/ticket")

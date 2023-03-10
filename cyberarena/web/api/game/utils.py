@@ -273,14 +273,17 @@ class WebsocketGameManager(object):
         :param user_id: The id of the user to connect
         :raises HTTPException: If the user is not in the game
         """
+        logger.error("connect")
         try:
             if user_id not in gamem.game_manager[game_id]:
+                logger.error("user not found")
                 await websocket.close()
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="User not in this game",
                 )
         except gamem.exceptions.GameNotFoundError:
+            logger.error("game not found")
             await websocket.close()
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -291,7 +294,9 @@ class WebsocketGameManager(object):
         self.__websocket_games[game_id].append(websocket)
         self.__websocket_to_player[websocket] = user_id
         await websocket.accept()
+
         if gamem.game_manager.connect(game_id, user_id):
+            logger.error("begin game connect")
             await self.begin_game(game_id)
 
     async def disconnect(self, websocket: WebSocket, game_id: int) -> None:
@@ -379,6 +384,7 @@ class WebsocketGameManager(object):
 
         :param game_id: The id of the game to begin
         """
+        logger.error("begin game")
         await self.game_broadcast(game_id, {"type": "begin_game"})
         for _ in range(gamem.get_starting_cards_amount()):
             for websocket in self.__websocket_games[game_id]:

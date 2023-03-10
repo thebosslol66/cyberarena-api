@@ -1,6 +1,8 @@
 import random
 from typing import List, Optional
 
+from loguru import logger
+
 from .card import AbstractCard, PlayableCharacterCard
 from .settings import settings
 
@@ -48,6 +50,8 @@ class Deck(object):
 
     def __init_deck(self) -> None:
         """Initialize the deck."""
-        for _ in range(0, self.__deckSize):
-            self.__deck.append(PlayableCharacterCard("Cyber-Heisenberg", 1, 1, 1))
+        logger.error("Deck size: ", str(self.__deckSize))
+        for i in range(0, self.__deckSize):
+            self.__deck.append(PlayableCharacterCard("Cyber-Heisenberg",
+                                                     1, 1, 1, 1, "", i))
         random.shuffle(self.__deck)
