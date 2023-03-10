@@ -41,8 +41,6 @@ class GameManager:
         p2 = Player()
         p1.id = p1id
         p2.id = p2id
-        p1.change_deck(d1)
-        p2.change_deck(d2)
         self.__players.append(p1)
         self.__players.append(p2)
         game = Game(p1, p2)

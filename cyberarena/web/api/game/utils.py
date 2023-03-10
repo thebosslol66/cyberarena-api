@@ -186,9 +186,7 @@ class TicketManager(object):
             self.__history[ticket2[0]] = ticket2[1]
             return gamem.game_manager.create_game(
                 ticket1[1].user_id,
-                ticket2[1].user_id,
-                gamem.create_deck(),
-                gamem.create_deck(),
+                ticket2[1].user_id
             ).id
         return -1
 
@@ -478,7 +476,9 @@ class WebsocketGameManager(object):
             logger.error("Card doesn't exist?!")
         elif res == -2:
             await websocket.send_json({"type": "error", "data": "Not enough mana"})
-
+        elif res == -1:
+            await websocket.send_json({"type": "error", "data": "It's not your turn"})
+        else:
             await self.game_broadcast(
                 game_id,
                 {
@@ -486,8 +486,6 @@ class WebsocketGameManager(object):
                     "id": str(id_card),
                 },
             )
-        else:
-            await websocket.send_json({"type": "error", "data": "invalid move"})
 
     async def attack(
         self,
@@ -509,6 +507,14 @@ class WebsocketGameManager(object):
             int(data["id_card2"]),
         )
         await self.game_broadcast(game_id, {"type": "attack", "data": "data"})
+
+    async def update_card_stats(self, game_id, websocket: WebSocket, id_card1: int, id_card2: int):
+        card = gamem.get_card_from_id(id_card1)
+        await self.game_broadcast(game_id, card.to_dict())
+        if id_card2 != -1:
+            card2 = gamem.get_card_from_id(id_card2)
+            await self.game_broadcast(game_id, card2.to_dict())
+
 
 
 websocket_manager = WebsocketGameManager()
