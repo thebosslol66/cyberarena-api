@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     starting_cards_in_deck: int = 3
     deck_size: int = 12
     board_size: int = 5
+    nexus_health: int = 100
 
     card_image_path: str = "cyberarena/static/img/cards"
     static_image: str = "{0}_static.png"

@@ -13,7 +13,9 @@ class Board:
     def __init__(self) -> None:
         """Constructor."""
         self.__side1: List[PlayableCharacterCard] = []
+        self.__nexus1: int = settings.nexus_health
         self.__side2: List[PlayableCharacterCard] = []
+        self.__nexus2: int = settings.nexus_health
         self.__boardSize = settings.board_size
 
     def deploy_card(self, card: AbstractCard, side: int) -> None:
@@ -66,6 +68,24 @@ class Board:
                 self.__side1.remove(cardrecv)
             else:
                 self.__side2.remove(cardrecv)
+
+    def attack_nexus(self, idatt: int, side: int) -> None:
+        """
+        Attack the nexus.
+
+        :param idatt: Id of the card attacking.
+        :param side: Side of the board of the nexus receving damage.
+        """
+        if side == 2:
+            for card in self.__side1:
+                if card.id == idatt:
+                    self.__nexus2 -= card.ap
+                    return
+        else:
+            for card2 in self.__side2:
+                if card2.id == idatt:
+                    self.__nexus1 -= card2.ap
+                    return
 
     def get_board_size(self) -> int:
         """
@@ -133,3 +153,14 @@ class Board:
         else:
             for card2 in self.__side1:
                 card2.end_turn()
+
+    def get_nexus_health(self, side: int) -> int:
+        """
+        Get the nexus health.
+
+        :param side: Side of the board of the nexus.
+        :return: The nexus health.
+        """
+        if side == 1:
+            return self.__nexus1
+        return self.__nexus2
