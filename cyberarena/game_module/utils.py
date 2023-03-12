@@ -1,7 +1,5 @@
 import os
 
-from loguru import logger
-
 from .card import AbstractCard, LibraryCard
 from .card.library import Library
 from .deck import Deck
@@ -122,7 +120,6 @@ def setup_game_module() -> None:
 
 
 def create_deck() -> Deck:
-    logger.error("CREATE DECK")
     """
     Create a deck.
 

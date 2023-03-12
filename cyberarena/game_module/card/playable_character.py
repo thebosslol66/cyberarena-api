@@ -4,6 +4,18 @@ from .base import AbstractCharacterCard
 from .enums import ObjectCardRace, ObjectCardRarity
 
 
+def from_dict(
+    data: typing.Dict[str, typing.Union[str, int]],
+) -> "PlayableCharacterCard":
+    """
+    Create a card from a dict.
+
+    :param data: Dict containing the data.
+    :return: Card created.
+    """
+    return PlayableCharacterCard(**data)  # type: ignore
+
+
 class PlayableCharacterCard(AbstractCharacterCard):
     """Card class."""
 
@@ -28,6 +40,7 @@ class PlayableCharacterCard(AbstractCharacterCard):
         :param ap: Attack points of the card.  # noqa: DAR003
         :param dp: Defense points of the card.
         :param description: Description of the card.
+        :param id_pic: ID of the picture of the card.
         :param rarity: Rarity of the card.
         :param race: Race of the card.
         :raise ValueError: If the cost, hp, ap or dp is negative.

@@ -226,5 +226,4 @@ async def websocket_endpoint(
         await websocket_manager.receive(websocket, data, room_id, user_id)
 
 
-
 router.include_router(ticket_router, prefix="/ticket")

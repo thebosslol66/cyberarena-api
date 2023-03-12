@@ -186,7 +186,7 @@ class TicketManager(object):
             self.__history[ticket2[0]] = ticket2[1]
             return gamem.game_manager.create_game(
                 ticket1[1].user_id,
-                ticket2[1].user_id
+                ticket2[1].user_id,
             ).id
         return -1
 
@@ -514,13 +514,26 @@ class WebsocketGameManager(object):
         )
         await self.game_broadcast(game_id, {"type": "attack", "data": "data"})
 
-    async def update_card_stats(self, game_id, websocket: WebSocket, id_card1: int, id_card2: int):
+    async def update_card_stats(
+        self,
+        game_id: int,
+        websocket: WebSocket,
+        id_card1: int,
+        id_card2: int,
+    ) -> None:  # type: ignore
+        """
+        Update the stats of a card.
+
+        :param game_id: The id of the game
+        :param websocket: The socket of the user
+        :param id_card1: The id of the first card
+        :param id_card2: The id of the second card
+        """
         card = gamem.get_card_from_id(id_card1)
-        await self.game_broadcast(game_id, card.to_dict())
+        await self.game_broadcast(game_id, card.to_dict())  # type: ignore
         if id_card2 != -1:
             card2 = gamem.get_card_from_id(id_card2)
-            await self.game_broadcast(game_id, card2.to_dict())
-
+            await self.game_broadcast(game_id, card2.to_dict())  # type: ignore
 
 
 websocket_manager = WebsocketGameManager()

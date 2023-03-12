@@ -2,7 +2,6 @@ from typing import List, Optional
 
 from . import AbstractCard
 from .card import LibraryCard
-from .deck import Deck
 from .exceptions import GameNotFoundError
 from .game import Game
 from .player import Player
@@ -33,8 +32,6 @@ class GameManager:
 
         :param p1id: Player 1 id.
         :param p2id: Player 2 id.
-        :param d1: Deck 1.
-        :param d2: Deck 2.
         :return: The game created.
         """
         p1 = Player()
