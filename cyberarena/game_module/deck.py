@@ -83,7 +83,7 @@ class Deck(object):
 
         # On affiche la liste des données récupérées
         logger.error(len(data_list))
-        for i in range(0, 12):
+        for i in range(0, 13):
             logger.error(type(data_list[i]))
             card = from_dict(data_list[i])
             self.__deck.append(card)
