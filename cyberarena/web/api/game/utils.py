@@ -352,6 +352,7 @@ class WebsocketGameManager(object):
                 else:
                     await websocket.send_json(data_for_other)
             except WebSocketDisconnect:
+                logger.error("disconnect")
                 await self.disconnect(websocket, game_id)
 
     async def receive(
@@ -386,11 +387,12 @@ class WebsocketGameManager(object):
         """
         logger.error("begin game")
         await self.game_broadcast(game_id, {"type": "begin_game"})
+        await self.get_websocket_turn(game_id)
         for _ in range(gamem.get_starting_cards_amount()):
             for websocket in self.__websocket_games[game_id]:
                 await self.draw_card(game_id, websocket, force=True)
 
-    async def set_websocket_turn(self, game_id: int) -> None:
+    async def get_websocket_turn(self, game_id: int) -> None:
         """
         Get the turn of the game.
 
@@ -402,11 +404,8 @@ class WebsocketGameManager(object):
             try:
                 await websocket.send_json(
                     {
-                        "type": "set_turn",
-                        "is_turn": gamem.game_manager.get_turn(
-                            game_id,
-                        )
-                        == self.__websocket_to_player[websocket],
+                        "type": "get_turn",
+                        "id_player": gamem.game_manager.get_turn(game_id)
                     },
                 )
             except WebSocketDisconnect:
@@ -451,7 +450,8 @@ class WebsocketGameManager(object):
             game_id,
             self.__websocket_to_player[websocket],
         )
-        await self.set_websocket_turn(game_id)
+        await self.draw_card(game_id, websocket)
+        await self.get_websocket_turn(game_id)
 
     async def deploy_card(
         self,
