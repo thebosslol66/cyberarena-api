@@ -4,6 +4,7 @@ from typing import Optional
 from .card import AbstractCard
 from .deck import Deck
 from .hand import Hand
+from .settings import settings
 
 logger = logging.getLogger("cyberarena.game_module")
 
@@ -23,9 +24,9 @@ class Player:
         self.__deck = Deck()
         self.__hand = Hand(self.__deck)
         self.life = 20
-        self.mana = 1
-        self.mana_max_turn = 1
-        self.mana_max = 10
+        self.mana = settings.mana_initial
+        self.mana_max_turn = settings.mana_initial
+        self.mana_max = settings.mana_max
         self.idcardcurr = 0
 
     def get_mana(self) -> int:
@@ -133,8 +134,8 @@ class Player:
 
     def next_turn(self) -> None:
         """Next turn."""
-        if self.mana_max_turn == self.mana_max:
+        if self.mana_max_turn >= self.mana_max:
             self.mana = self.mana_max_turn
             return
-        self.mana_max_turn += 1
+        self.mana_max_turn += settings.mana_increase_turn
         self.mana = self.mana_max_turn

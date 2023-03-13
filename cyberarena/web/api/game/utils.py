@@ -535,5 +535,26 @@ class WebsocketGameManager(object):
             card2 = gamem.get_card_from_id(id_card2)
             await self.game_broadcast(game_id, card2.to_dict())  # type: ignore
 
+    async def get_mana(self, game_id: int, websocket: WebSocket) -> None:
+        """
+        Get the mana of the player.
+
+        :param game_id: The id of the game
+        :param websocket: The socket of the user
+        """
+        mana = gamem.game_manager.get_mana(
+            game_id,
+            self.__websocket_to_player[websocket],
+        )
+        await self.game_private_broadcast(
+            game_id,
+            {
+                "type": "get_mana",
+                "mana": mana,  # type: ignore
+            },
+            websocket,
+            {"type": "get_mana_private"},
+        )
+
 
 websocket_manager = WebsocketGameManager()

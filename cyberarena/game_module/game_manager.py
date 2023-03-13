@@ -244,5 +244,21 @@ class GameManager:
         if game:
             game.increase_turn(idplayer)
 
+    def get_mana(self, idgame: int, idplayer: int) -> int:
+        """
+        Get the mana of a player.
+
+        :param idgame: Id of the game.
+        :param idplayer: Id of the player.
+        :return: The mana of the player.
+        """
+        game = self.find_game(idgame)
+        if game:
+            if game.player1.id == idplayer:
+                return game.player1.get_mana()
+            if game.player2.id == idplayer:
+                return game.player2.get_mana()
+        return -1
+
 
 game_manager = GameManager()
