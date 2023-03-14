@@ -81,6 +81,8 @@ class Hand:
         logger.error("size of hand = %d", len(self.__hand))
         for card in self.__hand:
             logger.error("card.id = %d", card.id)
+
+        for card in self.__hand:
             if card.id == idcard:
                 return card
         return None
