@@ -313,16 +313,30 @@ class WebsocketGameManager(object):
             if not self.__websocket_games[game_id]:
                 self.__websocket_games.pop(game_id)
 
-    async def game_broadcast(self, game_id: int, data: Dict[str, str]) -> None:
+    async def game_broadcast(  # noqa: C901
+        self,
+        game_id: int,
+        data: Dict[str, str],
+        player: Optional[WebSocket],
+        action: int = 0,
+    ) -> None:  # noqa: C901
         """
         Send a message to all players in a game.
 
         :param game_id: The id of the game
         :param data: The data to send
+        :param player: The websocket of the player who sent the message
+        :param action: If 0, send to everyone,
+                            if 1, send to everyone but the player,
+                            if 2, send only to the player
         """
         if game_id not in self.__websocket_games:
             return
         for websocket in self.__websocket_games[game_id]:
+            if action == 1 and websocket == player:
+                continue
+            if action == 2 and websocket != player:
+                continue
             try:
                 await websocket.send_json(data)
             except WebSocketDisconnect:
@@ -386,7 +400,7 @@ class WebsocketGameManager(object):
         :param game_id: The id of the game to begin
         """
         logger.error("begin game")
-        await self.game_broadcast(game_id, {"type": "begin_game"})
+        await self.game_broadcast(game_id, {"type": "begin_game"}, None, 1)
         await self.get_websocket_turn(game_id)
         for _ in range(gamem.get_starting_cards_amount()):
             for websocket in self.__websocket_games[game_id]:
@@ -405,7 +419,7 @@ class WebsocketGameManager(object):
                 await websocket.send_json(
                     {
                         "type": "get_turn",
-                        "id_player": gamem.game_manager.get_turn(game_id)
+                        "id_player": gamem.game_manager.get_turn(game_id),
                     },
                 )
             except WebSocketDisconnect:
@@ -489,8 +503,11 @@ class WebsocketGameManager(object):
                 game_id,
                 {
                     "type": "deploy_card",
-                    "id": str(id_card),
+                    "id_card": id_card,  # type: ignore
+                    "data": data,  # type: ignore
                 },
+                websocket,
+                1,
             )
 
     async def attack(
@@ -512,7 +529,7 @@ class WebsocketGameManager(object):
             int(data["id_card"]),
             int(data["id_card2"]),
         )
-        await self.game_broadcast(game_id, {"type": "attack", "data": "data"})
+        await self.game_broadcast(game_id, {"type": "attack", "data": "data"}, None, 1)
 
     async def update_card_stats(
         self,
@@ -546,14 +563,14 @@ class WebsocketGameManager(object):
             game_id,
             self.__websocket_to_player[websocket],
         )
-        await self.game_private_broadcast(
+        await self.game_broadcast(
             game_id,
             {
                 "type": "get_mana",
                 "mana": mana,  # type: ignore
             },
             websocket,
-            {"type": "get_mana_private"},
+            2,
         )
 
 
