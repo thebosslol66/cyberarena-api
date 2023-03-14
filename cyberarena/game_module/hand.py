@@ -77,7 +77,10 @@ class Hand:
         :param idcard: ID of the card.
         :return: The card.
         """
+        logger.error("get_card_id")
+        logger.error("size of hand = %d", len(self.__hand))
         for card in self.__hand:
+            logger.error("card.id = %d", card.id)
             if card.id == idcard:
                 return card
         return None
