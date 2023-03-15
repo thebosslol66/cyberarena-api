@@ -1,5 +1,6 @@
 # flake8: noqa
 import pytest
+from loguru import logger
 
 from cyberarena.game_module.deck import Deck
 from cyberarena.game_module.game_manager import GameManager
@@ -143,3 +144,21 @@ async def test_game_manager_find_player_multiple_games() -> None:
     assert game_manager.find_player(2) == 0
     assert game_manager.find_player(3) == 1
     assert game_manager.find_player(4) == 1
+
+
+@pytest.mark.anyio
+async def test_game_manager_test_card_same_id_pic() -> None:
+    game_manager = GameManager()
+    game_manager.create_game(1, 2, True)
+    game_manager.draw_card(0, 1)
+    game_manager.draw_card(0, 1)
+    # game_manager.find_game(0).player1.display_hand()
+    game_manager.draw_card(0, 1)
+    # game_manager.find_game(0).player1.display_hand()
+    game_manager.deploy_card(0, 1, 0)
+    cardid1 = game_manager.get_game(0).player1.get_card_from_hand_id(1).to_dict()
+    cardid2 = game_manager.get_game(0).player1.get_card_from_hand_id(2).to_dict()
+    logger.error(cardid1)
+    logger.error(cardid2)
+    assert cardid1["id"] == 1
+    assert cardid2["id"] == 2

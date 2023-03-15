@@ -10,14 +10,14 @@ logger = logging.getLogger("cyberarena.game_module")
 class Hand:
     """Hand Class."""
 
-    def __init__(self, deck: Deck) -> None:
+    def __init__(self, test: bool = False) -> None:
         """
         Constructor.
 
-        :param deck: Deck assigned to the Hand.
+        :param test: True if it's a test, False otherwise.
         """
         self.__hand: List[AbstractCard] = []
-        self.__Deck = deck
+        self.__Deck = Deck(test)
 
     def __len__(self) -> int:
         """
@@ -37,6 +37,8 @@ class Hand:
         card = self.__Deck.get_random_card()
         if card:
             card.id = idcard
+            logger.debug(card.name)
+            logger.debug(card.id)
             self.__hand.append(card)
         else:
             logger.debug("Deck is empty")
@@ -96,3 +98,19 @@ class Hand:
         """
         card.id = idcard
         self.__hand.append(card)
+
+    def get_hand(self) -> List[AbstractCard]:
+        """
+        Get the hand.
+
+        :return: The hand.
+        """
+        return self.__hand
+
+    def get_deck(self) -> Deck:
+        """
+        Get the deck.
+
+        :return: The deck.
+        """
+        return self.__Deck

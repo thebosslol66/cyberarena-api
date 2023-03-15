@@ -86,6 +86,7 @@ class Game:
             -3 if the card doesnt exist.
         """
         card = player.get_card_from_hand_id(idcard)
+
         if card is None:
             logger.debug("card doesnt exist")
             return -3

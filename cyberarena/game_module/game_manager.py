@@ -1,5 +1,7 @@
 from typing import List, Optional
 
+from loguru import logger
+
 from . import AbstractCard
 from .card import LibraryCard
 from .exceptions import GameNotFoundError
@@ -26,16 +28,17 @@ class GameManager:
             settings.card_image_filename,
         )
 
-    def create_game(self, p1id: int, p2id: int) -> Game:
+    def create_game(self, p1id: int, p2id: int, test: bool = False) -> Game:
         """
         Create a game.
 
         :param p1id: Player 1 id.
         :param p2id: Player 2 id.
+        :param test: Test mode.
         :return: The game created.
         """
-        p1 = Player()
-        p2 = Player()
+        p1 = Player("", test)
+        p2 = Player("", test)
         p1.id = p1id
         p2.id = p2id
         self.__players.append(p1)
@@ -165,6 +168,7 @@ class GameManager:
         game = self.find_game(id_game)
         if game:
             if game.player1.id == id_player:
+                logger.debug("Deploying card %s for player %s", id_card, id_player)
                 return game.deploy_card_id(game.player1, id_card)
             if game.player2.id == id_player:
                 return game.deploy_card_id(game.player2, id_card)

@@ -1,12 +1,11 @@
-import logging
 from typing import Optional
+
+from loguru import logger
 
 from .card import AbstractCard
 from .deck import Deck
 from .hand import Hand
 from .settings import settings
-
-logger = logging.getLogger("cyberarena.game_module")
 
 
 class Player:
@@ -14,15 +13,15 @@ class Player:
 
     id = -1
 
-    def __init__(self, name: str = "") -> None:
+    def __init__(self, name: str = "", test: bool = False) -> None:
         """
         Constructor.
 
         :param name: Name of the player.
+        :param test: True if the game is in test mode, False otherwise.
         """
         self.name = name
-        self.__deck = Deck()
-        self.__hand = Hand(self.__deck)
+        self.__hand = Hand(test)
         self.life = 20
         self.mana = settings.mana_initial
         self.mana_max_turn = settings.mana_initial
@@ -43,6 +42,8 @@ class Player:
 
         :return: The card drawn.
         """
+        logger.debug("draw card id = ")
+        logger.debug(self.idcardcurr)
         card = self.__hand.get_random_card(self.idcardcurr)
         self.idcardcurr += 1
         return card
@@ -57,9 +58,9 @@ class Player:
         res: AbstractCard = self.__hand.use_card(card, self.mana)
         if res.cost != 0:
             self.mana -= res.cost
-            logger.debug("Card used")
+            logger.error("Card used")
             return res
-        logger.debug("Card not used")
+        logger.error("Card not used")
         return None
 
     def use_card_debug(self, index: int) -> Optional[AbstractCard]:
@@ -72,9 +73,9 @@ class Player:
         res: AbstractCard = self.__hand.use_card_debug(index, self.mana)
         if res.cost != 0:
             self.mana -= res.cost
-            logger.debug("Card used")
+            logger.error("Card used")
             return res
-        logger.debug("Card not used")
+        logger.error("Card not used")
         return None
 
     def get_card_from_hand_id(self, idcard: int) -> Optional[AbstractCard]:
@@ -104,7 +105,7 @@ class Player:
 
         :return: The deck of the player.
         """
-        return self.__deck
+        return self.__hand.get_deck()
 
     def debug_get_hand(self) -> Hand:
         """
@@ -123,15 +124,6 @@ class Player:
         self.__hand.cheat_add_card(card, self.idcardcurr)
         self.idcardcurr += 1
 
-    def change_deck(self, deck: Deck) -> None:
-        """
-        Change the deck of the player.
-
-        :param deck: New deck.
-        """
-        self.__deck = deck
-        self.__hand = Hand(self.__deck)
-
     def next_turn(self) -> None:
         """Next turn."""
         if self.mana_max_turn >= self.mana_max:
@@ -139,3 +131,18 @@ class Player:
             return
         self.mana_max_turn += settings.mana_increase_turn
         self.mana = self.mana_max_turn
+
+    def get_hand(self) -> Hand:
+        """
+        Get the hand of the player.
+
+        :return: The hand of the player.
+        """
+        return self.__hand
+
+    def display_hand(self) -> None:
+        """Display the hand."""
+        logger.error("Hand of player " + self.name)
+        logger.error("size of hand : ", len(self.__hand.get_hand()))
+        for i in range(0, len(self.__hand)):
+            logger.error(self.__hand.get_hand()[i].to_dict())

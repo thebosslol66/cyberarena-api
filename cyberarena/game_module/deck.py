@@ -14,11 +14,15 @@ from .settings import settings
 class Deck(object):
     """Deck Class."""
 
-    def __init__(self) -> None:
-        """Constructor."""
+    def __init__(self, test: bool = False) -> None:
+        """
+        Constructor.
+
+        :param test: True if it's a test, False otherwise.
+        """
         self.__deck: List[AbstractCard] = []
         self.__deckSize = settings.deck_size
-        self.__init_deck()
+        self.__init_deck(test)
 
     def use_card(self, card: AbstractCard, mana: int, currid: int) -> AbstractCard:
         """
@@ -40,8 +44,11 @@ class Deck(object):
 
         :return: A random card.
         """
+        logger.debug("getrandom")
         if self.__deck:
-            return self.__deck.pop()
+            card = self.__deck.pop()
+            logger.debug(card.id)
+            return card
         return None
 
     def __len__(self) -> int:
@@ -52,9 +59,23 @@ class Deck(object):
         """
         return len(self.__deck)
 
-    def __init_deck(self) -> None:
-        """Initialize the deck."""
+    def __init_deck(self, test: bool = False) -> None:
+        """
+        Initialize the deck.
+
+        :param test: True if the deck is in test mode, False otherwise.
+        """
+        if test:
+            logger.error("Deck is in test mode")
+            card = PlayableCharacterCard("Bane", 7, 4, 5, 2, "", 11)
+            self.__deck.append(card)
+            card1 = PlayableCharacterCard("Bane", 7, 4, 5, 2, "", 11)
+            self.__deck.append(card1)
+            self.__deck.append(PlayableCharacterCard("Lisa", 7, 4, 5, 2, "", 4))
+            return
+
         logger.error("Deck size: ", str(self.__deckSize))
+
         # Le chemin du répertoire contenant les fichiers json
         path = settings.card_path
 
@@ -82,10 +103,9 @@ class Deck(object):
                         data_list.append(data)
 
         # On affiche la liste des données récupérées
-        logger.error(len(data_list))
         for i in range(0, 13):
-            logger.error(type(data_list[i]))
             card = from_dict(data_list[i])
             self.__deck.append(card)
-            self.__deck.append(card)
+            card2 = from_dict(data_list[i])
+            self.__deck.append(card2)
         random.shuffle(self.__deck)
