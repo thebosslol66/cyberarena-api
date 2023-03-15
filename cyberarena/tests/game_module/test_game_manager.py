@@ -162,3 +162,18 @@ async def test_game_manager_test_card_same_id_pic() -> None:
     logger.error(cardid2)
     assert cardid1["id"] == 1
     assert cardid2["id"] == 2
+
+
+@pytest.mark.anyio
+async def test_game_manager_test_draw_card() -> None:
+    game_manager = GameManager()
+    game_manager.create_game(1, 2)
+    game_manager.draw_card(0, 1)
+    game_manager.draw_card(0, 1)
+    game_manager.draw_card(0, 1)
+    game_manager.draw_card(0, 2)
+    game_manager.draw_card(0, 2)
+    game_manager.draw_card(0, 2)
+    assert game_manager.get_game(0).player1.get_hand_size() == 3
+    assert game_manager.get_game(0).player2.get_hand_size() == 3
+    assert game_manager.draw_card(0, 1) is not None

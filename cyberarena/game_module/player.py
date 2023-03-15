@@ -46,6 +46,8 @@ class Player:
         logger.debug(self.idcardcurr)
         card = self.__hand.get_random_card(self.idcardcurr)
         self.idcardcurr += 1
+        if card is None:
+            logger.error("no card player")
         return card
 
     def use_card(self, card: AbstractCard) -> Optional[AbstractCard]:

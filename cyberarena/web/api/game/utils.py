@@ -392,6 +392,8 @@ class WebsocketGameManager(object):
             await self.next_turn(room_id, websocket)
         elif data["type"] == "attack":
             await self.attack(room_id, websocket, data)
+        elif data["type"] == "get_mana":
+            await self.get_mana(room_id, websocket)
 
     async def begin_game(self, game_id: int) -> None:
         """
@@ -440,8 +442,10 @@ class WebsocketGameManager(object):
         """
         user_id = self.__websocket_to_player[websocket]
         card = gamem.game_manager.draw_card(game_id, user_id, force)
+        logger.error("user id = ")
+        logger.error(user_id)
         if card is None:
-            logger.error("No card to draw")
+            logger.error("No card to draw utils")
             return
         await self.game_private_broadcast(
             game_id,
@@ -460,11 +464,11 @@ class WebsocketGameManager(object):
         :param game_id: The id of the game
         :param websocket: The socket of the user
         """
+        await self.draw_card(game_id, websocket)
         gamem.game_manager.next_turn(
             game_id,
             self.__websocket_to_player[websocket],
         )
-        await self.draw_card(game_id, websocket)
         await self.get_websocket_turn(game_id)
 
     async def deploy_card(
@@ -563,11 +567,14 @@ class WebsocketGameManager(object):
             game_id,
             self.__websocket_to_player[websocket],
         )
+        mana_max = gamem.game_manager.get_mana_max()
+
         await self.game_broadcast(
             game_id,
             {
                 "type": "get_mana",
                 "mana": mana,  # type: ignore
+                "mana_max": mana_max,  # type: ignore
             },
             websocket,
             2,

@@ -44,10 +44,8 @@ class Deck(object):
 
         :return: A random card.
         """
-        logger.debug("getrandom")
         if self.__deck:
             card = self.__deck.pop()
-            logger.debug(card.id)
             return card
         return None
 
@@ -73,8 +71,6 @@ class Deck(object):
             self.__deck.append(card1)
             self.__deck.append(PlayableCharacterCard("Lisa", 7, 4, 5, 2, "", 4))
             return
-
-        logger.error("Deck size: ", str(self.__deckSize))
 
         # Le chemin du répertoire contenant les fichiers json
         path = settings.card_path
@@ -109,3 +105,5 @@ class Deck(object):
             card2 = from_dict(data_list[i])
             self.__deck.append(card2)
         random.shuffle(self.__deck)
+        logger.error("Deck size: ")
+        logger.error(len(self.__deck))

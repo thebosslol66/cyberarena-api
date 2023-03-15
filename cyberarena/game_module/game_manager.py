@@ -214,8 +214,11 @@ class GameManager:
         """
         game = self.find_game(id_game)
         if game:
+            logger.error("check turn gm")
             if game.check_turn(game.player1):
+                logger.error("check turn p1")
                 return game.player1.id
+            logger.error("check turn p2")
             return game.player2.id
         return -1
 
@@ -263,6 +266,14 @@ class GameManager:
             if game.player2.id == idplayer:
                 return game.player2.get_mana()
         return -1
+
+    def get_mana_max(self) -> int:
+        """
+        Get the max mana.
+
+        :return: The max mana.
+        """
+        return settings.mana_max
 
 
 game_manager = GameManager()

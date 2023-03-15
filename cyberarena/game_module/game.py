@@ -187,8 +187,9 @@ class Game:
         :param force: Force the draw.
         :return: The card drawn.
         """
-        if self.check_turn(player) or force:
+        if force or self.check_turn(player):
             return player.draw_card()
+        logger.error("It's not your turn!")
         return None
 
     def get_board(self) -> Board:
@@ -206,9 +207,16 @@ class Game:
         :param player: Player to check.
         :return: The turn.
         """
+        logger.error("turn = ")
+        logger.error(self.turn)
+        if player == self.player1:
+            logger.error("player1")
+        else:
+            logger.error("player2")
         if self.turn % 2 == 0:
-            return player != self.player1
-        return player != self.player2
+            logger.error("turn % 2 == 0")
+            return player == self.player1
+        return player == self.player2
 
     def increase_turn_debug(self) -> None:
         """Debug increase turn."""
