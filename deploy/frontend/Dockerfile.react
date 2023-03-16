@@ -1,0 +1,15 @@
+FROM node:16-alpine as builder
+
+workdir /app
+copy ./frontend/package.json .
+run npm install
+copy ./frontend .
+run npm run build
+
+# production environment
+
+from nginx
+copy --from=builder /app/dist /etc/nginx/html
+RUN rm /etc/nginx/conf.d/default.conf
+ADD ./nginx/nginx.prod.conf /etc/nginx/conf.d
+cmd ["nginx", "-g", "daemon off;"]
