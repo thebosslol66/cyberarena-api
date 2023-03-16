@@ -498,12 +498,15 @@ class WebsocketGameManager(object):
         )
 
         if res == -3:
-            await websocket.send_json({"type": "error", "data": "Card doesn't exist?!"})
+            await websocket.send_json({"type": "deploy_card",
+                                       "data": "Card doesn't exist?!"})
             logger.error("Card doesn't exist?!")
         elif res == -2:
-            await websocket.send_json({"type": "error", "data": "Not enough mana"})
+            await websocket.send_json({"type": "deploy_card",
+                                       "data": "Not enough mana"})
         elif res == -1:
-            await websocket.send_json({"type": "error", "data": "It's not your turn"})
+            await websocket.send_json({"type": "deploy_card",
+                                       "data": "It's not your turn"})
         else:
             await self.game_broadcast(
                 game_id,
