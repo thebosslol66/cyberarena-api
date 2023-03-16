@@ -87,6 +87,17 @@ class Board:
                     self.__nexus1 -= card2.ap
                     return
 
+    def get_nexus_health(self, side: int) -> int:
+        """
+        Get the health of a nexus.
+
+        :param side: Side of the board of the nexus.
+        :return: The health of the nexus.
+        """
+        if side == 1:
+            return self.__nexus1
+        return self.__nexus2
+
     def get_board_size(self) -> int:
         """
         Get the size of the board.
@@ -153,14 +164,3 @@ class Board:
         else:
             for card2 in self.__side1:
                 card2.end_turn()
-
-    def get_nexus_health(self, side: int) -> int:
-        """
-        Get the nexus health.
-
-        :param side: Side of the board of the nexus.
-        :return: The nexus health.
-        """
-        if side == 1:
-            return self.__nexus1
-        return self.__nexus2

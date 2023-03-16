@@ -205,6 +205,32 @@ class GameManager:
             if game.player2.id == idplayer:
                 game.attack_nexus(game.player2, idatt)
 
+    def get_nexus_health(
+        self,
+        idgame: int,
+        idplayer: int,
+        otherhp: bool = False,
+    ) -> int:
+        """
+        Get the health of the nexus.
+
+        :param idgame: Id of the game.
+        :param idplayer: Id of the player.
+        :param otherhp: If True, return the health of the other nexus.
+        :return: The health of the nexus.
+        """
+        game = self.find_game(idgame)
+        if game:
+            if game.player1.id == idplayer:
+                if otherhp:
+                    return game.get_nexus_health(game.player2)
+                return game.get_nexus_health(game.player1)
+            if game.player2.id == idplayer:
+                if otherhp:
+                    return game.get_nexus_health(game.player1)
+                return game.get_nexus_health(game.player2)
+        return -1
+
     def get_turn(self, id_game: int) -> int:
         """
         Get the turn of a game.

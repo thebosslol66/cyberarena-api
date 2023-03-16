@@ -369,13 +369,13 @@ class WebsocketGameManager(object):
                 logger.error("disconnect")
                 await self.disconnect(websocket, game_id)
 
-    async def receive(
+    async def receive(  # noqa: C901
         self,
         websocket: WebSocket,
         data: Dict[str, str],
         room_id: int,
         user_id: int,
-    ) -> None:
+    ) -> None:  # noqa: C901
         """
         Recieve messages from players' websockets.
 
@@ -394,6 +394,8 @@ class WebsocketGameManager(object):
             await self.attack(room_id, websocket, data)
         elif data["type"] == "get_mana":
             await self.get_mana(room_id, websocket)
+        elif data["type"] == "get_nexus_health":
+            await self.get_nexus_health(room_id, websocket)
 
     async def begin_game(self, game_id: int) -> None:
         """
@@ -578,6 +580,54 @@ class WebsocketGameManager(object):
             },
             websocket,
             2,
+        )
+
+    async def attack_nexus(
+        self,
+        game_id: int,
+        websocket: WebSocket,
+        id_card: int,
+    ) -> None:
+        """
+        Attack the nexus.
+
+        :param game_id: The id of the game
+        :param websocket: The socket of the user
+        :param id_card: The id of the card
+        """
+        gamem.game_manager.attack_nexus(
+            game_id,
+            self.__websocket_to_player[websocket],
+            id_card,
+        )
+        await self.get_nexus_health(game_id, websocket)
+
+    async def get_nexus_health(self, game_id: int, websocket: WebSocket) -> None:
+        """
+        Get the health of the nexus.
+
+        :param game_id: The id of the game
+        :param websocket: The socket of the user
+        """
+        health = gamem.game_manager.get_nexus_health(
+            game_id,
+            self.__websocket_to_player[websocket],
+        )
+        healthopp = gamem.game_manager.get_nexus_health(
+            game_id,
+            self.__websocket_to_player[websocket],
+            True,
+        )
+
+        await self.game_broadcast(
+            game_id,
+            {
+                "type": "get_nexus_health",
+                "myhealth": health,  # type: ignore
+                "ennemyhealth": healthopp,  # type: ignore
+            },
+            websocket,
+            0,
         )
 
 

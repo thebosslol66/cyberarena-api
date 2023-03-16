@@ -179,6 +179,17 @@ class Game:
         else:
             self.__board.attack_nexus(idatt, 1)
 
+    def get_nexus_health(self, player: Player) -> int:
+        """
+        Get the nexus health.
+
+        :param player: Player to check.
+        :return: The nexus health.
+        """
+        if player == self.player1:
+            return self.__board.get_nexus_health(1)
+        return self.__board.get_nexus_health(2)
+
     def draw_card(self, player: Player, force: bool = False) -> Optional[AbstractCard]:
         """
         Draw a card.
