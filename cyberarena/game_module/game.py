@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import Dict, Optional, Union
 
 from .board import Board
 from .card import AbstractCard, PlayableCharacterCard
@@ -255,3 +255,12 @@ class Game:
         :return: The game id.
         """
         return self.id
+
+    def get_updated_card_stats(self, idcard: int) -> Dict[str, Union[str, int]]:
+        """
+        Get the updated card stats.
+
+        :param idcard: id of the card.
+        :return: The updated card stats.
+        """
+        return self.__board.get_updated_card_stats(idcard)

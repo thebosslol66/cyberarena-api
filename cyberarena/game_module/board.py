@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional
+from typing import Dict, List, Optional, Union
 
 from .card import AbstractCard, PlayableCharacterCard
 from .settings import settings
@@ -164,3 +164,18 @@ class Board:
         else:
             for card2 in self.__side1:
                 card2.end_turn()
+
+    def get_updated_card_stats(self, idcard: int) -> Dict[str, Union[str, int]]:
+        """
+        Get updated card stats.
+
+        :param idcard: Id of the card to get the stats from.
+        :return: The updated stats.
+        """
+        for card in self.__side1:
+            if card.id == idcard:
+                return card.to_dict()
+        for card2 in self.__side2:
+            if card2.id == idcard:
+                return card2.to_dict()
+        return {}

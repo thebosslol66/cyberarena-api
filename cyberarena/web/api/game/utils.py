@@ -498,15 +498,27 @@ class WebsocketGameManager(object):
         )
 
         if res == -3:
-            await websocket.send_json({"type": "deploy_card",
-                                       "data": "Card doesn't exist?!"})
+            await websocket.send_json(
+                {
+                    "type": "deploy_card",
+                    "data": "Card doesn't exist?!",
+                },
+            )
             logger.error("Card doesn't exist?!")
         elif res == -2:
-            await websocket.send_json({"type": "deploy_card",
-                                       "data": "Not enough mana"})
+            await websocket.send_json(
+                {
+                    "type": "deploy_card",
+                    "data": "Not enough mana",
+                },
+            )
         elif res == -1:
-            await websocket.send_json({"type": "deploy_card",
-                                       "data": "It's not your turn"})
+            await websocket.send_json(
+                {
+                    "type": "deploy_card",
+                    "data": "It's not your turn",
+                },
+            )
         else:
             await self.game_broadcast(
                 game_id,
@@ -538,7 +550,12 @@ class WebsocketGameManager(object):
             int(data["id_card"]),
             int(data["id_card2"]),
         )
-        await self.update_card_stats(game_id, websocket, int(data["id_card"]), int(data["id_card2"]))
+        await self.update_card_stats(
+            game_id,
+            websocket,
+            int(data["id_card"]),
+            int(data["id_card2"]),
+        )
 
     async def update_card_stats(
         self,
@@ -555,14 +572,25 @@ class WebsocketGameManager(object):
         :param id_card1: The id of the first card
         :param id_card2: The id of the second card
         """
-        card = gamem.game_manager(id_card1)
-        await self.game_broadcast(game_id, {"type": "attack",
-                                            "card1": card.to_dict()}, websocket)  # type: ignore
+        card = gamem.game_manager.get_updated_card_stats(game_id, id_card1)
+        await self.game_broadcast(
+            game_id,
+            {
+                "type": "attack",
+                "card1": card.to_dict(),  # type: ignore
+            },
+            websocket,
+        )
         if id_card2 != -1:
-            card2 = gamem.get_card_from_id(id_card2)
-            await self.game_broadcast(game_id, {"type": "attack",
-                                                "card2": card2.to_dict()}, websocket) # type: ignore
-
+            card2 = gamem.game_manager.get_updated_card_stats(game_id, id_card2)
+            await self.game_broadcast(
+                game_id,
+                {
+                    "type": "attack",
+                    "card2": card2.to_dict(),  # type: ignore
+                },
+                websocket,
+            )
 
     async def get_mana(self, game_id: int, websocket: WebSocket) -> None:
         """
