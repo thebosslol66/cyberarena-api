@@ -26,6 +26,7 @@ class AbstractCard(metaclass=abc.ABCMeta):
         :raises ValueError: If the name is negative or if the cost is negative.
         """
         self._name: str = name
+        self.id_pic: int = -1
         self._description: str = description
         self._cost: int = cost
         self._rarity: ObjectCardRarity = rarity

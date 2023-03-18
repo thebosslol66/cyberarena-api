@@ -27,7 +27,6 @@ class PlayableCharacterCard(AbstractCharacterCard):
         ap: int,
         dp: int = 0,
         description: str = "",
-        id_pic: int = -1,
         rarity: ObjectCardRarity = ObjectCardRarity.COMMON,
         race: ObjectCardRace = ObjectCardRace.HUMAN,
     ) -> None:
@@ -40,7 +39,6 @@ class PlayableCharacterCard(AbstractCharacterCard):
         :param ap: Attack points of the card.  # noqa: DAR003
         :param dp: Defense points of the card.
         :param description: Description of the card.
-        :param id_pic: ID of the picture of the card.
         :param rarity: Rarity of the card.
         :param race: Race of the card.
         :raise ValueError: If the cost, hp, ap or dp is negative.
@@ -56,7 +54,6 @@ class PlayableCharacterCard(AbstractCharacterCard):
             rarity=rarity,
             race=race,
         )
-        self.id_pic = id_pic
 
     def __str__(self) -> str:
         """
