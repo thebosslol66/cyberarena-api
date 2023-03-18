@@ -135,6 +135,7 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
         self._hp: int = hp
         self._ap: int = ap
         self._dp: int = dp
+        self.already_attacked = False
         self._race: ObjectCardRace = race
         valuer_error: str = ""
         if self._hp < 0:
@@ -223,6 +224,7 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
         It is usefull to remove effects or kill a car if it can live only for a number
             of turn.
         """
+        self.already_attacked = False
 
     def attack_card(self, card: "AbstractCharacterCard") -> None:
         """
@@ -230,7 +232,9 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
 
         :param card: The card to attack.
         """
+        self.already_attacked = True
         card._receive_damage(self.ap)
+        self._receive_damage(card.ap)
 
     def _receive_damage(self, damage: int) -> None:
         """

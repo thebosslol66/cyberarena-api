@@ -586,7 +586,6 @@ class WebsocketGameManager(object):
             websocket,
         )
 
-
     async def get_mana(self, game_id: int, websocket: WebSocket) -> None:
         """
         Get the mana of the player.

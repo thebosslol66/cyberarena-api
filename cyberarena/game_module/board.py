@@ -62,12 +62,20 @@ class Board:
         :param cardrecv: Card receiving the attack.
         :param side: Side of the board of the card recving damage.
         """
+        if cardatt.already_attacked:
+            logger.error("already attacked this turn")
+            return
         cardatt.attack_card(cardrecv)
         if not cardrecv.is_alive():
             if side == 1:
                 self.__side1.remove(cardrecv)
             else:
                 self.__side2.remove(cardrecv)
+        if not cardatt.is_alive():
+            if side == 1:
+                self.__side1.remove(cardatt)
+            else:
+                self.__side2.remove(cardatt)
 
     def attack_nexus(self, idatt: int, side: int) -> None:
         """
