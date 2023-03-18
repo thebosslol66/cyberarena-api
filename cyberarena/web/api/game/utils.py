@@ -538,7 +538,7 @@ class WebsocketGameManager(object):
             int(data["id_card"]),
             int(data["id_card2"]),
         )
-        await self.game_broadcast(game_id, {"type": "attack", "data": "data"}, None, 1)
+        await self.update_card_stats(game_id, websocket, int(data["id_card"]), int(data["id_card2"]))
 
     async def update_card_stats(
         self,
@@ -555,11 +555,14 @@ class WebsocketGameManager(object):
         :param id_card1: The id of the first card
         :param id_card2: The id of the second card
         """
-        card = gamem.get_card_from_id(id_card1)
-        await self.game_broadcast(game_id, card.to_dict())  # type: ignore
+        card = gamem.game_manager(id_card1)
+        await self.game_broadcast(game_id, {"type": "attack",
+                                            "card1": card.to_dict()}, websocket)  # type: ignore
         if id_card2 != -1:
             card2 = gamem.get_card_from_id(id_card2)
-            await self.game_broadcast(game_id, card2.to_dict())  # type: ignore
+            await self.game_broadcast(game_id, {"type": "attack",
+                                                "card2": card2.to_dict()}, websocket) # type: ignore
+
 
     async def get_mana(self, game_id: int, websocket: WebSocket) -> None:
         """
