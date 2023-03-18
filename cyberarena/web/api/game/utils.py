@@ -569,8 +569,11 @@ class WebsocketGameManager(object):
             game_id,
             self.__websocket_to_player[websocket],
         )
-        mana_max = gamem.game_manager.get_mana_max()
-
+        mana_max = gamem.game_manager.get_mana_max(
+            game_id,
+            self.__websocket_to_player[websocket],
+        )
+        logger.error("get mana")
         await self.game_broadcast(
             game_id,
             {
