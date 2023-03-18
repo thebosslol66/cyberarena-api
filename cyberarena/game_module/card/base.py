@@ -231,6 +231,7 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
         :param card: The card to attack.
         """
         card._receive_damage(self.ap)
+        self._receive_damage(card.ap)
 
     def _receive_damage(self, damage: int) -> None:
         """
