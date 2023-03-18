@@ -42,12 +42,8 @@ class Player:
 
         :return: The card drawn.
         """
-        logger.debug("draw card id = ")
-        logger.debug(self.idcardcurr)
         card = self.__hand.get_random_card(self.idcardcurr)
         self.idcardcurr += 1
-        if card is None:
-            logger.error("no card player")
         return card
 
     def use_card(self, card: AbstractCard) -> Optional[AbstractCard]:
@@ -60,9 +56,7 @@ class Player:
         res: AbstractCard = self.__hand.use_card(card, self.mana)
         if res.cost != 0:
             self.mana -= res.cost
-            logger.error("Card used")
             return res
-        logger.error("Card not used")
         return None
 
     def use_card_debug(self, index: int) -> Optional[AbstractCard]:
@@ -75,9 +69,7 @@ class Player:
         res: AbstractCard = self.__hand.use_card_debug(index, self.mana)
         if res.cost != 0:
             self.mana -= res.cost
-            logger.error("Card used")
             return res
-        logger.error("Card not used")
         return None
 
     def get_card_from_hand_id(self, idcard: int) -> Optional[AbstractCard]:
@@ -144,7 +136,5 @@ class Player:
 
     def display_hand(self) -> None:
         """Display the hand."""
-        logger.error("Hand of player " + self.name)
-        logger.error("size of hand : ", len(self.__hand.get_hand()))
         for i in range(0, len(self.__hand)):
             logger.error(self.__hand.get_hand()[i].to_dict())

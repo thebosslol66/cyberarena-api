@@ -218,14 +218,7 @@ class Game:
         :param player: Player to check.
         :return: The turn.
         """
-        logger.error("turn = ")
-        logger.error(self.turn)
-        if player == self.player1:
-            logger.error("player1")
-        else:
-            logger.error("player2")
         if self.turn % 2 == 0:
-            logger.error("turn % 2 == 0")
             return player == self.player1
         return player == self.player2
 
@@ -233,9 +226,11 @@ class Game:
         """Debug increase turn."""
         player = 2 if self.turn % 2 == 0 else 1
         if player == 1:
-            self.player1.next_turn()
+            if self.turn != 1:
+                self.player1.next_turn()
         else:
             self.player2.next_turn()
+
         self.turn += 1
         self.__board.end_turn(player)
 
