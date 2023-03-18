@@ -574,17 +574,48 @@ class WebsocketGameManager(object):
         """
         card = gamem.game_manager.get_updated_card_stats(game_id, id_card1)
         card2 = gamem.game_manager.get_updated_card_stats(game_id, id_card2)
-        logger.error(card)
-        logger.error(card2)
-        await self.game_broadcast(
-            game_id,
-            {
-                "type": "attack",
-                "card1": card,  # type: ignore
-                "card2": card2,  # type: ignore
-            },
-            websocket,
-        )
+
+        if not card:
+            await self.game_broadcast(
+                game_id,
+                {
+                    "type": "attack",
+                    "card1": id_card1,  # type: ignore
+                    "card2": card2,  # type: ignore
+                },
+                websocket,
+            )
+        elif not card2:
+            await self.game_broadcast(
+                game_id,
+                {
+                    "type": "attack",
+                    "card1": card,  # type: ignore
+                    "card2": id_card2,  # type: ignore
+                },
+                websocket,
+            )
+        elif not card and not card2:
+            await self.game_broadcast(
+                game_id,
+                {
+                    "type": "attack",
+                    "card1": id_card1,  # type: ignore
+                    "card2": id_card2,  # type: ignore
+                },
+                websocket,
+            )
+        else:
+            await self.game_broadcast(
+                game_id,
+                {
+                    "type": "attack",
+                    "card1": card,  # type: ignore
+                    "card2": card2,  # type: ignore
+                },
+                websocket,
+            )
+
 
     async def get_mana(self, game_id: int, websocket: WebSocket) -> None:
         """
