@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional
+from typing import Dict, List, Optional, Union
 
 from .card import AbstractCard, PlayableCharacterCard
 from .settings import settings
@@ -62,12 +62,20 @@ class Board:
         :param cardrecv: Card receiving the attack.
         :param side: Side of the board of the card recving damage.
         """
+        if cardatt.already_attacked:
+            logger.error("already attacked this turn")
+            return
         cardatt.attack_card(cardrecv)
         if not cardrecv.is_alive():
             if side == 1:
                 self.__side1.remove(cardrecv)
             else:
                 self.__side2.remove(cardrecv)
+        if not cardatt.is_alive():
+            if side == 1:
+                self.__side1.remove(cardatt)
+            else:
+                self.__side2.remove(cardatt)
 
     def attack_nexus(self, idatt: int, side: int) -> None:
         """
@@ -164,3 +172,18 @@ class Board:
         else:
             for card2 in self.__side1:
                 card2.end_turn()
+
+    def get_updated_card_stats(self, idcard: int) -> Dict[str, Union[str, int]]:
+        """
+        Get updated card stats.
+
+        :param idcard: Id of the card to get the stats from.
+        :return: The updated stats.
+        """
+        for card in self.__side1:
+            if card.id == idcard:
+                return card.to_dict()
+        for card2 in self.__side2:
+            if card2.id == idcard:
+                return card2.to_dict()
+        return {}

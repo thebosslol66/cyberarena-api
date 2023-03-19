@@ -7,6 +7,7 @@ from typing import List, Optional
 from loguru import logger
 
 from .card import AbstractCard, PlayableCharacterCard
+from .card.library import Library
 from .card.playable_character import from_dict
 from .settings import settings
 
@@ -57,20 +58,23 @@ class Deck(object):
         """
         return len(self.__deck)
 
-    def __init_deck(self, test: bool = False) -> None:
+    def __init_deck(self, test: bool = False) -> None:  # noqa: C901
         """
         Initialize the deck.
 
         :param test: True if the deck is in test mode, False otherwise.
         """
         if test:
-            logger.error("Deck is in test mode")
-            card = PlayableCharacterCard("Bane", 7, 4, 5, 2, "", 11)
-            self.__deck.append(card)
-            card1 = PlayableCharacterCard("Bane", 7, 4, 5, 2, "", 11)
-            self.__deck.append(card1)
-            self.__deck.append(PlayableCharacterCard("Lisa", 7, 4, 5, 2, "", 4))
-            return
+            library = Library()
+            for i in range(0, 13):
+                card = library[i]
+                card.id = -1
+                card.id_pic = i
+                self.__deck.append(card)
+                card2 = library[i]
+                card2.id = -1
+                card2.id_pic = i
+                self.__deck.append(card2)
 
         # Le chemin du répertoire contenant les fichiers json
         path = settings.card_path

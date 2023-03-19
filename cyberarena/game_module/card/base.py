@@ -26,6 +26,7 @@ class AbstractCard(metaclass=abc.ABCMeta):
         :raises ValueError: If the name is negative or if the cost is negative.
         """
         self._name: str = name
+        self.id_pic: int = -1
         self._description: str = description
         self._cost: int = cost
         self._rarity: ObjectCardRarity = rarity
@@ -135,6 +136,7 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
         self._hp: int = hp
         self._ap: int = ap
         self._dp: int = dp
+        self.already_attacked = False
         self._race: ObjectCardRace = race
         valuer_error: str = ""
         if self._hp < 0:
@@ -223,6 +225,7 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
         It is usefull to remove effects or kill a car if it can live only for a number
             of turn.
         """
+        self.already_attacked = False
 
     def attack_card(self, card: "AbstractCharacterCard") -> None:
         """
@@ -230,7 +233,9 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
 
         :param card: The card to attack.
         """
+        self.already_attacked = True
         card._receive_damage(self.ap)
+        self._receive_damage(card.ap)
 
     def _receive_damage(self, damage: int) -> None:
         """

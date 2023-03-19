@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Dict, List, Optional, Union
 
 from loguru import logger
 
@@ -293,13 +293,38 @@ class GameManager:
                 return game.player2.get_mana()
         return -1
 
-    def get_mana_max(self) -> int:
+    def get_mana_max(self, idgame: int, idplayer: int) -> int:
         """
         Get the max mana.
 
+        :param idgame: Id of the game.
+        :param idplayer: Id of the player.
         :return: The max mana.
         """
-        return settings.mana_max
+        game = self.find_game(idgame)
+        if game:
+            if game.player1.id == idplayer:
+                return game.player1.mana_max_turn
+            if game.player2.id == idplayer:
+                return game.player2.mana_max_turn
+        return -1
+
+    def get_updated_card_stats(
+        self,
+        idgame: int,
+        idcard: int,
+    ) -> Dict[str, Union[str, int]]:
+        """
+        Get the updated stats of a card.
+
+        :param idgame: Id of the game.
+        :param idcard: Id of the card.
+        :return: The updated stats of the card.
+        """
+        game = self.find_game(idgame)
+        if game:
+            return game.get_updated_card_stats(idcard)
+        return {}
 
 
 game_manager = GameManager()
