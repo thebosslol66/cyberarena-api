@@ -2,8 +2,16 @@
 import pytest
 from loguru import logger
 
+from cyberarena.game_module.card import LibraryCard
 from cyberarena.game_module.deck import Deck
 from cyberarena.game_module.game_manager import GameManager
+from cyberarena.game_module.settings import settings
+
+LibraryCard(
+    settings.card_path,
+    settings.card_data_filename,
+    settings.card_image_filename,
+)
 
 
 @pytest.mark.anyio
