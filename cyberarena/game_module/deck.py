@@ -64,8 +64,9 @@ class Deck(object):
 
         :param test: True if the deck is in test mode, False otherwise.
         """
+        library = Library()
         if test:
-            library = Library()
+
             for i in range(0, 13):
                 card = library[i]
                 card.id = -1
@@ -75,7 +76,18 @@ class Deck(object):
                 card2.id = -1
                 card2.id_pic = i
                 self.__deck.append(card2)
-
+            return
+        for i in range(0, 13):
+            card = library[i]
+            card.id = -1
+            card.id_pic = i
+            self.__deck.append(card)
+            card2 = library[i]
+            card2.id = -1
+            card2.id_pic = i
+            self.__deck.append(card2)
+        random.shuffle(self.__deck)
+        return
         # Le chemin du répertoire contenant les fichiers json
         path = settings.card_path
 
