@@ -11,3 +11,24 @@ services:
     environment:
       # Enables autoreload.
       CYBERARENA_RELOAD: "True"
+
+  app:
+    build:
+      context: .
+      dockerfile: ./deploy/frontend/Dockerfile.react.dev
+    volumes:
+      # Adds current directory as volume
+    - ./frontend:/frontend
+    image: app:alpha-cyberarena
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile.nginx.dev
+    image: nginx:alpha-cyberarena
+    ports:
+      # Exposes nginx port.
+    - "80:80"
+    depends_on:
+      # Waits for api to be ready.
+    - api

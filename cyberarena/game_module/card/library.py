@@ -99,7 +99,7 @@ class Library(object):
 
     def __getitem__(self, key: int) -> AbstractCard:
         """
-        Get a card by his name.
+        Get a card by his ID.
 
         :param key: The name of the card.
         :raises LibraryCardNotFoundError: If the card is not in the library.
