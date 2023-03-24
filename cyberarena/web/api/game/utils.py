@@ -575,7 +575,7 @@ class WebsocketGameManager(object):
         card = gamem.game_manager.get_updated_card_stats(game_id, id_card1)
         card2 = gamem.game_manager.get_updated_card_stats(game_id, id_card2)
 
-        if not card:
+        if not card and card2:
             await self.game_broadcast(
                 game_id,
                 {
@@ -585,7 +585,7 @@ class WebsocketGameManager(object):
                 },
                 websocket,
             )
-        elif not card2:
+        elif not card2 and card:
             await self.game_broadcast(
                 game_id,
                 {

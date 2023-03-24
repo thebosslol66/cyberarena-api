@@ -1,6 +1,8 @@
 import abc
 from typing import Dict, Union
 
+from loguru import logger
+
 from cyberarena.game_module.card.enums import ObjectCardRace, ObjectCardRarity
 
 
@@ -243,5 +245,10 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
 
         :param damage: The damage to receive.
         """
+        logger.error(self.name)
+        logger.error("Receive damage")
+        logger.error(damage)
+        logger.error(self.hp)
+        logger.error(self.dp)
         if damage > self.dp:
             self._hp -= damage - self.dp
