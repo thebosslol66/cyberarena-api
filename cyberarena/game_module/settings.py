@@ -12,9 +12,9 @@ class Settings(BaseSettings):
     starting_cards_in_deck: int = 3
     deck_size: int = 12
     board_size: int = 5
-    nexus_health: int = 100
+    nexus_health: int = 50
     mana_initial: int = 5
-    mana_max: int = 25
+    mana_max: int = 30
     mana_increase_turn: int = 2
 
     card_image_path: str = "cyberarena/static/img/cards"

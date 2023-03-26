@@ -27,6 +27,7 @@ class PlayableCharacterCard(AbstractCharacterCard):
         ap: int,
         dp: int = 0,
         description: str = "",
+        id_pic: int = -1,
         rarity: ObjectCardRarity = ObjectCardRarity.COMMON,
         race: ObjectCardRace = ObjectCardRace.HUMAN,
     ) -> None:
@@ -54,6 +55,7 @@ class PlayableCharacterCard(AbstractCharacterCard):
             rarity=rarity,
             race=race,
         )
+        self.id_pic = id_pic
 
     def __str__(self) -> str:
         """

@@ -1,7 +1,7 @@
 {
   "id": 2,
   "name": "T-800",
-  "description": "A long description for the lore... #NotImplemented",
+  "description": "T-800 is a legendary robot",
   "ap": 5,
   "dp": 3,
   "hp": 5,

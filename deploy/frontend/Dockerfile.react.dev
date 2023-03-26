@@ -3,5 +3,5 @@ FROM node:16-alpine
 COPY ./frontend /frontend
 WORKDIR /frontend
 RUN npm install --force
-
-CMD ["npm", "run", "start"]
+RUN npm install @craco/craco --force
+CMD ["npx", "craco", "start"]

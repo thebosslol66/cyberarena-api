@@ -164,15 +164,18 @@ class Game:
         :param player: Player attacking the nexus.
         :param idatt: Card attacking.
         """
+        logger.error("attack_nexus")
+        logger.error ("player : %s", player)
+        logger.error ("idatt : %s", idatt)
         if not self.check_turn(player):
-            logger.debug("It's not your turn!")
+            logger.error("It's not your turn!")
             return
         if player == self.player1:
             cardatt = self.__board.get_card_id(1, idatt)
         if player == self.player2:
             cardatt = self.__board.get_card_id(2, idatt)
         if cardatt is None:
-            logger.debug("cardatt doesnt exist")
+            logger.error("cardatt doesnt exist")
             return
         if player == self.player1:
             self.__board.attack_nexus(idatt, 2)

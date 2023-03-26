@@ -84,15 +84,28 @@ class Board:
         :param idatt: Id of the card attacking.
         :param side: Side of the board of the nexus receving damage.
         """
+        logger.error('attack_nexusf')
+
+
         if side == 2:
             for card in self.__side1:
                 if card.id == idatt:
+                    if card.already_attacked:
+                        logger.error("already attacked this turn")
+                        return
                     self.__nexus2 -= card.ap
+                    card.already_attacked = True
+                    logger.error("nexus1 attacké")
                     return
         else:
             for card2 in self.__side2:
                 if card2.id == idatt:
+                    if card2.already_attacked:
+                        logger.error("already attacked this turn")
+                        return
                     self.__nexus1 -= card2.ap
+                    card2.already_attacked = True
+                    logger.error("nexus2 attacké")
                     return
 
     def get_nexus_health(self, side: int) -> int:
