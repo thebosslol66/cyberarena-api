@@ -1,9 +1,0 @@
-FROM node:16-alpine
-
-COPY ./frontend /frontend
-WORKDIR /frontend
-ENV PATH /frontend/node_modules/.bin:$PATH
-RUN cd /frontend
-RUN npm i --force
-
-CMD ["npm", "run", "start"]
