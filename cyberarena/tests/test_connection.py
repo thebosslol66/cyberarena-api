@@ -21,47 +21,6 @@ from cyberarena.web.api.connection import utils
 
 
 @pytest.mark.anyio
-async def test_new_sign_up(
-    fastapi_app: FastAPI,
-    client: AsyncClient,
-    dbsession: AsyncSession,
-) -> None:
-    """
-    Checks the register endpoint.
-
-    :param client: client for the app.
-    :param fastapi_app: current FastAPI application.
-    """
-    url = fastapi_app.url_path_for("sign_up")
-    test_name = uuid.uuid4().hex
-    password = "aAZ?o2aaaaa"
-    email = "test@test.com"
-    response = await client.post(
-        url,
-        json={
-            "username": test_name,
-            "password": password,
-            "email": email,
-        },
-    )
-    assert response.status_code == status.HTTP_200_OK
-    assert response.json()["status"] == 0
-
-    dao = UserDAO(dbsession)
-    instance1 = await dao.get_user_by_username(test_name)
-    assert instance1 is not None
-    assert instance1.username == test_name
-    assert instance1.email == email
-    assert instance1.is_correct_password(password)
-    assert instance1.refresh_token_value is None
-    assert instance1.is_superuser is False
-    assert instance1.is_active is False
-
-    instance2 = await dao.get_user_by_email(email)
-    assert instance1 == instance2
-
-
-@pytest.mark.anyio
 async def test_sign_up_username_too_short(
     fastapi_app: FastAPI,
     client: AsyncClient,

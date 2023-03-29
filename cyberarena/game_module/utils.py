@@ -2,6 +2,7 @@ import os
 
 from .card import AbstractCard, LibraryCard
 from .card.library import Library
+from .deck import Deck
 from .image_card_generator import (
     ImageCardGenerator,
     is_data_or_image_newer_than_builded_card,
@@ -54,7 +55,7 @@ def update_card_image(card_id: int) -> None:
     )
     builded_card_filename = os.path.join(
         settings.card_image_path,
-        "{0}_static.png".format(card_id),
+        settings.static_image.format(card_id),
     )
     if is_data_or_image_newer_than_builded_card(  # noqa: WPS337
         data_file_path,
@@ -92,7 +93,7 @@ def setup_card_images() -> None:  # noqa: WPS210
         )
         builded_card_filename = os.path.join(
             settings.card_image_path,
-            "{0}_static.png".format(card_id),
+            settings.static_image.format(card_id),
         )
         if os.path.exists(builded_card_filename):
             continue
@@ -116,3 +117,21 @@ def setup_game_module() -> None:
     """
     setup_library()
     setup_card_images()
+
+
+def create_deck() -> Deck:
+    """
+    Create a deck.
+
+    :return: The deck created.
+    """
+    return Deck()
+
+
+def get_starting_cards_amount() -> int:
+    """
+    Get the amount of cards in a deck.
+
+    :return: The amount of cards in a deck.
+    """
+    return settings.starting_cards_in_deck

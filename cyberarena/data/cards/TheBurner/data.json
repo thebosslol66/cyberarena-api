@@ -1,7 +1,7 @@
 {
   "id": 5,
   "name": "The Burner",
-  "description": "The attacked card burn and lose 2 health points durin the next turn.",
+  "description": "Burns everything in his path. He's a bit of a pyromaniac.",
   "ap": 2,
   "dp": 2,
   "hp": 3,

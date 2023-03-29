@@ -1,4 +1,7 @@
 import abc
+from typing import Dict, Union
+
+from loguru import logger
 
 from cyberarena.game_module.card.enums import ObjectCardRace, ObjectCardRarity
 
@@ -93,6 +96,10 @@ class AbstractCard(metaclass=abc.ABCMeta):
         """
         return self._rarity
 
+    @abc.abstractmethod
+    def to_dict(self) -> Dict[str, Union[str, int]]:
+        """Getter for json of the card."""
+
 
 class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
     """class AbstractCharacterCard."""
@@ -130,6 +137,7 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
         self._hp: int = hp
         self._ap: int = ap
         self._dp: int = dp
+        self.already_attacked = False
         self._race: ObjectCardRace = race
         valuer_error: str = ""
         if self._hp < 0:
@@ -218,6 +226,7 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
         It is usefull to remove effects or kill a car if it can live only for a number
             of turn.
         """
+        self.already_attacked = False
 
     def attack_card(self, card: "AbstractCharacterCard") -> None:
         """
@@ -225,7 +234,9 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
 
         :param card: The card to attack.
         """
+        self.already_attacked = True
         card._receive_damage(self.ap)
+        self._receive_damage(card.ap)
 
     def _receive_damage(self, damage: int) -> None:
         """
@@ -233,5 +244,10 @@ class AbstractCharacterCard(AbstractCard, metaclass=abc.ABCMeta):
 
         :param damage: The damage to receive.
         """
+        logger.error(self.name)
+        logger.error("Receive damage")
+        logger.error(damage)
+        logger.error(self.hp)
+        logger.error(self.dp)
         if damage > self.dp:
             self._hp -= damage - self.dp

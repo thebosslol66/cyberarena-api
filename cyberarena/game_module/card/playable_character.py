@@ -1,5 +1,19 @@
+import typing
+
 from .base import AbstractCharacterCard
 from .enums import ObjectCardRace, ObjectCardRarity
+
+
+def from_dict(
+    data: typing.Dict[str, typing.Union[str, int]],
+) -> "PlayableCharacterCard":
+    """
+    Create a card from a dict.
+
+    :param data: Dict containing the data.
+    :return: Card created.
+    """
+    return PlayableCharacterCard(**data)  # type: ignore
 
 
 class PlayableCharacterCard(AbstractCharacterCard):
@@ -13,6 +27,7 @@ class PlayableCharacterCard(AbstractCharacterCard):
         ap: int,
         dp: int = 0,
         description: str = "",
+        id_pic: int = -1,
         rarity: ObjectCardRarity = ObjectCardRarity.COMMON,
         race: ObjectCardRace = ObjectCardRace.HUMAN,
     ) -> None:
@@ -27,6 +42,7 @@ class PlayableCharacterCard(AbstractCharacterCard):
         :param description: Description of the card.
         :param rarity: Rarity of the card.
         :param race: Race of the card.
+        :param id_pic: Id of the picture of the card.
         :raise ValueError: If the cost, hp, ap or dp is negative.
 
         """
@@ -40,6 +56,7 @@ class PlayableCharacterCard(AbstractCharacterCard):
             rarity=rarity,
             race=race,
         )
+        self.id_pic = id_pic
 
     def __str__(self) -> str:
         """
@@ -67,3 +84,21 @@ class PlayableCharacterCard(AbstractCharacterCard):
             repr(super())[:-1],
             self.cost,
         )
+
+    def to_dict(self) -> typing.Dict[str, typing.Union[str, int]]:
+        """
+        Return a dictionary representation of the card.
+
+        :return: A dict representaiton of the card
+        """
+        return {
+            "id": self.id,
+            "id_pic": self.id_pic,
+            "name": self.name,
+            "description": self.description,
+            "cost": self.cost,
+            "damage": self.ap,
+            "health": self.hp,
+            "defense": self.dp,
+            "rarity": self.rarity,
+        }

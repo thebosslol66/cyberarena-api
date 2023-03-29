@@ -174,6 +174,18 @@ class ImageCardGeneratorResources(object):
     )
     DESCRIPTION_PADDING = 25
 
+    DIAMOND_POSITION = (
+        50,
+        20,
+    )
+    DIAMOND_GRAD = [(0, (255, 255, 255)), (0.5, (255, 204, 204)), (1, (255, 51, 51))]
+    COST_SYMBOL_SIZE = 70
+    DIAMOND_COST_SYMBOL = Image.new(
+        "RGBA",
+        (COST_SYMBOL_SIZE, COST_SYMBOL_SIZE),
+        (255, 255, 255, 0),
+    )
+
     RARITY_SYMBOL_SIZE = 50
     RARITY_SYMBOL_BORDER_WIDTH = 2
     RARITY_SYMBOL_BORDER_COLOR = (0, 0, 0)
@@ -363,6 +375,69 @@ class ImageCardGeneratorResources(object):
             width=self.RARITY_SYMBOL_BORDER_WIDTH,
         )
 
+        draw = ImageDraw.Draw(self.DIAMOND_COST_SYMBOL)
+        # fill color 1
+        draw.polygon(
+            (
+                (self.COST_SYMBOL_SIZE / 4, 0),
+                (0, self.COST_SYMBOL_SIZE / 3),
+                (self.COST_SYMBOL_SIZE / 5, self.COST_SYMBOL_SIZE / 3),
+                (self.COST_SYMBOL_SIZE / 3, 0),
+            ),
+            fill=(255, 255, 255, 255),
+        )
+        # fill color 2
+        draw.polygon(
+            (
+                (self.COST_SYMBOL_SIZE / 5, self.COST_SYMBOL_SIZE / 3),
+                (0, self.COST_SYMBOL_SIZE / 3),
+                (self.COST_SYMBOL_SIZE / 2, self.COST_SYMBOL_SIZE),
+                (self.COST_SYMBOL_SIZE / 5, self.COST_SYMBOL_SIZE / 3),
+                (self.COST_SYMBOL_SIZE * 4 / 5, self.COST_SYMBOL_SIZE / 3),
+                (self.COST_SYMBOL_SIZE * 2 / 3, 0),
+                (self.COST_SYMBOL_SIZE / 3, 0),
+                (self.COST_SYMBOL_SIZE / 5, self.COST_SYMBOL_SIZE / 3),
+            ),
+            fill=(1, 255, 255, 255),
+        )
+        # fill color 3
+        draw.polygon(
+            (
+                (self.COST_SYMBOL_SIZE * 4 / 5, self.COST_SYMBOL_SIZE / 3),
+                (self.COST_SYMBOL_SIZE * 2 / 3, 0),
+                (self.COST_SYMBOL_SIZE * 3 / 4, 0),
+                (self.COST_SYMBOL_SIZE, self.COST_SYMBOL_SIZE / 3),
+                (self.COST_SYMBOL_SIZE * 4 / 5, self.COST_SYMBOL_SIZE / 3),
+                (self.COST_SYMBOL_SIZE / 5, self.COST_SYMBOL_SIZE / 3),
+                (self.COST_SYMBOL_SIZE / 2, self.COST_SYMBOL_SIZE),
+                (self.COST_SYMBOL_SIZE * 4 / 5, self.COST_SYMBOL_SIZE / 3),
+            ),
+            fill=(0, 192, 193, 255),
+        )
+        # fill color 4
+        draw.polygon(
+            (
+                (self.COST_SYMBOL_SIZE * 4 / 5, self.COST_SYMBOL_SIZE / 3),
+                (self.COST_SYMBOL_SIZE / 2, self.COST_SYMBOL_SIZE),
+                (self.COST_SYMBOL_SIZE, self.COST_SYMBOL_SIZE / 3),
+                (self.COST_SYMBOL_SIZE * 4 / 5, self.COST_SYMBOL_SIZE / 3),
+            ),
+            fill=(0, 150, 149, 255),
+        )
+
+        draw.polygon(
+            (
+                (self.COST_SYMBOL_SIZE / 2, self.COST_SYMBOL_SIZE),
+                (self.COST_SYMBOL_SIZE, self.COST_SYMBOL_SIZE / 3),
+                (self.COST_SYMBOL_SIZE * 3 / 4, 0),
+                (self.COST_SYMBOL_SIZE / 4, 0),
+                (0, self.COST_SYMBOL_SIZE / 3),
+                (self.COST_SYMBOL_SIZE / 2, self.COST_SYMBOL_SIZE),
+            ),
+            outline=self.RARITY_SYMBOL_BORDER_COLOR,
+            width=self.RARITY_SYMBOL_BORDER_WIDTH,
+        )
+
     @property
     def output_folder(self) -> str:
         """
@@ -531,6 +606,7 @@ class ImageCardGenerator(object):
             self._place_stats()
         self._place_card_description()
         self._place_card_rarity()
+        self._place_card_cost()
         return self._image
 
     def save_image(self, filename: str) -> None:
@@ -575,6 +651,7 @@ class ImageCardGenerator(object):
         path = os.path.join(ImageCardGenerator.resources.output_folder, filename)
         base_image = self._image.copy()
         self._place_stats_value()  # Only place if it is a character card
+        self._write_card_cost()
         self._image.save(path)
         self._image = base_image
         logger.info(f"Image with stats saved at {path}")
@@ -871,4 +948,35 @@ class ImageCardGenerator(object):
             stats_background,
             self.resources.STATS_POSITION,
             stats_background,
+        )
+
+    def _place_card_cost(self) -> None:
+        """Place the cost of the card on the image."""
+        cost_background = self.resources.DIAMOND_COST_SYMBOL.copy()
+        self._image.paste(
+            cost_background,
+            self.resources.DIAMOND_POSITION,
+            cost_background,
+        )
+
+    def _write_card_cost(self) -> None:
+        """Write the cost of the card on the image."""
+        draw = ImageDraw.Draw(self._image)
+        # Draw the text
+        font = self.resources.BIG_TEXT_FONT
+        _, _, w, h = draw.textbbox((0, 0), str(self._card.cost), font=font)
+        draw.text(
+            (
+                self.resources.DIAMOND_POSITION[0]
+                + int(self.resources.COST_SYMBOL_SIZE / 2)
+                - w / 2,
+                self.resources.DIAMOND_POSITION[1]
+                + int(self.resources.COST_SYMBOL_SIZE / 2)
+                - h / 2,
+            ),
+            str(self._card.cost),
+            font=font,
+            fill=self.resources.TEXT_COLOR,
+            stroke_width=self.resources.BIG_TEXT_STROKE_WIDTH,
+            stroke_fill=self.resources.TEXT_STROKE_COLOR,
         )

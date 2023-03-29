@@ -9,8 +9,13 @@ class Settings(BaseSettings):
     with environment variables.
     """
 
-    deck_size: int = 20
+    starting_cards_in_deck: int = 3
+    deck_size: int = 12
     board_size: int = 5
+    nexus_health: int = 10
+    mana_initial: int = 5
+    mana_max: int = 30
+    mana_increase_turn: int = 2
 
     card_image_path: str = "cyberarena/static/img/cards"
     static_image: str = "{0}_static.png"

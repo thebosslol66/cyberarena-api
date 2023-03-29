@@ -1,13 +1,19 @@
-import uuid
-
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.websockets import WebSocket
+from loguru import logger
 from starlette import status
 from starlette.responses import FileResponse
 
 from cyberarena.db.models.user_model import UserModel
 from cyberarena.web.api.connection.utils import get_current_user
 from cyberarena.web.api.game.schema import CardModel, TicketModel, TicketStatus
-from cyberarena.web.api.game.utils import get_card_data, get_card_path, ticket_manager
+from cyberarena.web.api.game.utils import (
+    get_card_data,
+    get_card_path,
+    get_game_id,
+    ticket_manager,
+    websocket_manager,
+)
 
 ticket_router = APIRouter()
 router = APIRouter()
@@ -53,9 +59,9 @@ async def open_ticket(
             detail="You already have an open ticket.",
         )
     # TODO: verify if in game
-    ticket_manager.create_ticket(current_user.id)
+    ticket = ticket_manager.create_ticket(current_user.id)
     return TicketModel(
-        id=uuid.uuid4(),
+        id=ticket.ticket_id,
         status=TicketStatus.OPEN,
     )
 
@@ -113,19 +119,28 @@ async def get_ticket_status(
     :return: The status of the ticket
     :raises HTTPException: If the ticket doesn't exist or is closed
     """
-    ticket_manager.find_match()
+    # in the background
     statu: TicketStatus = ticket_manager.get_ticket_status(ticket_id)
+    logger.error("statu : " + statu)
     if statu == TicketStatus.DONT_EXIST:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Ticket doesn't exist.",
         )
-    if statu == TicketStatus.CLOSED:
-        # TODO: get room id from user id from game manager
-        pass  # noqa: WPS420
+    if statu == TicketStatus.CLOSED and current_user.id:
+        id_game = get_game_id(current_user.id)
+
+    elif statu == TicketStatus.OPEN:
+        id_game = ticket_manager.find_match()
+    else:
+        id_game = -1
+    statu = ticket_manager.get_ticket_status(ticket_id)
+    id_player = current_user.id
     return TicketModel(
         id=ticket_id,
         status=statu,
+        room_id=id_game,
+        player_id=id_player,
     )
 
 
@@ -186,6 +201,29 @@ async def get_card_image_fulfilled(card_id: int) -> FileResponse:
     :return: The image of the card
     """
     return FileResponse(get_card_path(card_id, full_path=True))
+
+
+@router.websocket("/{room_id}/ws/{user_id}")
+async def websocket_endpoint(
+    websocket: WebSocket,
+    room_id: int,
+    user_id: int,
+) -> None:
+    """
+    Connect to a websocket game.
+
+    :param websocket: The websocket
+    :param room_id: The id of the room to connect to
+    :param user_id: The id of the user trying to connect
+    """
+    logger.error("room_id : " + str(room_id))
+    logger.error("user_id : " + str(user_id))
+    await websocket_manager.connect(websocket, room_id, user_id)
+    while True:
+        data = await websocket.receive_json()
+        if data["type"] == "close":
+            break
+        await websocket_manager.receive(websocket, data, room_id, user_id)
 
 
 router.include_router(ticket_router, prefix="/ticket")

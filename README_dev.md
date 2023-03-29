@@ -4,7 +4,24 @@ This project was generated using fastapi_template.
 
 This project is a card game like Hearthstone where you can fight opponents
 
-If you wan to run this project don't forget the front end part.
+## Poetry
+
+This project uses poetry. It's a modern dependency management
+tool.
+
+To run the project use this set of commands:
+
+```bash
+poetry install
+poetry run python -m cyberarena
+```
+
+This will start the server on the configured host.
+
+You can find swagger documentation at `/api/docs`.
+
+You can read more about poetry here: https://python-poetry.org/
+
 ## Docker
 
 You can start the project with docker using this command:
@@ -218,3 +235,33 @@ options:
 ```
 
 If you want to generate the card images use this command. It will automatically refresh cards image when their data file or main image are newer.
+
+
+
+## Déployer en mode dev
+
+Il faut construire les images avec
+```bash
+docker-compose -f deploy/docker-compose.yml -f deploy/docker-compose.dev.yml --project-directory . build
+```
+Puis les lancer avec
+```bash
+docker-compose -f deploy/docker-compose.yml -f deploy/docker-compose.dev.yml --project-directory . up
+```
+
+## Déployer en mode prod
+
+Il faut construire les images avec
+```bash
+docker-compose -f deploy/docker-compose.yml -f deploy/docker-compose.prod.yml --project-directory . build
+```
+Puis les lancer avec
+```bash
+docker-compose -f deploy/docker-compose.yml -f deploy/docker-compose.prod.yml --project-directory . up
+```
+
+## Pour lancer les tests
+
+```bash
+docker-compose -f deploy/docker-compose.yml --project-directory . run --rm api pytest -vv .
+```

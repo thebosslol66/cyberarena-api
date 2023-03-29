@@ -62,6 +62,6 @@ def get_app() -> FastAPI:
         name="static",
     )
 
-    setup_game_module()
+    setup_game_module()  # Generate images
 
     return app

@@ -1,0 +1,12 @@
+{
+  "id": 13,
+  "name": "Ehrmantraut",
+  "description": "The famous old mutant from Breaking Bed",
+  "ap": 7,
+  "dp": 2,
+  "hp": 4,
+  "cost": 7,
+  "race": "mutant",
+  "rarity": "legendary",
+  "card_type": "character"
+}

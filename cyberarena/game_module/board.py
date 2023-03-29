@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional
+from typing import Dict, List, Optional, Union
 
 from .card import AbstractCard, PlayableCharacterCard
 from .settings import settings
@@ -13,7 +13,9 @@ class Board:
     def __init__(self) -> None:
         """Constructor."""
         self.__side1: List[PlayableCharacterCard] = []
+        self.__nexus1: int = settings.nexus_health
         self.__side2: List[PlayableCharacterCard] = []
+        self.__nexus2: int = settings.nexus_health
         self.__boardSize = settings.board_size
 
     def deploy_card(self, card: AbstractCard, side: int) -> None:
@@ -60,12 +62,59 @@ class Board:
         :param cardrecv: Card receiving the attack.
         :param side: Side of the board of the card recving damage.
         """
+        if cardatt.already_attacked:
+            logger.error("already attacked this turn")
+            return
         cardatt.attack_card(cardrecv)
         if not cardrecv.is_alive():
             if side == 1:
                 self.__side1.remove(cardrecv)
             else:
                 self.__side2.remove(cardrecv)
+        if not cardatt.is_alive():
+            if side == 1:
+                self.__side2.remove(cardatt)
+            else:
+                self.__side1.remove(cardatt)
+
+    def attack_nexus(self, idatt: int, side: int) -> None:  # noqa: C901
+        """
+        Attack the nexus.
+
+        :param idatt: Id of the card attacking.
+        :param side: Side of the board of the nexus receving damage.
+        """
+        if side == 2:
+            for card in self.__side1:
+                if card.id == idatt:
+                    if card.already_attacked:
+                        logger.error("already attacked this turn")
+                        return
+                    self.__nexus2 -= card.ap
+                    card.already_attacked = True
+                    logger.error("nexus1 attacké")
+                    return
+        else:
+            for card2 in self.__side2:
+                if card2.id == idatt:
+                    if card2.already_attacked:
+                        logger.error("already attacked this turn")
+                        return
+                    self.__nexus1 -= card2.ap
+                    card2.already_attacked = True
+                    logger.error("nexus2 attacké")
+                    return
+
+    def get_nexus_health(self, side: int) -> int:
+        """
+        Get the health of a nexus.
+
+        :param side: Side of the board of the nexus.
+        :return: The health of the nexus.
+        """
+        if side == 1:
+            return self.__nexus1
+        return self.__nexus2
 
     def get_board_size(self) -> int:
         """
@@ -133,3 +182,18 @@ class Board:
         else:
             for card2 in self.__side1:
                 card2.end_turn()
+
+    def get_updated_card_stats(self, idcard: int) -> Dict[str, Union[str, int]]:
+        """
+        Get updated card stats.
+
+        :param idcard: Id of the card to get the stats from.
+        :return: The updated stats.
+        """
+        for card in self.__side1:
+            if card.id == idcard:
+                return card.to_dict()
+        for card2 in self.__side2:
+            if card2.id == idcard:
+                return card2.to_dict()
+        return {}

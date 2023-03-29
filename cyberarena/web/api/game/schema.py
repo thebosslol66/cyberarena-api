@@ -12,6 +12,7 @@ class TicketModel(BaseModel):
     id: int
     status: TicketStatus
     room_id: Optional[int] = None
+    player_id: Optional[int] = None
 
 
 class CardModel(BaseModel):

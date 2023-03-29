@@ -1,3 +1,5 @@
+import typing
+
 from card import AbstractCard
 
 
@@ -21,3 +23,11 @@ class PlayableObjectCard(AbstractCard):
         :return: A string representation of the card.
         """
         return repr(super())
+
+    def to_dict(self) -> typing.Dict[str, str | int]:
+        """
+        Getter for json of the card.
+
+        :raises NotImplementedError: Your darone is not implemented
+        """
+        raise NotImplementedError()

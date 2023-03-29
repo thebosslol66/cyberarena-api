@@ -1,11 +1,11 @@
 {
   "id": 10,
   "name": "Jube",
-  "description": "",
+  "description": "JULIEN BERNARD HIMSELF",
   "ap": 0,
   "dp": 0,
   "hp": 1,
-  "cost": 0,
+  "cost": 1,
   "race": "human",
   "rarity": "common",
   "card_type": "character"
