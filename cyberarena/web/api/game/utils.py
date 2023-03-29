@@ -407,7 +407,7 @@ class WebsocketGameManager(object):
 
         :param game_id: The id of the game to begin
         """
-        logger.error("begin game")
+        logger.error("begin")
         await self.game_broadcast(game_id, {"type": "begin_game"}, None, 1)
         await self.get_websocket_turn(game_id)
         for _ in range(gamem.get_starting_cards_amount()):
