@@ -165,8 +165,8 @@ class Game:
         :param idatt: Card attacking.
         """
         logger.error("attack_nexus")
-        logger.error ("player : %s", player)
-        logger.error ("idatt : %s", idatt)
+        logger.error("player : %s", player)
+        logger.error("idatt : %s", idatt)
         if not self.check_turn(player):
             logger.error("It's not your turn!")
             return

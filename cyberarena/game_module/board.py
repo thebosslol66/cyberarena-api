@@ -77,16 +77,13 @@ class Board:
             else:
                 self.__side1.remove(cardatt)
 
-    def attack_nexus(self, idatt: int, side: int) -> None:
+    def attack_nexus(self, idatt: int, side: int) -> None:  # noqa: C901
         """
         Attack the nexus.
 
         :param idatt: Id of the card attacking.
         :param side: Side of the board of the nexus receving damage.
         """
-        logger.error('attack_nexusf')
-
-
         if side == 2:
             for card in self.__side1:
                 if card.id == idatt:

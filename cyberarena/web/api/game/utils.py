@@ -397,10 +397,9 @@ class WebsocketGameManager(object):
         elif data["type"] == "get_nexus_health":
             await self.get_nexus_health(room_id, websocket)
         elif data["type"] == "attack_nexus":
-            await self.attack_nexus(room_id, websocket, data["id_card"])
+            await self.attack_nexus(room_id, websocket, data["id_card"])  # type: ignore
         elif data["type"] == "end_game":
-            await self.end_game(room_id, websocket, data["winner"])
-
+            await self.end_game(room_id, websocket, data["winner"])  # type: ignore
 
     async def begin_game(self, game_id: int) -> None:
         """
@@ -691,7 +690,7 @@ class WebsocketGameManager(object):
                 "type": "get_nexus_health",
                 "myhealth": health,  # type: ignore
                 "ennemyhealth": healthopp,  # type: ignore
-                "requester": self.__websocket_to_player[websocket],
+                "requester": self.__websocket_to_player[websocket],  # type: ignore
             },
             websocket,
             0,
@@ -702,13 +701,14 @@ class WebsocketGameManager(object):
         End the game.
 
         :param game_id: The id of the game
+        :param winner: The winner of the game
         :param websocket: The socket of the user
         """
         await self.game_broadcast(
             game_id,
             {
                 "type": "end_game",
-                "winner": winner,
+                "winner": winner,  # type: ignore
             },
             websocket,
             1,

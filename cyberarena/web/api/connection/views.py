@@ -69,7 +69,9 @@ async def sign_up(
             sign_up_data.email,
             sign_up_data.password,
         )
-        user: Optional[UserModel] = await user_dao.get_user_by_username(sign_up_data.username)
+        user: Optional[UserModel] = await user_dao.get_user_by_username(
+            sign_up_data.username,
+        )
         if user is not None and user.id is not None:
             await user_dao.update_active(user.id, active=True)
         response.message = "User created"

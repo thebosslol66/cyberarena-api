@@ -42,6 +42,7 @@ class PlayableCharacterCard(AbstractCharacterCard):
         :param description: Description of the card.
         :param rarity: Rarity of the card.
         :param race: Race of the card.
+        :param id_pic: Id of the picture of the card.
         :raise ValueError: If the cost, hp, ap or dp is negative.
 
         """

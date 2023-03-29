@@ -7,7 +7,6 @@ from typing import List, Optional
 from loguru import logger
 
 from .card import AbstractCard, PlayableCharacterCard
-from .card.library import Library
 from .card.playable_character import from_dict
 from .settings import settings
 
